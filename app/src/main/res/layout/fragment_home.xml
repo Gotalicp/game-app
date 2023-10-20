@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="16dp"
+    tools:context=".HomeFragment">
+
+    <Button
+        android:id="@+id/btnPlay"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Play"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnHost"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Host"
+        android:layout_below="@id/btnPlay"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnLibrary"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Library"
+        android:layout_below="@id/btnHost"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:layout_below="@id/btnLibrary"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+</RelativeLayout>

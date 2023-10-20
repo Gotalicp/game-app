@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_menu"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.game_app.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/HomeToMenu"
+            app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/HomeToLibrary"
+            app:destination="@id/libraryFragment" />
+        <action
+            android:id="@+id/HomeToHost"
+            app:destination="@id/hostFragment" />
+        <action
+            android:id="@+id/HomeToSettings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.example.game_app.MenuFragment"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" />
+    <fragment
+        android:id="@+id/libraryFragment"
+        android:name="com.example.game_app.library.LibraryFragment"
+        android:label="LibraryFragment" />
+    <fragment
+        android:id="@+id/hostFragment"
+        android:name="com.example.game_app.HostFragment"
+        android:label="fragment_host"
+        tools:layout="@layout/fragment_host" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.game_app.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+</navigation>

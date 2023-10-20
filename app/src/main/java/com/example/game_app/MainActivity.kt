@@ -6,18 +6,20 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.example.game_app.login.AuthenticationActivity
 import com.example.game_app.login.ui.login.AuthenticationViewModel
+import com.google.firebase.FirebaseApp
 
 class MainActivity : AppCompatActivity() {
-    private val fireBaseViewModel: AuthenticationViewModel by viewModels()
+    private val authenticationViewModel: AuthenticationViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
-        fireBaseViewModel.logged.observe(this) {
-            if (it == false) {
+        authenticationViewModel.logged.observe(this) {
+            if (!it) {
                 startActivity(Intent(this, AuthenticationActivity::class.java))
                 finish()
             }
+            FirebaseApp.initializeApp(this)
         }
     }
 }
