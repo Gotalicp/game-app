@@ -15,6 +15,12 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.Socket
 
 
 class P2PTestViewModel(application: Application): AndroidViewModel(application)  {
@@ -31,6 +37,12 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
     private lateinit var wifiP2pManager: WifiP2pManager
     private lateinit var channel: WifiP2pManager.Channel
     private lateinit var receiver: BroadcastReceiver
+
+    private var outputStream: OutputStream? = null
+    private var inputStream: InputStream? = null
+    private var clientSocket: Socket? = null
+    private var serverSocket: ServerSocket? = null
+
 
 
     init {
@@ -103,6 +115,65 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
                 }
             }
         }
+    }
+
+
+    fun connectAndSendMessage(message: String) {
+        val info = connectionInfo.value
+
+        if (info != null) {
+            clientSocket = Socket()
+            try {
+                clientSocket?.connect(InetSocketAddress(info.groupOwnerAddress, 8888), 5000)
+
+                outputStream = clientSocket?.getOutputStream()
+
+                outputStream?.write(message.toByteArray())
+                outputStream?.flush()
+
+                Log.d("P2P Message", "Message sent: $message")
+            } catch (e: IOException) {
+                Log.e("P2P Message", "Error sending message: ${e.message}")
+            }
+        }
+    }
+    private fun startServer() {
+        Thread {
+            try {
+                serverSocket = ServerSocket(8888)
+                Log.d("P2P Message", "Server socket started")
+
+                while (true) {
+                    clientSocket = serverSocket?.accept()
+                    Log.d("P2P Message", "Client connected")
+
+                    outputStream = clientSocket?.getOutputStream()
+                    inputStream = clientSocket?.getInputStream()
+
+                    // Start a thread to handle incoming messages
+                    Thread {
+                        val buffer = ByteArray(1024)
+                        var bytesRead: Int
+
+                        try {
+                            while (true) {
+                                bytesRead = inputStream?.read(buffer) ?: -1
+                                if (bytesRead == -1) {
+                                    break
+                                }
+
+                                val receivedMessage = String(buffer, 0, bytesRead)
+                                Log.d("P2P Message", "Message received: $receivedMessage")
+                            }
+                        } catch (e: IOException) {
+                            Log.e("P2P Message", "Error reading message: ${e.message}")
+                        }
+                    }.start()
+                }
+            } catch (e: IOException) {
+                Log.e("P2P Message", "Error starting server: ${e.message}")
+            }
+        }.start()
     }
 
     override fun onCleared() {
