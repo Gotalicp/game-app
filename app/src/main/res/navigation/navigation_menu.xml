@@ -22,6 +22,9 @@
         <action
             android:id="@+id/HomeToSettings"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/HomeToP2P"
+            app:destination="@id/p2PTestFragment" />
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
@@ -42,4 +45,8 @@
         android:name="com.example.game_app.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/p2PTestFragment"
+        android:name="com.example.game_app.host.P2PTestFragment"
+        android:label="P2PTestFragment" />
 </navigation>
