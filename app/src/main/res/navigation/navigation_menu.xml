@@ -30,7 +30,11 @@
         android:id="@+id/menuFragment"
         android:name="com.example.game_app.menu.MenuFragment"
         android:label="fragment_menu"
-        tools:layout="@layout/fragment_menu" />
+        tools:layout="@layout/fragment_menu" >
+        <action
+            android:id="@+id/MenuToConnected"
+            app:destination="@id/ConnectedToMenu" />
+    </fragment>
     <fragment
         android:id="@+id/libraryFragment"
         android:name="com.example.game_app.library.LibraryFragment"
@@ -49,4 +53,13 @@
         android:id="@+id/p2PTestFragment"
         android:name="com.example.game_app.host.P2PTestFragment"
         android:label="P2PTestFragment" />
+    <fragment
+        android:id="@+id/ConnectedToMenu"
+        android:name="com.example.game_app.ConnectedFragment"
+        android:label="fragment_connected"
+        tools:layout="@layout/fragment_connected" >
+        <action
+            android:id="@+id/action_connectedFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
 </navigation>
