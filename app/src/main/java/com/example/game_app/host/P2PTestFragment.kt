@@ -26,7 +26,6 @@ class P2PTestFragment : Fragment(R.layout.fragment_p2_p_test) {
         _binding = FragmentP2PTestBinding.inflate(inflater, container, false)
         _binding!!.apply {
             btnHost.setOnClickListener {
-                Log.d(ContentValues.TAG, "Hosted")
                 viewModel.createGroup()
             }
             btnSend.setOnClickListener {

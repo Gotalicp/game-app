@@ -27,7 +27,6 @@ class P2PBroadcastReceiver (
             }
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
                 manager.requestPeers(channel , viewModel.peerListListener)
-                Log.d(TAG, "P2P peers changed")
             }
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
                 manager.requestConnectionInfo(channel, viewModel.connectionListener)

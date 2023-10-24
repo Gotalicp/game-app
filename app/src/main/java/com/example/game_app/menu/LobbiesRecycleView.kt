@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
@@ -38,10 +39,10 @@ class LobbiesRecycleView() : RecyclerView.Adapter<LobbiesRecycleView.LobbiesView
     }
     inner class LobbiesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val button = view.findViewById<Button>(R.id.buttonJoin)
-        private val name = view.findViewById<Button>(R.id.textViewLobbyName)
-        private val connection = view.findViewById<Button>(R.id.textViewConnectionType)
-        private val players = view.findViewById<Button>(R.id.textViewPlayers)
-        private val gamemode = view.findViewById<Button>(R.id.textViewGameMode)
+        private val name = view.findViewById<TextView>(R.id.textViewLobbyName)
+        private val connection = view.findViewById<TextView>(R.id.textViewConnectionType)
+        private val players = view.findViewById<TextView>(R.id.textViewPlayers)
+        private val gamemode = view.findViewById<TextView>(R.id.textViewGameMode)
 
 
 

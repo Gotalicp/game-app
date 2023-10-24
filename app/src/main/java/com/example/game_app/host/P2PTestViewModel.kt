@@ -21,9 +21,6 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
     private val _peers = MutableLiveData<List<WifiP2pDevice>>()
     val peers: LiveData<List<WifiP2pDevice>> = _peers
 
-    private val _connectionInfo = MutableLiveData<WifiP2pInfo>()
-    val connectionInfo: LiveData<WifiP2pInfo> = _connectionInfo
-
     private val _connected = MutableLiveData<Boolean>()
     val connected: LiveData<Boolean> = _connected
 
@@ -52,8 +49,18 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
     fun discoverPeers() {
         wifiP2pManager.discoverPeers(channel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {
+                Toast.makeText(
+                    getApplication(),
+                    "Found.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            override fun onFailure(reasonCode: Int) {
+            override fun onFailure(reason: Int) {
+                Toast.makeText(
+                    getApplication(),
+                    "Discovery Failed $reason. Retry.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
     }
@@ -65,7 +72,7 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
                 override fun onSuccess() {
                     _connected.postValue(true)
                 }
-                override    fun onFailure(reason: Int) {
+                override fun onFailure(reason: Int) {
                     Toast.makeText(
                         getApplication(),
                         "Connect failed. Retry.",
@@ -98,16 +105,12 @@ class P2PTestViewModel(application: Application): AndroidViewModel(application) 
         })
     }
     val peerListListener = WifiP2pManager.PeerListListener { peerList ->
-        val peers = mutableListOf<WifiP2pDevice>()
         val refreshedPeers = peerList.deviceList
         if (refreshedPeers != peers) {
-            peers.clear()
-            peers.addAll(refreshedPeers)
-            Log.d(TAG, "Peers found: $peers")
-            _peers.value = peers
+            _peers.postValue(refreshedPeers.toMutableList())
+            Log.d(TAG, "Peers found: ${peers.value.toString()}")
         }
-
-        if (peers.isEmpty()) {
+        if (refreshedPeers.isEmpty()) {
             Log.d(TAG, "No devices found")
             return@PeerListListener
         }
