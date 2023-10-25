@@ -10,9 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
-import com.example.game_app.data.LobbyAdapter
+import com.example.game_app.data.adapters.LobbyAdapter
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.host.P2PTestViewModel
 
 class LobbiesRecycleView() : RecyclerView.Adapter<LobbiesRecycleView.LobbiesViewHolder>() {
 

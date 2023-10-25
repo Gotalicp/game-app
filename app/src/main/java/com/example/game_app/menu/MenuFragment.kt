@@ -38,7 +38,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
                 itemClickListener = object : itemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
-                        viewModel.connect2Peers(item.ownerAddress)
+                        viewModel.connect2Peers(item.ownerIp)
                     }
                 }
             }

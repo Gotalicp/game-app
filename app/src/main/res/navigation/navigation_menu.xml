@@ -41,7 +41,7 @@
         android:label="LibraryFragment" />
     <fragment
         android:id="@+id/hostFragment"
-        android:name="com.example.game_app.HostFragment"
+        android:name="com.example.game_app.host.HostFragment"
         android:label="fragment_host"
         tools:layout="@layout/fragment_host" />
     <fragment
@@ -55,7 +55,7 @@
         android:label="P2PTestFragment" />
     <fragment
         android:id="@+id/ConnectedToMenu"
-        android:name="com.example.game_app.ConnectedFragment"
+        android:name="com.example.game_app.host.ConnectedFragment"
         android:label="fragment_connected"
         tools:layout="@layout/fragment_connected" >
         <action
