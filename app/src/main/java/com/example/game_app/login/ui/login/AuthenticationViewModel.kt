@@ -36,7 +36,7 @@ class AuthenticationViewModel : ViewModel() {
         Firebase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Firebase.database.getReference(currentUser!!.uid)
+                    Firebase.database.getReference("user/" + currentUser!!.uid)
                         .setValue(Account(username, currentUser!!.uid,null))
                         .addOnCompleteListener {
                         getAccountInfo {
@@ -83,7 +83,7 @@ class AuthenticationViewModel : ViewModel() {
             }
     }
     private fun getAccountInfo(callback: (Account) -> Unit) {
-        Firebase.database.getReference(currentUser!!.uid).get().addOnSuccessListener { documentSnapshot ->
+        Firebase.database.getReference("user/" + currentUser!!.uid).get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot != null) {
                 val result = accAdapter.adapt(documentSnapshot)
                 Log.d("firebase"," text $result")

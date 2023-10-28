@@ -55,7 +55,7 @@
         android:label="P2PTestFragment" />
     <fragment
         android:id="@+id/ConnectedToMenu"
-        android:name="com.example.game_app.host.ConnectedFragment"
+        android:name="com.example.game_app.connected.ConnectedFragment"
         android:label="fragment_connected"
         tools:layout="@layout/fragment_connected" >
         <action

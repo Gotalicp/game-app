@@ -41,14 +41,14 @@ class FireBaseViewModel : ViewModel() {
     }
     fun hostLobby(lobby: LobbyInfo){
         lobby.players.add(PlayerInfo(account.acc.value!!.username!!,account.acc.value!!.uid!!, true, account.acc.value!!.image!!))
-        Firebase.database.getReference("user/${account.acc.value!!.uid}").setValue(lobby)
+        Firebase.database.getReference("lobby/${account.acc.value!!.uid}").setValue(lobby)
     }
-    fun joinLobby(lobby: LobbyInfo, username: String){
+    fun joinLobby(lobby: LobbyInfo){
         lobby.players.add(PlayerInfo(account.acc.value!!.username!!,account.acc.value!!.uid!!, false, account.acc.value!!.image!!))
-        Firebase.database.getReference("user/${lobby.lobbyUid}").setValue(lobby)
+        Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
     }
     fun leaveLobby(lobby: LobbyInfo){
         lobby.players = lobby.players.filterNot { it.uid == account.acc.value!!.uid }.toMutableList()
-        Firebase.database.getReference("user/${lobby.lobbyUid}").setValue(lobby)
+        Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
     }
 }

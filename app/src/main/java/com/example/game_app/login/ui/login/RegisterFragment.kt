@@ -17,10 +17,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     private val authenticationViewModel: AuthenticationViewModel by activityViewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

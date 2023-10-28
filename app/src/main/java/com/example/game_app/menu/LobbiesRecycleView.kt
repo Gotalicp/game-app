@@ -11,7 +11,7 @@ import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 
-class LobbiesRecycleView() : RecyclerView.Adapter<LobbiesRecycleView.LobbiesViewHolder>() {
+class LobbiesRecycleView : RecyclerView.Adapter<LobbiesRecycleView.LobbiesViewHolder>() {
 
     private var items = listOf<LobbyInfo>()
     var itemClickListener: itemClickListener<LobbyInfo>? = null

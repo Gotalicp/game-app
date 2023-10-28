@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.R
@@ -36,6 +38,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
                 itemClickListener = object : itemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
+                        findNavController().navigate(R.id.MenuToConnected, bundleOf("Lobby" to item))
                     }
                 }
             }
