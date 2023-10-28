@@ -6,23 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.game_app.FireBaseViewModel
 import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentMenuBinding
-import com.example.game_app.host.P2PTestViewModel
 
 class MenuFragment : Fragment(R.layout.fragment_menu) {
     private var _binding: FragmentMenuBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: P2PTestViewModel by activityViewModels()
+    private val viewModel: FireBaseViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.discoverPeers()
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +36,6 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
                 itemClickListener = object : itemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
-                        viewModel.connect2Peers(item.ownerIp)
                     }
                 }
             }
@@ -47,15 +44,10 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
                 layoutManager = LinearLayoutManager(requireContext())
             }
             questionButton.setOnClickListener{
-                viewModel.discoverPeers()
+                viewModel.refresh()
             }
-            viewModel.peers.observe(viewLifecycleOwner){
+            viewModel.lobbiesList.observe(viewLifecycleOwner){
                 lobbiesRecycleView.updateItems(it)
-            }
-            viewModel.connected.observe(viewLifecycleOwner) { connected ->
-                if (connected == true) {
-                    findNavController().navigate(R.id.MenuToConnected)
-                }
             }
         }
     }

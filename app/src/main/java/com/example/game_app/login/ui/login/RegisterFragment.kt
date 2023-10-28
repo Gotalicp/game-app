@@ -36,12 +36,15 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 findNavController().navigate(R.id.RegisterToLogin)
             }
             btnSignIn.setOnClickListener {
-                if (password.text.toString() != "" && repassword.text.toString() == password.text.toString() && email.text.toString() != "") {
+                if (password.text.toString() != ""
+                    && repassword.text.toString() == password.text.toString()
+                    && email.text.toString() != ""
+                    && password.text.toString() != "" ) {
                     authenticationViewModel.createAcc(
+                        usenname.text.toString(),
                         email.text.toString(),
                         password.text.toString(),
-                        view
-                    )
+                        view)
                 }
             }
             checkBoxShowPassword.setOnCheckedChangeListener{ _, isChecked ->
