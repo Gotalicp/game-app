@@ -8,8 +8,8 @@ import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.PlayerInfo
 import com.example.game_app.data.adapters.LobbyAdapter
 import com.example.game_app.login.ui.login.AuthenticationViewModel
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 class FireBaseViewModel : ViewModel() {
     private val lobbyAdapter = LobbyAdapter()

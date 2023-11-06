@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
         authenticationViewModel.logged.observe(this) {
@@ -19,7 +20,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, AuthenticationActivity::class.java))
                 finish()
             }
-            FirebaseApp.initializeApp(this)
         }
     }
 }

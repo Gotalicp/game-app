@@ -1,29 +1,31 @@
 package com.example.game_app.host
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.R
 import com.example.game_app.TextRecycleView
 import com.example.game_app.databinding.FragmentHostBinding
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+
 
 class HostFragment : Fragment(R.layout.fragment_host) {
-    private var hostViewModel = HostViewModel()
+    private var hostViewModel  = HostViewModel()
 
     private var _binding: FragmentHostBinding? = null
     private val binding get() = _binding!!
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        hostViewModel.start()
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHostBinding.inflate(inflater, container, false)
-        hostViewModel.host("test")
         return binding.root
     }
 
@@ -37,9 +39,7 @@ class HostFragment : Fragment(R.layout.fragment_host) {
             }
             btnSend.setOnClickListener {
                 if(etMessage.text.isNotEmpty()){
-                    GlobalScope.launch {
-                        hostViewModel.send(etMessage.text.toString())
-                    }
+                    hostViewModel.send(etMessage.text.toString())
                 }
             }
             hostViewModel.messages.observe(viewLifecycleOwner){

@@ -2,6 +2,7 @@ package com.example.game_app.connected
 
 import android.os.Build
 import android.os.Bundle
+import android.os.StrictMode
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentConnectedBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 
 class ConnectedFragment : Fragment() {
     private var _binding: FragmentConnectedBinding? = null
@@ -20,10 +22,17 @@ class ConnectedFragment : Fragment() {
 
     private val connectedViewModel = ConnectedViewModel()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val policy = StrictMode.ThreadPolicy.Builder()
+            .permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentConnectedBinding.inflate( inflater ,container, false)
         return binding.root
     }
@@ -33,7 +42,8 @@ class ConnectedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         var info : Class<LobbyInfo> = LobbyInfo::class.java
         val textRecycleView = TextRecycleView()
-        connectedViewModel.join(arguments?.getParcelable("lobbyInfo", info)!!)
+        var lobbyInfo = arguments?.getParcelable("lobbyInfo", info)!!
+        connectedViewModel.join(InetAddress.getByName(lobbyInfo.ownerIp))
         _binding?.apply {
             textView.apply {
             adapter = textRecycleView

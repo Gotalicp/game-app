@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.game_app.databinding.FragmentHomeBinding
+import com.example.game_app.login.ui.login.AuthenticationViewModel
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+private val auth =   AuthenticationViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -29,13 +31,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 findNavController().navigate(R.id.HomeToMenu)
             }
             btnHost.setOnClickListener {
-                findNavController().navigate(R.id.HomeToP2P)
+                findNavController().navigate(R.id.HomeToHost)
             }
             btnLibrary.setOnClickListener {
                 findNavController().navigate(R.id.HomeToLibrary)
             }
             btnSettings.setOnClickListener {
-                findNavController().navigate(R.id.HomeToSettings)
+//                findNavController().navigate(R.id.HomeToSettings)
+                auth.logout()
             }
         }
     }
