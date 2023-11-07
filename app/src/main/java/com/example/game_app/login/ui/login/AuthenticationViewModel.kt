@@ -5,7 +5,7 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.game_app.SharedAccount
+import com.example.game_app.SharedInformation
 import com.example.game_app.data.Account
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.auth
@@ -14,18 +14,18 @@ import com.google.firebase.Firebase
 class AuthenticationViewModel : ViewModel() {
     private val accAdapter = FireBaseAccAdapter()
     private val auth = Firebase.auth
-    private val sharedAccount: LiveData<Account> = SharedAccount.getAcc()
+    private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
 
     private val _logged = MutableLiveData<Boolean>()
     val logged: LiveData<Boolean> get() = _logged
 
     init {
         if(auth.currentUser == null){
-            SharedAccount.updateAcc(Account(null,null,null))
+            SharedInformation.updateAcc(Account(null,null,null))
             _logged.postValue(false)
         } else {
             getAccountInfo {
-                SharedAccount.updateAcc(it)
+                SharedInformation.updateAcc(it)
                 _logged.postValue(true)
             }
         }
@@ -36,7 +36,7 @@ class AuthenticationViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     val account = Account(username, auth.uid, null)
                     _logged.postValue(true)
-                    SharedAccount.updateAcc(account)
+                    SharedInformation.updateAcc(account)
                     try {
                         Firebase.database.getReference("user/${auth.uid}")
                             .setValue(account)
@@ -49,7 +49,7 @@ class AuthenticationViewModel : ViewModel() {
                         Snackbar.LENGTH_SHORT,
                     ).show()
                 } else {
-                    SharedAccount.updateAcc(Account(null,null,null))
+                    SharedInformation.updateAcc(Account(null,null,null))
                     Snackbar.make(
                         context,
                         "Register failed.",
@@ -64,7 +64,7 @@ class AuthenticationViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     _logged.postValue(true)
                     getAccountInfo {
-                        SharedAccount.updateAcc(it)
+                        SharedInformation.updateAcc(it)
                         Snackbar.make(
                             context,
                             "Login success , ${sharedAccount.value}.",

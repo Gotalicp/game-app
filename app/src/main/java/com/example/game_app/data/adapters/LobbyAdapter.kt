@@ -13,7 +13,7 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
         val lobbyInfoList = ArrayList<LobbyInfo>()
         for (info in t.children) {
             val lobbyName = info.child("lobbyName").getValue(String::class.java)
-            val ownerIp = info.child("ownerIp").getValue(InetAddress::class.java)
+            val ownerIp = info.child("ownerIp").getValue(String::class.java)
             val lobbyUid = info.child("lobbyUid").getValue(String::class.java)
             val players = mutableListOf<PlayerInfo>()
             val maxPlayerCount = info.child("maxPlayerCount").getValue(Int::class.java)
@@ -30,7 +30,6 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
                 )
                 players.add(player)
             }
-
             val lobby = LobbyInfo(
                 lobbyName = lobbyName!!,
                 lobbyUid = lobbyUid!!,
@@ -41,10 +40,8 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
                 gamemodeId = gamemodeId!!,
                 connection = connection!!
             )
-
             lobbyInfoList.add(lobby)
         }
-
         return lobbyInfoList
     }
 }

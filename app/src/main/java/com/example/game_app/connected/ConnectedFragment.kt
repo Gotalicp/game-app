@@ -43,7 +43,7 @@ class ConnectedFragment : Fragment() {
         var info : Class<LobbyInfo> = LobbyInfo::class.java
         val textRecycleView = TextRecycleView()
         var lobbyInfo = arguments?.getParcelable("lobbyInfo", info)!!
-        connectedViewModel.join(lobbyInfo.ownerIp)
+        connectedViewModel.join(InetAddress.getByName(lobbyInfo.ownerIp))
         _binding?.apply {
             textView.apply {
             adapter = textRecycleView

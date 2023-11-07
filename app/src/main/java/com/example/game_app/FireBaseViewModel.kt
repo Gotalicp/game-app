@@ -8,20 +8,15 @@ import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.PlayerInfo
 import com.example.game_app.data.adapters.LobbyAdapter
-import com.example.game_app.host.HostViewModel
-import com.example.game_app.login.ui.login.AuthenticationViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 
 class FireBaseViewModel : ViewModel() {
     private val lobbyAdapter = LobbyAdapter()
     private val _lobbiesList = MutableLiveData<List<LobbyInfo>>()
-    private val sharedAccount: LiveData<Account> = SharedAccount.getAcc()
+    private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
 
     val lobbiesList: LiveData<List<LobbyInfo>> get() = _lobbiesList
-    init {
-        refresh()
-    }
     private fun getLobbies(callback: (MutableList<LobbyInfo>) -> Unit) {
         Firebase.database.getReference("lobby").get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot != null) {
@@ -59,7 +54,7 @@ class FireBaseViewModel : ViewModel() {
             Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
         }
     }
-    fun destoryLobby(lobby: LobbyInfo) {
-        Firebase.database.getReference("lobby/${lobby.lobbyUid}").removeValue()
+    fun destoryLobby(uid: String) {
+        Firebase.database.getReference("lobby/${uid}").removeValue()
     }
 }

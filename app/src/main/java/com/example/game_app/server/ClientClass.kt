@@ -3,6 +3,7 @@ package com.example.game_app.server
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.game_app.SharedInformation
 import com.example.game_app.data.Messages
 import com.example.game_app.host.HostViewModel
 import java.io.IOException
@@ -19,7 +20,6 @@ class ClientClass(ip: InetAddress): Thread() {
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
     private lateinit var socket: Socket
-
     fun write(message: Messages) {
         try {
             Log.i("Server write", "$message sending")
@@ -49,6 +49,7 @@ class ClientClass(ip: InetAddress): Thread() {
                             handler.post(Runnable {
                                 kotlin.run {
                                     Log.i("client class", message.toString())
+                                    SharedInformation.updateChat(message)
                                 }
                             })
                     } catch (ex: IOException) {

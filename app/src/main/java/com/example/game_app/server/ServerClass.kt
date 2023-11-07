@@ -3,6 +3,7 @@ package com.example.game_app.server
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.game_app.SharedInformation
 import com.example.game_app.data.Messages
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -19,31 +20,37 @@ class ServerClass :Thread(){
     private lateinit var serverSocket: ServerSocket
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
-    lateinit var socket: Socket
+    private var socket: Socket? = null
+
+    @Volatile
+    private var isRunning = true
+
     override fun run() {
         try {
             serverSocket = ServerSocket(8888)
             socket = serverSocket.accept()
-            inputStream = ObjectInputStream(socket.getInputStream())
-            outputStream = ObjectOutputStream(socket.getOutputStream())
+
+            socket?.let{
+                inputStream = ObjectInputStream(it.getInputStream())
+                outputStream = ObjectOutputStream(it.getOutputStream())
+            }
         }catch (ex: IOException){
             ex.printStackTrace()
             Log.i("Server write","$ex")
-
         }
-        Log.i("Server write","after")
 
         val executors = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executors.execute(Runnable{
             kotlin.run {
-                while (true){
+                while (isRunning){
                     try {
-                        val message =  inputStream.readObject() as Messages
-                        if(!message.toString().isNullOrEmpty()) {
+                        val message = inputStream.readObject() as Messages
+                        if(message.toString().isNotEmpty()) {
                             handler.post(Runnable {
                                 kotlin.run {
                                     Log.i("Server class", message.toString())
+                                    SharedInformation.updateChat(message)
                                 }
                             })
                         }
@@ -53,6 +60,7 @@ class ServerClass :Thread(){
                 }
             }
         })
+        println("Thread is stopping")
     }
     fun getLocalInetAddress(): InetAddress? {
         try {
@@ -84,9 +92,14 @@ class ServerClass :Thread(){
     }
     fun close() {
         try {
-            outputStream.close()
-            inputStream.close()
-            socket.close()
+            isRunning=false
+            if(socket != null) {
+                outputStream.close()
+                inputStream.close()
+                socket!!.close()
+            }else{
+                serverSocket.close()
+            }
             Log.i("Server", "Closed streams and socket")
         } catch (ex: IOException) {
             ex.printStackTrace()
