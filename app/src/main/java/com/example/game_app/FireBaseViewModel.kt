@@ -4,18 +4,20 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.PlayerInfo
 import com.example.game_app.data.adapters.LobbyAdapter
+import com.example.game_app.host.HostViewModel
 import com.example.game_app.login.ui.login.AuthenticationViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 
 class FireBaseViewModel : ViewModel() {
     private val lobbyAdapter = LobbyAdapter()
-    private val account: AuthenticationViewModel by viewModels()
-
     private val _lobbiesList = MutableLiveData<List<LobbyInfo>>()
+    private val sharedAccount: LiveData<Account> = SharedAccount.getAcc()
+
     val lobbiesList: LiveData<List<LobbyInfo>> get() = _lobbiesList
     init {
         refresh()
@@ -40,23 +42,24 @@ class FireBaseViewModel : ViewModel() {
         }
     }
     fun hostLobby(lobby: LobbyInfo){
-        Log.d("hosting","${account.acc.value}")
-
-        account.acc.value?.let {
-            Log.d("hosting","hositng")
-            lobby.players.add(PlayerInfo(it.username!!, it.uid!!, true, it.image!!))
+        sharedAccount.value?.let {
+            lobby.players.add(PlayerInfo(it.username!!, it.uid!!, true, it.image))
             Firebase.database.getReference("lobby/${it.uid}").setValue(lobby)
         }
     }
     fun joinLobby(lobby: LobbyInfo){
-        lobby.players.add(PlayerInfo(account.acc.value!!.username!!,account.acc.value!!.uid!!, false, account.acc.value!!.image!!))
+        sharedAccount.value?.let {
+        lobby.players.add(PlayerInfo(it.username!!,it.uid!!, false, it.image))
         Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
     }
-    fun leaveLobby(lobby: LobbyInfo){
-        lobby.players = lobby.players.filterNot { it.uid == account.acc.value!!.uid }.toMutableList()
-        Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
+        }
+    fun leaveLobby(lobby: LobbyInfo) {
+        sharedAccount.value?.let { acc ->
+            lobby.players = lobby.players.filterNot { it.uid == acc.uid }.toMutableList()
+            Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
+        }
     }
-    fun destoryLobby(lobby: LobbyInfo){
+    fun destoryLobby(lobby: LobbyInfo) {
         Firebase.database.getReference("lobby/${lobby.lobbyUid}").removeValue()
     }
 }

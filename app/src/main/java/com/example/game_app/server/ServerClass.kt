@@ -24,12 +24,8 @@ class ServerClass :Thread(){
         try {
             serverSocket = ServerSocket(8888)
             socket = serverSocket.accept()
-            Log.i("Server write","accept")
             inputStream = ObjectInputStream(socket.getInputStream())
-            Log.i("Server write","input")
             outputStream = ObjectOutputStream(socket.getOutputStream())
-            Log.i("Server write","output")
-
         }catch (ex: IOException){
             ex.printStackTrace()
             Log.i("Server write","$ex")

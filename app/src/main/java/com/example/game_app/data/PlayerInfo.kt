@@ -6,5 +6,5 @@ data class PlayerInfo (
     val username: String,
     val uid : String,
     val isHost: Boolean,
-    val image: Bitmap
+    val image: Bitmap?
     )

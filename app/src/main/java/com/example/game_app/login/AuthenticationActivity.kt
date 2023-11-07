@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.example.game_app.MainActivity
 import com.example.game_app.R
 import com.example.game_app.login.ui.login.AuthenticationViewModel
@@ -11,7 +12,9 @@ import com.google.firebase.FirebaseApp
 
 class AuthenticationActivity : AppCompatActivity() {
 
-    private val authenticationViewModel: AuthenticationViewModel by viewModels()
+    private val authenticationViewModel: AuthenticationViewModel by viewModels{
+        ViewModelProvider.NewInstanceFactory()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

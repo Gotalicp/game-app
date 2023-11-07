@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.game_app.databinding.FragmentHomeBinding
 import com.example.game_app.login.ui.login.AuthenticationViewModel
@@ -12,7 +14,7 @@ import com.example.game_app.login.ui.login.AuthenticationViewModel
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-private val auth =   AuthenticationViewModel()
+    private val auth: AuthenticationViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }

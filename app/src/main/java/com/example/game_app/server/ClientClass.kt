@@ -19,7 +19,6 @@ class ClientClass(ip: InetAddress): Thread() {
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
     private lateinit var socket: Socket
-    private var hostViewModel = HostViewModel()
 
     fun write(message: Messages) {
         try {
@@ -50,7 +49,6 @@ class ClientClass(ip: InetAddress): Thread() {
                             handler.post(Runnable {
                                 kotlin.run {
                                     Log.i("client class", message.toString())
-                                    hostViewModel.updateMessage(message)
                                 }
                             })
                     } catch (ex: IOException) {

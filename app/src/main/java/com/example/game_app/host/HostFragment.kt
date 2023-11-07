@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.R
 import com.example.game_app.TextRecycleView
@@ -12,7 +13,7 @@ import com.example.game_app.databinding.FragmentHostBinding
 
 
 class HostFragment : Fragment(R.layout.fragment_host) {
-    private var hostViewModel  = HostViewModel()
+    private val hostViewModel:HostViewModel by activityViewModels()
 
     private var _binding: FragmentHostBinding? = null
     private val binding get() = _binding!!
