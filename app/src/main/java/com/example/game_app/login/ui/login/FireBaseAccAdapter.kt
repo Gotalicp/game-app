@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 
 class FireBaseAccAdapter : Adapter<DataSnapshot?, Account> {
-    override fun adapt(t: DataSnapshot?): Account? {
+    override fun adapt(t: DataSnapshot?): Account {
         return t?.let {
             return Account(
                 t.child("username").getValue(String::class.java),

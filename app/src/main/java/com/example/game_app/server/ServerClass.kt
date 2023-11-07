@@ -8,8 +8,10 @@ import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.net.InetAddress
+import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.Enumeration
 import java.util.concurrent.Executors
 
 class ServerClass :Thread(){
@@ -56,17 +58,21 @@ class ServerClass :Thread(){
             }
         })
     }
-    private fun getLocalIpAddress(): String? {
+    fun getLocalInetAddress(): InetAddress? {
         try {
-            val interfaces = InetAddress.getAllByName(InetAddress.getLocalHost().hostName)
-            for (inetAddress in interfaces) {
-                if (!inetAddress.isLoopbackAddress) {
-                    return inetAddress.hostAddress
+            val networkInterfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
+            while (networkInterfaces.hasMoreElements()) {
+                val networkInterface: NetworkInterface = networkInterfaces.nextElement()
+                val addresses: Enumeration<InetAddress> = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address: InetAddress = addresses.nextElement()
+                    if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
+                        return address
+                    }
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("Server", "Error getting local IP address: $e")
         }
         return null
     }

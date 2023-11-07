@@ -85,10 +85,9 @@ class AuthenticationViewModel : ViewModel() {
     }
     private fun getAccountInfo(callback: (Account) -> Unit) {
         try {
-            Firebase.database.getReference("user/${auth.uid}")
-                .get()
+            Firebase.database.getReference("user/${auth.uid}").get()
                 .addOnSuccessListener { documentSnapshot ->
-                    callback(accAdapter.adapt(documentSnapshot)!!)
+                    callback(accAdapter.adapt(documentSnapshot))
                 }
         }catch(ex:Exception){
             Log.e("firebase", "Error getting data", ex)

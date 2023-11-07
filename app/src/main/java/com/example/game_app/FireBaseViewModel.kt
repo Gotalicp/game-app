@@ -13,7 +13,7 @@ import com.google.firebase.database.database
 
 class FireBaseViewModel : ViewModel() {
     private val lobbyAdapter = LobbyAdapter()
-    private val account = AuthenticationViewModel()
+    private val account: AuthenticationViewModel by viewModels()
 
     private val _lobbiesList = MutableLiveData<List<LobbyInfo>>()
     val lobbiesList: LiveData<List<LobbyInfo>> get() = _lobbiesList
@@ -40,8 +40,13 @@ class FireBaseViewModel : ViewModel() {
         }
     }
     fun hostLobby(lobby: LobbyInfo){
-        lobby.players.add(PlayerInfo(account.acc.value!!.username!!,account.acc.value!!.uid!!, true, account.acc.value!!.image!!))
-        Firebase.database.getReference("lobby/${account.acc.value!!.uid}").setValue(lobby)
+        Log.d("hosting","${account.acc.value}")
+
+        account.acc.value?.let {
+            Log.d("hosting","hositng")
+            lobby.players.add(PlayerInfo(it.username!!, it.uid!!, true, it.image!!))
+            Firebase.database.getReference("lobby/${it.uid}").setValue(lobby)
+        }
     }
     fun joinLobby(lobby: LobbyInfo){
         lobby.players.add(PlayerInfo(account.acc.value!!.username!!,account.acc.value!!.uid!!, false, account.acc.value!!.image!!))
@@ -50,5 +55,8 @@ class FireBaseViewModel : ViewModel() {
     fun leaveLobby(lobby: LobbyInfo){
         lobby.players = lobby.players.filterNot { it.uid == account.acc.value!!.uid }.toMutableList()
         Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
+    }
+    fun destoryLobby(lobby: LobbyInfo){
+        Firebase.database.getReference("lobby/${lobby.lobbyUid}").removeValue()
     }
 }
