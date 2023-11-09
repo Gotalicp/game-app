@@ -14,6 +14,7 @@ import com.example.game_app.SharedInformation
 import com.example.game_app.TextRecycleView
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentConnectedBinding
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.InetAddress
@@ -39,11 +40,13 @@ class ConnectedFragment : Fragment() {
         return binding.root
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val textRecycleView = TextRecycleView()
-        connectedViewModel.join(arguments?.getString("ip")!!)
+        val bundle = arguments?.getSerializable("lobbyInfo",LobbyInfo::class.java)
+        connectedViewModel.join(bundle!!)
         _binding?.apply {
             textView.apply {
             adapter = textRecycleView

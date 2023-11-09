@@ -38,7 +38,10 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
                 itemClickListener = object : itemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
-                        findNavController().navigate(R.id.MenuToConnected, bundleOf("ip" to item.ownerIp))
+                        val bundle = Bundle().apply {
+                            putSerializable("lobbyInfo", item)
+                        }
+                        findNavController().navigate(R.id.MenuToConnected, bundle)
                     }
                 }
             }

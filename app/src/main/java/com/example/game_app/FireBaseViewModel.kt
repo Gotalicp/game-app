@@ -53,7 +53,7 @@ class FireBaseViewModel : ViewModel() {
             Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
         }
     }
-    fun destoryLobby(uid: String) {
+    fun destroyLobby(uid: String) {
         Firebase.database.getReference("lobby/${uid}").removeValue()
     }
 }

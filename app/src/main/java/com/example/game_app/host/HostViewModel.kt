@@ -1,14 +1,11 @@
 package com.example.game_app.host
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.data.Messages
-import com.example.game_app.data.PlayerInfo
 import com.example.game_app.server.ServerClass
 
 class HostViewModel : ViewModel() {
@@ -36,7 +33,7 @@ class HostViewModel : ViewModel() {
         server.write(message)
     }
     fun end(){
-        fireBaseViewModel.destoryLobby(sharedAccount.value!!.uid!!)
+        fireBaseViewModel.destroyLobby(sharedAccount.value!!.uid!!)
         server.close()
     }
     fun removeLeadingSlash(ipWithSlash: String): String {
