@@ -22,22 +22,28 @@ class HostViewModel : ViewModel() {
             fireBaseViewModel.hostLobby(
                 LobbyInfo(
                     lobbyName = "test",
-                    ownerIp = server.getLocalInetAddress()!!.toString(),
+                    ownerIp = removeLeadingSlash(server.getLocalInetAddress()!!.toString()),
                     lobbyUid = acc.uid!!,
                     connection = "internet",
                     maxPlayerCount = 2,
                     gamemode = "gamemode",
-                    players = mutableListOf(PlayerInfo(acc.username!!, acc.uid, false, null)),
+                    players = mutableListOf(),
                     gamemodeId = 1
                 )) }
         server.start()
     }
-
     fun send(message: String){
-        server.write(Messages("name", message,"now"))
+        server.write(message)
     }
     fun end(){
         fireBaseViewModel.destoryLobby(sharedAccount.value!!.uid!!)
         server.close()
+    }
+    fun removeLeadingSlash(ipWithSlash: String): String {
+        return if (ipWithSlash.startsWith("/")) {
+            ipWithSlash.substring(1)
+        } else {
+            ipWithSlash
+        }
     }
 }

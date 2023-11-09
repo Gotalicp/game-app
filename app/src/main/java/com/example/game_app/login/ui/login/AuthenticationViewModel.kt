@@ -1,18 +1,25 @@
 package com.example.game_app.login.ui.login
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.game_app.R
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Account
+import com.example.game_app.data.adapters.BitmapConverter
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import com.google.firebase.Firebase
+
 class AuthenticationViewModel : ViewModel() {
     private val accAdapter = FireBaseAccAdapter()
+    private val bitmapConverter = BitmapConverter()
     private val auth = Firebase.auth
     private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
 
@@ -30,11 +37,12 @@ class AuthenticationViewModel : ViewModel() {
             }
         }
     }
-    fun createAcc(username: String,email: String , password: String , context: View){
+    fun createAcc(username: String,email: String , password: String , view: View , context: Context){
         Firebase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val account = Account(username, auth.uid, null)
+                    val image = BitmapFactory.decodeResource(context.resources, R.drawable.image)
+                    val account = Account(username, auth.uid,bitmapConverter.adapt(image))
                     _logged.postValue(true)
                     SharedInformation.updateAcc(account)
                     try {
@@ -44,14 +52,14 @@ class AuthenticationViewModel : ViewModel() {
                         println("Error: ${e.message}")
                     }
                     Snackbar.make(
-                        context,
+                        view,
                         "Register success.",
                         Snackbar.LENGTH_SHORT,
                     ).show()
                 } else {
                     SharedInformation.updateAcc(Account(null,null,null))
                     Snackbar.make(
-                        context,
+                        view,
                         "Register failed.",
                         Snackbar.LENGTH_SHORT,
                     ).show()

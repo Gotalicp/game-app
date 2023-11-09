@@ -12,7 +12,7 @@ class FireBaseAccAdapter : Adapter<DataSnapshot?, Account> {
             return Account(
                 t.child("username").getValue(String::class.java),
                 t.child("uid").getValue(String::class.java),
-                t.child("image").getValue(Bitmap::class.java))
+                t.child("image").getValue(String::class.java))
         } ?: Account(null,null,null)
     }
 }

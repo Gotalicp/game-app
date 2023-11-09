@@ -1,24 +1,22 @@
 package com.example.game_app.connected
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.game_app.data.Messages
 import com.example.game_app.server.ClientClass
 import java.net.InetAddress
+import java.net.InetSocketAddress
 
 class ConnectedViewModel : ViewModel() {
-    private val _messages = MutableLiveData<List<Messages>>()
-    val messages: LiveData<List<Messages>> get() = _messages
     private lateinit var client : ClientClass
 
-    fun join(ip : InetAddress){
+    fun join(ip : String){
         client = ClientClass(ip)
+        client.start()
     }
-    fun send(message: String){
-        client.write(Messages("name", message,"now"))
-    }
-    fun updateMessage(message: Messages){
-        _messages.value = _messages.value.orEmpty() + listOf(message)
+    fun send(message: String) {
+        client.write(message)
     }
 }

@@ -24,33 +24,38 @@ class ServerClass :Thread(){
 
     @Volatile
     private var isRunning = true
+    private var isConnected = false
+
 
     override fun run() {
         try {
             serverSocket = ServerSocket(8888)
+            Log.i("ServerClass","started")
             socket = serverSocket.accept()
-
-            socket?.let{
-                inputStream = ObjectInputStream(it.getInputStream())
-                outputStream = ObjectOutputStream(it.getOutputStream())
+                socket?.let{
+                    inputStream = ObjectInputStream(it.getInputStream())
+                    Log.i("ServerClass","input")
+                    outputStream = ObjectOutputStream(it.getOutputStream())
+                    Log.i("ServerClass","output")
+                    isConnected = true
+                    isRunning = true
             }
         }catch (ex: IOException){
             ex.printStackTrace()
             Log.i("Server write","$ex")
         }
-
         val executors = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executors.execute(Runnable{
             kotlin.run {
                 while (isRunning){
                     try {
-                        val message = inputStream.readObject() as Messages
-                        if(message.toString().isNotEmpty()) {
+                        val message = inputStream.readObject() as String
+                        if(message.isNotEmpty()) {
                             handler.post(Runnable {
                                 kotlin.run {
-                                    Log.i("Server class", message.toString())
-                                    SharedInformation.updateChat(message)
+                                    Log.i("Server class", message)
+                                    SharedInformation.updateChat(Messages("me",message,"now"))
                                 }
                             })
                         }
@@ -60,7 +65,6 @@ class ServerClass :Thread(){
                 }
             }
         })
-        println("Thread is stopping")
     }
     fun getLocalInetAddress(): InetAddress? {
         try {
@@ -81,18 +85,29 @@ class ServerClass :Thread(){
         return null
     }
 
-    fun write(message: Messages) {
+    fun write(message: String) {
         try {
-            Log.i("Server write", "$message sending")
-            outputStream.writeObject(message)
+            if (::outputStream.isInitialized && isConnected) {
+                Log.i("Server write", "$message sending")
+                Thread {
+                    outputStream.writeObject(message)
+                }.start()
+                Log.i("Server write", "Send")
+            } else {
+                Log.e(
+                    "ClientClass",
+                    "Error writing message: outputStream not initialized or connection not established."
+                )
+            }
         } catch (ex: IOException) {
             ex.printStackTrace()
-            Log.e("Server", "Error writing message: $ex")
+            Log.e("ClientClass", "Error writing message: $ex")
         }
     }
     fun close() {
         try {
-            isRunning=false
+            isRunning = false
+            isConnected = false
             if(socket != null) {
                 outputStream.close()
                 inputStream.close()

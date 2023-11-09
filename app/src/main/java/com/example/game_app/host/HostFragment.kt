@@ -1,6 +1,7 @@
 package com.example.game_app.host
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +47,8 @@ class HostFragment : Fragment(R.layout.fragment_host) {
                     hostViewModel.send(etMessage.text.toString())
                 }
             }
-            sharedChat.observe(viewLifecycleOwner){
+            SharedInformation.sharedChat.observe(viewLifecycleOwner){
+                Log.d("observe", it.toString())
                 textRecycleView.updateItems(it)
             }
         }

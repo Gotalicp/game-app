@@ -21,8 +21,7 @@ class FireBaseViewModel : ViewModel() {
         Firebase.database.getReference("lobby").get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot != null) {
                 val result = lobbyAdapter.adapt(documentSnapshot)
-                Log.d("firebase"," text $result")
-                callback(result ?: mutableListOf())
+                callback(result)
             } else {
                 callback(mutableListOf())
             }

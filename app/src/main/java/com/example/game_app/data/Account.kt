@@ -5,5 +5,5 @@ import android.graphics.Bitmap
 data class Account (
     val username: String?,
     val uid: String?,
-    val image: Bitmap?
+    val image: String?
 )

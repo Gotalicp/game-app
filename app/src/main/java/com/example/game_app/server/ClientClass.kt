@@ -1,40 +1,57 @@
 package com.example.game_app.server
 
+import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Messages
-import com.example.game_app.host.HostViewModel
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.Executors
 
-class ClientClass(ip: InetAddress): Thread() {
-
-    private var hostAddress = ip
+class ClientClass(ip: String): Thread() { private var hostAddress = ip
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
     private lateinit var socket: Socket
-    fun write(message: Messages) {
+
+    @Volatile
+    private var isConnected = false
+
+    fun write(message: String) {
         try {
-            Log.i("Server write", "$message sending")
-            outputStream.writeObject(message)
+            if (::outputStream.isInitialized && isConnected) {
+                Log.i("ClientClass", "$message sending")
+                outputStream.writeObject(message)
+                Log.i("ClientClass", "Send")
+                outputStream.reset()
+            } else {
+                Log.e(
+                    "ClientClass",
+                    "Error writing message: outputStream not initialized or connection not established."
+                )
+            }
         } catch (ex: IOException) {
             ex.printStackTrace()
+            Log.e("ClientClass", "Error writing message: $ex")
         }
     }
-
-    override fun run() {
+            @SuppressLint("SuspiciousIndentation")
+            override fun run() {
         try {
             socket = Socket()
-            socket.connect(InetSocketAddress(hostAddress, 8888), 500)
-            inputStream = ObjectInputStream(socket.getInputStream())
+            val ip = InetSocketAddress(hostAddress, 8888)
+            socket.connect(ip, 500)
             outputStream = ObjectOutputStream(socket.getOutputStream())
+            outputStream.flush()
+            Log.d("connection", "Connection established")
+            inputStream = ObjectInputStream(socket.getInputStream())
+            Log.d("connection", "Connection established")
+            isConnected = true
+            Log.d("connected","connected")
         } catch (ex: IOException) {
             ex.printStackTrace()
         }
@@ -43,13 +60,13 @@ class ClientClass(ip: InetAddress): Thread() {
 
         executor.execute(kotlinx.coroutines.Runnable {
             kotlin.run {
-                while (true) {
+                while (isConnected) {
                     try {
-                         val message = inputStream.readObject() as Messages
+                         val message = inputStream.readObject() as String
                             handler.post(Runnable {
                                 kotlin.run {
-                                    Log.i("client class", message.toString())
-                                    SharedInformation.updateChat(message)
+                                    Log.i("client class", message)
+                                    SharedInformation.updateChat(Messages("me",message,"now"))
                                 }
                             })
                     } catch (ex: IOException) {
