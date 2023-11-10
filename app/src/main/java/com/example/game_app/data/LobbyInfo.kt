@@ -4,8 +4,9 @@ import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.RequiresApi
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class LobbyInfo (
     val lobbyName: String,
     val lobbyUid: String,
@@ -15,7 +16,7 @@ data class LobbyInfo (
     val gamemode:String,
     val gamemodeId: Int,
     val connection:String,
-) : Serializable
+):java.io.Serializable
 // : Parcelable {
 //    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 //    constructor(parcel: Parcel) : this(

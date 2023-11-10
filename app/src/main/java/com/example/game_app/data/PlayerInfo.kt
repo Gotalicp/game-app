@@ -2,14 +2,16 @@ package com.example.game_app.data
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class PlayerInfo (
     val username: String,
     val uid : String,
     val isHost: Boolean,
     val image: String?
-):Serializable
+):java.io.Serializable
 //    : Parcelable {
 //    constructor(parcel: Parcel) : this(
 //        parcel.readString() ?: "",
