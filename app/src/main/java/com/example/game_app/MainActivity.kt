@@ -15,6 +15,8 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
+
+        //Here I check if there is a current user logged in and if not i go to AuthenticationActivity
         authenticationViewModel.logged.observe(this) {
             if (!it) {
                 startActivity(Intent(this, AuthenticationActivity::class.java))

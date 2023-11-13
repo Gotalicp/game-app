@@ -5,11 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.data.Account
 import com.example.game_app.data.Messages
-
+//An object of information to share between all fragments and viewModels
 object SharedInformation {
+    //Current User
     private val account = MutableLiveData<Account>()
+    //Chat from sockets
     private val _chat = MutableLiveData<MutableList<Messages>>()
-
     val sharedChat: LiveData<MutableList<Messages>>
         get() = _chat
     fun getAcc(): LiveData<Account> {
