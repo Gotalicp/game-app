@@ -1,20 +1,22 @@
-package com.example.game_app.game.war
+package com.example.game_app.game.goFish
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.game_app.game.war.Deck
-import com.example.game_app.game.GameLogic
+import com.example.game_app.common.GameLogic
+import com.example.game_app.game.Card
+import com.example.game_app.game.Deck
+import com.example.game_app.game.Rank
+import java.io.Serializable
 
 data class Play(
     val askingPlayer: Int,
     val askedPlayer: Int,
     val rank: Rank
-)
+):Serializable
 
-class GameWarThread(override val playerNumber: Int,
-                    override val roundSeed: Long,
-                    override val players: List<Int>,
+class GoFishLogic(override val playerNumber: Int,
+                    override val players: Int
     ) : GameLogic<Play> {
 
     //Here i keep each players cards
@@ -25,7 +27,7 @@ class GameWarThread(override val playerNumber: Int,
 
     //initiate deck
     private var deck = Deck()
-    override fun startGame() {
+    override fun startGame(roundSeed: Long) {
         _playerToTakeTurn.postValue(1)
         deck.showDeck()
         deck.shuffle(roundSeed)
@@ -35,27 +37,22 @@ class GameWarThread(override val playerNumber: Int,
     override fun endGame() {
     }
 
-
-    override fun turnHandling(t: Play) {
-            processTurn(t)
-            //Takes the next player
-            _playerToTakeTurn.postValue(players[players.indexOf(_playerToTakeTurn.value)+1 % players.size])
-            //checks if move ended the game
-    }
-    private fun processTurn(play: Play ) {
+    override fun turnHandling(t: Play ) {
         // Check if the asked player has any cards of the requested rank
-        val cardsReceived = playersDeck[play.askedPlayer].first.filter { it.rank == play.rank }
+        val cardsReceived = playersDeck[t.askedPlayer].first.filter { it.rank == t.rank }
             if (cardsReceived.isNotEmpty()) {
-                playersDeck[play.askingPlayer].first.addAll(cardsReceived)
-                playersDeck[play.askedPlayer].first.removeAll(cardsReceived)
+                playersDeck[t.askingPlayer].first.addAll(cardsReceived)
+                playersDeck[t.askedPlayer].first.removeAll(cardsReceived)
             } else {
+                //sets next player
+                _playerToTakeTurn.postValue((_playerToTakeTurn.value!!+ 1) % players)
                 // If no cards received, draw a card from the deck
                 deck.drawCard()?.let {
                     playersDeck[playerNumber].first.add(it)
                 }
             }
         // Check for books in the current player's hand
-        checkForBooks(playersDeck[play.askingPlayer].first)
+        checkForBooks(playersDeck[t.askingPlayer].first)
     }
 
     private fun checkForBooks(hand: MutableList<Card>) {

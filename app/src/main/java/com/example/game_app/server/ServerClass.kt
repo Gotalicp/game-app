@@ -3,129 +3,101 @@ package com.example.game_app.server
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.game_app.SharedInformation
-import com.example.game_app.data.Messages
-import com.example.game_app.game.GameLogic
+import com.example.game_app.common.GameLogic
+import com.example.game_app.data.Wrapper
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
-import java.net.InetAddress
-import java.net.NetworkInterface
-import java.net.ServerSocket
 import java.net.Socket
-import java.util.Enumeration
 import java.util.concurrent.Executors
+import kotlin.random.Random
 
-class ServerClass<T : Serializable>(private val gameLogic: GameLogic<T>) : Thread() {
-
-    private lateinit var serverSocket: ServerSocket
+class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameLogic<T>) : Thread() {
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
-    private var socket: Socket? = null
+    private var socket: Socket = socket
 
     @Volatile
     private var isRunning = true
-    private var isConnected = false
-
+    private var gameStarter = false
 
     override fun run() {
         try {
-            serverSocket = ServerSocket(8888)
-            Log.i("ServerClass","started")
-            socket = serverSocket.accept()
-                socket?.let{
-                    inputStream = ObjectInputStream(it.getInputStream())
-                    Log.i("ServerClass","input")
-                    outputStream = ObjectOutputStream(it.getOutputStream())
-                    Log.i("ServerClass","output")
-                    isConnected = true
-                    isRunning = true
-                    gameLogic.startGame()
-            }
+                inputStream = ObjectInputStream(socket.getInputStream())
+                outputStream = ObjectOutputStream(socket.getOutputStream())
         }catch (ex: IOException){
             ex.printStackTrace()
-            Log.i("Server write","$ex")
+            Log.i("Server","$ex")
         }
         val executors = Executors.newSingleThreadExecutor()
         val handler = Handler(Looper.getMainLooper())
         executors.execute(Runnable{
             kotlin.run {
-                while (isRunning){
+                while(isRunning){
+                while (gameStarter) {
                     try {
-                        val play = inputStream.readObject() as T
-                        if(play.isNotEmpty()) {
-                            handler.post(Runnable {
-                                kotlin.run {
-                                    Log.i("Server class", play.toString())
-//                                    SharedInformation.updateChat(Messages("me ",play.toString()," now"))
-                                    gameLogic.turnHandling(play)
-                                    if(gameLogic.gameEnded()){
-                                        gameLogic.endGame()
+                        val play = inputStream.readObject() as Result<T>
+                        play.fold(
+                            onSuccess = {
+                                handler.post(Runnable {
+                                    kotlin.run {
+                                        Log.i("Server", play.toString())
+                                        gameLogic.turnHandling(play.getOrNull()!!)
+                                        if (gameLogic.gameEnded()) {
+                                            gameLogic.endGame()
+                                        }
                                     }
-                                }
-                            })
-                        }
-                    }catch (ex:IOException){
+                                })
+                            },
+                            onFailure = {}
+                        )
+                    } catch (ex: IOException) {
                         ex.printStackTrace()
                     }
+                }
                 }
             }
         })
     }
-    fun getLocalInetAddress(): InetAddress? {
-        try {
-            val networkInterfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
-            while (networkInterfaces.hasMoreElements()) {
-                val networkInterface: NetworkInterface = networkInterfaces.nextElement()
-                val addresses: Enumeration<InetAddress> = networkInterface.inetAddresses
-                while (addresses.hasMoreElements()) {
-                    val address: InetAddress = addresses.nextElement()
-                    if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
-                        return address
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
-    }
 
-    fun write(play: T) {
+    fun write(play: Wrapper<T>) {
         try {
-            if (::outputStream.isInitialized && isConnected) {
-                Log.i("Server write", "${play.toString()} sending")
+            if (::outputStream.isInitialized) {
+                Log.i("Server", "${play.toString()} sending")
                 Thread {
                     outputStream.writeObject(play)
                 }.start()
-                Log.i("Server write", "Send")
+                Log.i("Server", "Send")
             } else {
                 Log.e(
-                    "ClientClass",
+                    "Server",
                     "Error writing message: outputStream not initialized or connection not established."
                 )
             }
         } catch (ex: IOException) {
             ex.printStackTrace()
-            Log.e("ClientClass", "Error writing message: $ex")
+            Log.e("Server", "Error writing message: $ex")
         }
     }
     fun close() {
         try {
+            gameStarter = false
             isRunning = false
-            isConnected = false
-            if(socket != null) {
-                outputStream.close()
-                inputStream.close()
-                socket!!.close()
-            }else{
-                serverSocket.close()
-            }
+            outputStream.close()
+            inputStream.close()
+            socket.close()
             Log.i("Server", "Closed streams and socket")
         } catch (ex: IOException) {
             ex.printStackTrace()
             Log.e("Server", "Error closing resources: $ex")
         }
+    }
+
+    fun startGame(){
+        val seed = Random.nextLong()
+        gameLogic.startGame(seed)
+        write(Wrapper(t = null,seed))
+        gameStarter= true
     }
 }

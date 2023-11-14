@@ -8,12 +8,14 @@ import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.PlayerInfo
 import com.example.game_app.data.adapters.LobbyAdapter
+import com.example.game_app.data.adapters.SingleLobbyAdapter
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 
 class FireBaseViewModel : ViewModel() {
     //Adapter that turns snapshot data in lobbyInfo
     private val lobbyAdapter = LobbyAdapter()
+    private val singleLobbyAdapter = SingleLobbyAdapter()
     //Save all the lobbies here
     private val _lobbiesList = MutableLiveData<List<LobbyInfo>>()
     val lobbiesList: LiveData<List<LobbyInfo>> get() = _lobbiesList
@@ -22,7 +24,7 @@ class FireBaseViewModel : ViewModel() {
 
 
     //Get all lobbies from the database
-    private fun getLobbies(callback: (MutableList<LobbyInfo>) -> Unit) {
+        fun getLobbies(callback: (MutableList<LobbyInfo>) -> Unit) {
         Firebase.database.getReference("lobby").get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot != null) {
                 val result = lobbyAdapter.adapt(documentSnapshot)
@@ -35,6 +37,18 @@ class FireBaseViewModel : ViewModel() {
             callback(mutableListOf())
     }}
 
+    fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
+        Firebase.database.getReference("lobby/$uid").get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot != null) {
+                val result = singleLobbyAdapter.adapt(documentSnapshot)
+                callback(result)
+            } else {
+                callback(null)
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("firebase", "Error getting data", exception)
+            callback(null)
+        }}
     fun refresh(){
         getLobbies {
             _lobbiesList.postValue(it)

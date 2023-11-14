@@ -1,5 +1,6 @@
-package com.example.game_app.game.war
+package com.example.game_app.game
 
+import android.util.Log
 import kotlin.random.Random
 
 enum class Suit {
@@ -29,15 +30,17 @@ class Deck{
     }
 
     //Gives Each Player (N) Number Of Cards
-    fun deal(players: List<Int>, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<Pair<MutableList<Card>,Int>> {
+    fun deal(players: Int, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<Pair<MutableList<Card>,Int>> {
+        //create empty temporary list to return later
         val playerHands = mutableListOf<Pair<MutableList<Card>,Int>>()
-        for(player in players){
-            playerHands.add(Pair(mutableListOf<Card>(), 0))
+        for(size in 0..players){
+            //create hand for every player
+            playerHands.add(Pair(mutableListOf(), 0))
         }
         //Gives Card To Players
         for (i in 1..numberOfCardsPerPlayer) {
-            for(player in players) {
-                playerHands[player].add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
+            for(player in 0..players) {
+                playerHands[player].first.add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
             }
         }
         return playerHands

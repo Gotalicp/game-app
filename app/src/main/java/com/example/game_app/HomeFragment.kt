@@ -33,7 +33,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 findNavController().navigate(R.id.HomeToMenu)
             }
             btnHost.setOnClickListener {
-                findNavController().navigate(R.id.HomeToHost)
+                findNavController().navigate(R.id.HomeToLobby)
             }
             btnLibrary.setOnClickListener {
                 findNavController().navigate(R.id.HomeToLibrary)
