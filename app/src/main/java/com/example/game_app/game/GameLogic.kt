@@ -6,5 +6,6 @@ interface GameLogic <Turn>{
     val roundSeed : Long
     fun startGame()
     fun turnHandling(t: Turn)
+    fun gameEnded(): Boolean
     fun endGame()
 }

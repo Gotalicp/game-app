@@ -6,14 +6,16 @@ import android.os.Looper
 import android.util.Log
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Messages
+import com.example.game_app.game.GameLogic
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.Executors
 
-class ClientClass(ip: String): Thread() { private var hostAddress = ip
+class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>,ip: String): Thread() { private var hostAddress = ip
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
     private lateinit var socket: Socket
@@ -21,11 +23,11 @@ class ClientClass(ip: String): Thread() { private var hostAddress = ip
     @Volatile
     private var isConnected = false
 
-    fun write(message: String) {
+    fun write(play: T) {
         try {
             if (::outputStream.isInitialized && isConnected) {
-                Log.i("ClientClass", "$message sending")
-                outputStream.writeObject(message)
+                Log.i("ClientClass", "${play.toString()} sending")
+                outputStream.writeObject(play)
                 Log.i("ClientClass", "Send")
                 outputStream.reset()
             } else {
@@ -51,6 +53,7 @@ class ClientClass(ip: String): Thread() { private var hostAddress = ip
             inputStream = ObjectInputStream(socket.getInputStream())
             Log.d("connection", "Connection established")
             isConnected = true
+            gameLogic.startGame()
             Log.d("connected","connected")
         } catch (ex: IOException) {
             ex.printStackTrace()
@@ -62,11 +65,15 @@ class ClientClass(ip: String): Thread() { private var hostAddress = ip
             kotlin.run {
                 while (isConnected) {
                     try {
-                         val message = inputStream.readObject() as String
+                         val play = inputStream.readObject() as T
                             handler.post(Runnable {
                                 kotlin.run {
-                                    Log.i("client class", message)
-                                    SharedInformation.updateChat(Messages("me",message,"now"))
+                                    Log.i("client class", play.toString())
+//                                    SharedInformation.updateChat(Messages("me",play,"now"))
+                                    gameLogic.turnHandling(play)
+                                    if(gameLogic.gameEnded()){
+                                        gameLogic.endGame()
+                                    }
                                 }
                             })
                     } catch (ex: IOException) {

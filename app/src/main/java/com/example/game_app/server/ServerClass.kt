@@ -5,9 +5,11 @@ import android.os.Looper
 import android.util.Log
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Messages
+import com.example.game_app.game.GameLogic
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
@@ -15,7 +17,7 @@ import java.net.Socket
 import java.util.Enumeration
 import java.util.concurrent.Executors
 
-class ServerClass :Thread(){
+class ServerClass<T : Serializable>(private val gameLogic: GameLogic<T>) : Thread() {
 
     private lateinit var serverSocket: ServerSocket
     private lateinit var inputStream: ObjectInputStream
@@ -39,6 +41,7 @@ class ServerClass :Thread(){
                     Log.i("ServerClass","output")
                     isConnected = true
                     isRunning = true
+                    gameLogic.startGame()
             }
         }catch (ex: IOException){
             ex.printStackTrace()
@@ -50,12 +53,16 @@ class ServerClass :Thread(){
             kotlin.run {
                 while (isRunning){
                     try {
-                        val message = inputStream.readObject() as String
-                        if(message.isNotEmpty()) {
+                        val play = inputStream.readObject() as T
+                        if(play.isNotEmpty()) {
                             handler.post(Runnable {
                                 kotlin.run {
-                                    Log.i("Server class", message)
-                                    SharedInformation.updateChat(Messages("me",message,"now"))
+                                    Log.i("Server class", play.toString())
+//                                    SharedInformation.updateChat(Messages("me ",play.toString()," now"))
+                                    gameLogic.turnHandling(play)
+                                    if(gameLogic.gameEnded()){
+                                        gameLogic.endGame()
+                                    }
                                 }
                             })
                         }
@@ -85,12 +92,12 @@ class ServerClass :Thread(){
         return null
     }
 
-    fun write(message: String) {
+    fun write(play: T) {
         try {
             if (::outputStream.isInitialized && isConnected) {
-                Log.i("Server write", "$message sending")
+                Log.i("Server write", "${play.toString()} sending")
                 Thread {
-                    outputStream.writeObject(message)
+                    outputStream.writeObject(play)
                 }.start()
                 Log.i("Server write", "Send")
             } else {

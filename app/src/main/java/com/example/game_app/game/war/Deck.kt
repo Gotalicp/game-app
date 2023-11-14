@@ -29,10 +29,10 @@ class Deck{
     }
 
     //Gives Each Player (N) Number Of Cards
-    fun deal(players: List<Int>, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<MutableList<Card>> {
-        val playerHands = mutableListOf<MutableList<Card>>()
+    fun deal(players: List<Int>, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<Pair<MutableList<Card>,Int>> {
+        val playerHands = mutableListOf<Pair<MutableList<Card>,Int>>()
         for(player in players){
-            playerHands.add(mutableListOf())
+            playerHands.add(Pair(mutableListOf<Card>(), 0))
         }
         //Gives Card To Players
         for (i in 1..numberOfCardsPerPlayer) {
@@ -68,7 +68,7 @@ class Deck{
     }
     fun showDeck() {
         for (card in cards) {
-            println("${card.rank} of ${card.suit}")
+            Log.d("ShowDeck","${card.rank} of ${card.suit}")
         }
     }
     fun drawCard(): Card? {
