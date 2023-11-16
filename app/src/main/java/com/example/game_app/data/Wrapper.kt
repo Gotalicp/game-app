@@ -1,3 +1,5 @@
 package com.example.game_app.data
 
-data class Wrapper<T>(val t:T?, val seed: Long?)
+import java.io.Serializable
+
+data class Wrapper<T>(val t:T?, val seed: Long?):Serializable

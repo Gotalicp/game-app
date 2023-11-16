@@ -1,6 +1,8 @@
 package com.example.game_app.game
 
 import android.util.Log
+import com.example.game_app.data.PlayerInfo
+import com.example.game_app.game.goFish.GoFishLogic
 import kotlin.random.Random
 
 enum class Suit {
@@ -20,7 +22,6 @@ data class Card(val suit: Suit, val rank: Rank)
 
 class Deck{
     private val cards: MutableList<Card> = mutableListOf()
-
     init {
         for (suit in Suit.values()) {
             for (rank in Rank.values()) {
@@ -30,31 +31,29 @@ class Deck{
     }
 
     //Gives Each Player (N) Number Of Cards
-    fun deal(players: Int, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<Pair<MutableList<Card>,Int>> {
+    fun deal(players: MutableList<PlayerInfo>, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<GoFishLogic.Player> {
         //create empty temporary list to return later
-        val playerHands = mutableListOf<Pair<MutableList<Card>,Int>>()
-        for(size in 0..players){
+        val playersHands = mutableListOf<GoFishLogic.Player>()
+        for(player in players){
             //create hand for every player
-            playerHands.add(Pair(mutableListOf(), 0))
+            playersHands.add(GoFishLogic.Player(mutableListOf(),player,0))
         }
         //Gives Card To Players
         for (i in 1..numberOfCardsPerPlayer) {
-            for(player in 0..players) {
-                playerHands[player].first.add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
+            for(player in playersHands) {
+                player.deck.add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
             }
         }
-        return playerHands
+        return playersHands
     }
 
     //Gives players all the cards
     fun deal(players: List<Int>, deck: Deck): MutableList<Pair<Int, MutableList<Card>>> {
         val playerHands = mutableMapOf<Int, MutableList<Card>>()
-
         // Initialize hands for each player
         for (player in players) {
             playerHands[player] = mutableListOf()
         }
-
         //Loop of giving cards util empty
         while (deck.isEmpty()) {
             for (player in players) {
@@ -62,7 +61,6 @@ class Deck{
                 playerHands[player]?.add(card)
             }
         }
-
         // Convert playerHands to a list of pairs
         return playerHands.toList().toMutableList()
     }
@@ -74,14 +72,6 @@ class Deck{
             Log.d("ShowDeck","${card.rank} of ${card.suit}")
         }
     }
-    fun drawCard(): Card? {
-        return if (cards.isNotEmpty()) {
-            cards.removeAt(0)
-        } else {
-            null
-        }
-    }
-    private fun isEmpty(): Boolean {
-        return cards.isEmpty()
-    }
+    fun drawCard() = if (cards.isNotEmpty()) { cards.removeAt(0) } else { null }
+    fun isEmpty() = cards.isEmpty()
 }

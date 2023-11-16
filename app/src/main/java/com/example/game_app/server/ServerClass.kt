@@ -20,27 +20,23 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
 
     @Volatile
     private var isRunning = true
-    private var gameStarter = false
 
     override fun run() {
         try {
-                inputStream = ObjectInputStream(socket.getInputStream())
-                outputStream = ObjectOutputStream(socket.getOutputStream())
+            inputStream = ObjectInputStream(socket.getInputStream())
+            outputStream = ObjectOutputStream(socket.getOutputStream())
         }catch (ex: IOException){
             ex.printStackTrace()
             Log.i("Server","$ex")
         }
-        val executors = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executors.execute(Runnable{
+        Executors.newSingleThreadExecutor().execute(Runnable{
             kotlin.run {
                 while(isRunning){
-                while (gameStarter) {
                     try {
                         val play = inputStream.readObject() as Result<T>
                         play.fold(
                             onSuccess = {
-                                handler.post(Runnable {
+                                Handler(Looper.getMainLooper()).post(Runnable {
                                     kotlin.run {
                                         Log.i("Server", play.toString())
                                         gameLogic.turnHandling(play.getOrNull()!!)
@@ -55,7 +51,6 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
                     } catch (ex: IOException) {
                         ex.printStackTrace()
                     }
-                }
                 }
             }
         })
@@ -82,7 +77,6 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
     }
     fun close() {
         try {
-            gameStarter = false
             isRunning = false
             outputStream.close()
             inputStream.close()
@@ -97,7 +91,6 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
     fun startGame(){
         val seed = Random.nextLong()
         gameLogic.startGame(seed)
-        write(Wrapper(t = null,seed))
-        gameStarter= true
+        write(Wrapper(null,seed))
     }
 }

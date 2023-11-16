@@ -26,7 +26,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
     fun write(play: T) {
         try {
             if (::writer.isInitialized && isConnected) {
-                Log.i("Client", "${play.toString()} sending")
+                Log.i("Client", "${play} sending")
                 writer.writeObject(play)
                 Log.i("Client", "Send")
                 writer.reset()
@@ -53,12 +53,12 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
             Log.e("Client", "Error closing resources: $ex")
         }
     }
-            @SuppressLint("SuspiciousIndentation")
-            override fun run() {
+    @SuppressLint("SuspiciousIndentation")
+    override fun run() {
         try {
             socket = Socket()
             val ip = InetSocketAddress(hostAddress, 8888)
-            socket.connect(ip, 500)
+            socket.connect(ip, 1000)
             writer = ObjectOutputStream(socket.getOutputStream())
             writer.flush()
             Log.d("Client", "Connection established")
@@ -66,18 +66,13 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
             Log.d("Client", "Connection established")
             isConnected = true
             Log.d("Client","connected")
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-        }
-        val executor = Executors.newSingleThreadExecutor()
-        var handler = Handler(Looper.getMainLooper())
-
-        executor.execute(kotlinx.coroutines.Runnable {
+        } catch (ex: IOException) { ex.printStackTrace() }
+        Executors.newSingleThreadExecutor().execute(kotlinx.coroutines.Runnable {
             kotlin.run {
                 while (isConnected) {
                     try {
                         val play = reader.readObject() as Wrapper<T>
-                        handler.post(Runnable {
+                        Handler(Looper.getMainLooper()).post(Runnable {
                             kotlin.run {
                                 Log.i("Client", play.toString())
                                 play.apply{

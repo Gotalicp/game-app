@@ -8,7 +8,6 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.util.Enumeration
 
-
 class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>): Thread() {
     private val serverThreads: ArrayList<ServerClass<T>> = ArrayList()
     private var isRunning = false
