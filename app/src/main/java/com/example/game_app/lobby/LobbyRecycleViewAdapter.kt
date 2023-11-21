@@ -20,10 +20,8 @@ class LobbyRecycleViewAdapter(isHost:Boolean) : RecyclerView.Adapter<LobbyRecycl
     var itemClickListener: itemClickListener<PlayerInfo>? = null
     private val host = isHost
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LobbyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_lobby, parent, false)
-        return LobbyViewHolder(view, host)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)
+     = LobbyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_lobby, parent, false), host)
 
     override fun onBindViewHolder(holder: LobbyViewHolder, position: Int) {
         holder.bind(items[position])
