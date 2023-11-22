@@ -43,8 +43,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 if (password.text.toString() != "" && email.text.toString() != "") {
                     authenticationViewModel.logIn(
                         email.text.toString(),
-                        password.text.toString(),
-                        view
+                        password.text.toString()
                     )
                 }
             }

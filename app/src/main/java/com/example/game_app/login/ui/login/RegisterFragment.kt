@@ -40,7 +40,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                         usenname.text.toString(),
                         email.text.toString(),
                         password.text.toString(),
-                        view , requireContext())
+                        requireContext())
                 }
             }
             checkBoxShowPassword.setOnCheckedChangeListener{ _, isChecked ->

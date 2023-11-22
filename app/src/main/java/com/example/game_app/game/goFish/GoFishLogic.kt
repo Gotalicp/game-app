@@ -29,7 +29,6 @@ class GoFishLogic(override val players: MutableList<PlayerInfo>): GameLogic<Play
     private val _playerToTakeTurn = MutableLiveData<Player>()
     val playerToTakeTurn: LiveData<Player> get() = _playerToTakeTurn
 
-
     //initiate deck
     private var deck = Deck()
     override fun startGame(seed: Long) {
@@ -52,19 +51,20 @@ class GoFishLogic(override val players: MutableList<PlayerInfo>): GameLogic<Play
             gamePlayer[indexOf(t.askedPlayer)].deck.removeAll(cardsReceived)
             checkForEmptyHand(gamePlayer[indexOf(t.askedPlayer)])
         } else {
-            //sets next player
-            _playerToTakeTurn.postValue(gamePlayer[(indexOf(t.askingPlayer)+1)%gamePlayer.size])
             // If no cards received, draw a card from the deck
             deck.drawCard()?.let {
                 gamePlayer[indexOf(t.askingPlayer)].deck.add(it)
             }
         }
         // Check for books in the current player's hand
-        checkForBooks(gamePlayer[indexOf(t.askingPlayer)])
+        if(checkForBooks(gamePlayer[indexOf(t.askingPlayer)])){
+            // Sets next player
+            _playerToTakeTurn.postValue(gamePlayer[(indexOf(t.askingPlayer)+1)%gamePlayer.size])
+        }
         if(gameEnded()){ endGame() }
     }
 
-    private fun checkForBooks(hand: Player) {
+    private fun checkForBooks(hand: Player):Boolean{
         val ranks = hand.deck.groupBy { it.rank }
         for (rank in ranks.keys) {
             if (ranks[rank]?.size == 4) {
@@ -72,8 +72,10 @@ class GoFishLogic(override val players: MutableList<PlayerInfo>): GameLogic<Play
                 hand.deck.removeAll { it.rank == rank }
                 hand.score+=1
                 checkForEmptyHand(hand)
+                return false
             }
         }
+        return true
     }
     private fun checkForEmptyHand(hand: Player){
         if(hand.deck.isEmpty()){
