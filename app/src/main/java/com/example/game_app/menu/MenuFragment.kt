@@ -1,5 +1,6 @@
 package com.example.game_app.menu
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +14,8 @@ import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentMenuBinding
+import com.example.game_app.game.goFish.GoFishActivity
+import com.example.game_app.login.AuthenticationActivity
 
 class MenuFragment : Fragment(R.layout.fragment_menu) {
     private var _binding: FragmentMenuBinding? = null
@@ -40,7 +43,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
                         val bundle = Bundle().apply {
                             putSerializable("lobbyInfo", item)
                         }
-                        findNavController().navigate(R.id.MenuToConnected, bundle)
+                        startActivity(Intent(context, GoFishActivity::class.java),bundle)
                     }
                 }
             }

@@ -19,19 +19,12 @@
         <action
             android:id="@+id/HomeToSettings"
             app:destination="@id/settingsFragment" />
-        <action
-            android:id="@+id/HomeToLobby"
-            app:destination="@id/lobbyFragment" />
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
         android:name="com.example.game_app.menu.MenuFragment"
         android:label="fragment_menu"
-        tools:layout="@layout/fragment_menu" >
-        <action
-            android:id="@+id/MenuToLobby"
-            app:destination="@id/lobbyFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_menu" />
     <fragment
         android:id="@+id/libraryFragment"
         android:name="com.example.game_app.library.LibraryFragment"
@@ -41,15 +34,4 @@
         android:name="com.example.game_app.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
-    <fragment
-        android:id="@+id/lobbyFragment"
-        android:name="com.example.game_app.lobby.LobbyFragment"
-        android:label="LobbyFragment" >
-        <action
-            android:id="@+id/LobbyToMenu"
-            app:destination="@id/menuFragment" />
-        <action
-            android:id="@+id/LobbyToHome"
-            app:destination="@id/homeFragment" />
-    </fragment>
 </navigation>

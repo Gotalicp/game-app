@@ -15,9 +15,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val auth: AuthenticationViewModel by activityViewModels()
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,9 +29,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         _binding?.apply {
             btnPlay.setOnClickListener {
                 findNavController().navigate(R.id.HomeToMenu)
-            }
-            btnHost.setOnClickListener {
-                findNavController().navigate(R.id.HomeToLobby)
             }
             btnLibrary.setOnClickListener {
                 findNavController().navigate(R.id.HomeToLibrary)
