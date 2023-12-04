@@ -26,23 +26,24 @@ class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>, priva
             serverThreads.add(thread)
         }
     }
-    fun startGame(){
+    fun startGame(seed: Long){
         isRunning = false
         for(servers in serverThreads){
-            servers.startGame()
+            servers.startGame(seed)
         }
     }
     fun endGame(){
         for(servers in serverThreads){
             servers.close()
         }
+        fireBase.destroyLobby(lobbyInfo.lobbyUid)
     }
     fun send(t:T){
         for(servers in serverThreads){
             servers.write(Wrapper(t, null))
         }
     }
-    fun getLocalInetAddress(): String? {
+    private fun getLocalInetAddress(): String? {
         try {
             val networkInterfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
             while (networkInterfaces.hasMoreElements()) {

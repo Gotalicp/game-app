@@ -1,4 +1,4 @@
-package com.example.game_app.game.goFish.Popup
+package com.example.game_app.game.goFish.popup
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.PlayerInfo
 
-class PopupCreateRecycleView : RecyclerView.Adapter<PopupCreateRecycleView.PopupCreateViewHolder>() {
+class PopupLobbyRecycleView : RecyclerView.Adapter<PopupLobbyRecycleView.PopupCreateViewHolder>() {
 
     private var items = listOf<PlayerInfo>()
     var itemClickListener: itemClickListener<PlayerInfo>? = null

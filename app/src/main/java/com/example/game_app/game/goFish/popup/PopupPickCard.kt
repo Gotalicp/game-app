@@ -1,46 +1,32 @@
-package com.example.game_app.game.goFish.Popup
+package com.example.game_app.game.goFish.popup
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.SharedInformation
-import com.example.game_app.game.goFish.GoFishViewModel
 
-class PopupCreate(
-    private val context: Context,
-    private val viewModel: GoFishViewModel
+class PopupPickCard(
+    private val context: Context
 ){
 
     private val popupView: View
     private val recyclerView: RecyclerView
-    private val adapter: PopupCreateRecycleView
-    private val sharedLobby = SharedInformation.getLobby()
+    private val adapter: PopupLobbyRecycleView
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        popupView = inflater.inflate(R.layout.dialog_fragment_lobby, null)
+        popupView = inflater.inflate(R.layout.window_pick_card, null)
         recyclerView = popupView.findViewById(R.id.recyclerView)
-        adapter = PopupCreateRecycleView()
+        adapter = PopupLobbyRecycleView()
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
-
-        sharedLobby.observe(context as LifecycleOwner){
-            adapter.updateItems(it.players)
-        }
 
         popupView.findViewById<TextView>(R.id.lobbyName).text = "test"
         popupView.findViewById<TextView>(R.id.gamemode).text = "Gamemode Name: gofish"
@@ -62,13 +48,5 @@ class PopupCreate(
             0,
             0
         )
-
-        popupView.findViewById<Button>(R.id.btn_start).setOnClickListener {
-            popupWindow.dismiss()
-        }
-
-        popupView.findViewById<Button>(R.id.btn_exit).setOnClickListener {
-            popupWindow.dismiss()
-        }
     }
 }

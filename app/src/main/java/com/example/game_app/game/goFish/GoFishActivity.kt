@@ -1,29 +1,23 @@
 package com.example.game_app.game.goFish
 
-import DialogFragmentLobby
-import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.fragment.app.activityViewModels
-import com.example.game_app.R
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.ActivityGoFishBinding
-import com.example.game_app.game.goFish.Popup.PopupCreate
+import com.example.game_app.game.goFish.popup.PopupLobby
 
 class GoFishActivity : AppCompatActivity() {
     private val goFishViewMode: GoFishViewModel by viewModels()
     private lateinit var binding: ActivityGoFishBinding
-    private var bundle: Bundle? = null
+    private var uid: String? = null
 
     init {
         if(intent != null){
-            bundle = intent.getBundleExtra("lobbyInfo")
+            uid = intent.getStringExtra("lobbyInfo")
         }
     }
 
@@ -32,16 +26,18 @@ class GoFishActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (bundle != null) {
-            goFishViewMode.joinGame(bundle!!.getSerializable("lobbyUID", LobbyInfo::class.java)!!)
+
+        if (uid != null) {
+            goFishViewMode.joinGame(uid!!)
                 findViewById<View>(android.R.id.content).post {
-                    PopupCreate(this, goFishViewMode).showPopup(findViewById(android.R.id.content))
+                    PopupLobby(this) {}.showPopup(findViewById(android.R.id.content))
                 }
             } else {
                 goFishViewMode.createGame(LobbyInfo(lobbyName = "text", maxPlayerCount = 4, gamemode = "gofish", gamemodeId = 0, connection = "local"))
                 findViewById<View>(android.R.id.content).post {
-                    PopupCreate(this,goFishViewMode).showPopup(findViewById(android.R.id.content))
+                    PopupLobby(this){goFishViewMode.startGame()}.showPopup(findViewById(android.R.id.content))
             }
         }
+
     }
 }

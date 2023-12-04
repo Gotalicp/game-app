@@ -74,6 +74,7 @@ class FireBaseViewModel : ViewModel() {
                         SharedInformation.updateLobby(singleLobbyAdapter.adapt(snapshot))
                     }
                     override fun onCancelled(error: DatabaseError) {
+                        Log.e("bug in firebase observe", "bug")
                         databaseListenerThread.interrupt()
                     }
                 })
@@ -96,6 +97,7 @@ class FireBaseViewModel : ViewModel() {
                         }
                         override fun onCancelled(error: DatabaseError) {
                             databaseListenerThread.interrupt()
+                            Log.e("bug in firebase observe", "bug")
                         }
                     })
         }

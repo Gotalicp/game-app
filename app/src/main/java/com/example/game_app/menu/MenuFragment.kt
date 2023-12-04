@@ -43,7 +43,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
                         FireBaseViewModel().joinLobby(item)
                         startActivity(Intent(context, GoFishActivity::class.java), Bundle().apply{
-                            putSerializable("lobbyUid", item.lobbyUid)
+                            putString("lobbyUid", item.lobbyUid)
                         })
                     }
                 }

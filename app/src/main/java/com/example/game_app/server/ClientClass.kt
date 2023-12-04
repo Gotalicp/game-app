@@ -7,6 +7,7 @@ import android.util.Log
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
+import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.Wrapper
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -16,8 +17,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.Executors
 
-class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: String): Thread() {
-    private var hostAddress = ip
+class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private val lobbyInfo: LobbyInfo): Thread() {
     private lateinit var reader: ObjectInputStream
     private lateinit var writer: ObjectOutputStream
     private lateinit var socket: Socket
@@ -55,12 +55,13 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
             ex.printStackTrace()
             Log.e("Client", "Error closing resources: $ex")
         }
+        fireBase.leaveLobby(lobbyInfo)
     }
     @SuppressLint("SuspiciousIndentation")
     override fun run() {
         try {
             socket = Socket()
-            val ip = InetSocketAddress(hostAddress, 8888)
+            val ip = InetSocketAddress(lobbyInfo.ownerIp, 8888)
             socket.connect(ip, 1000)
             writer = ObjectOutputStream(socket.getOutputStream())
             writer.flush()
@@ -69,6 +70,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
             Log.d("Client", "Connection established")
             isConnected = true
             Log.d("Client","connected")
+            fireBase.joinLobby(lobbyInfo)
         } catch (ex: IOException) { ex.printStackTrace() }
         Executors.newSingleThreadExecutor().execute(kotlinx.coroutines.Runnable {
             kotlin.run {

@@ -90,8 +90,7 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
         }
     }
 
-    fun startGame(){
-        val seed = Random.nextLong()
+    fun startGame(seed:Long){
         gameLogic.startGame(seed, SharedInformation.getLobby().value!!.players)
         write(Wrapper(null,seed))
     }
