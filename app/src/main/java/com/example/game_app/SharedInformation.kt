@@ -16,10 +16,8 @@ object SharedInformation {
         account.value = acc
     }
     private val lobby = MutableLiveData<LobbyInfo>()
-    fun getLobby(): LiveData<LobbyInfo> {
-        return lobby
-    }
-    fun updateAcc(lobbyInfo: LobbyInfo) {
-        lobby.value = lobbyInfo
+    fun getLobby(): LiveData<LobbyInfo> = lobby
+    fun updateLobby(lobbyInfo: LobbyInfo?) {
+        lobby.value = lobbyInfo?: LobbyInfo()
     }
 }

@@ -4,12 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LobbyInfo (
-    val lobbyName: String,
-    val lobbyUid: String,
-    val ownerIp: String,
-    var players: MutableList<PlayerInfo>,
-    val maxPlayerCount:Int,
-    val gamemode:String,
-    val gamemodeId: Int,
-    val connection:String,
+    val lobbyName: String = "",
+    var lobbyUid: String = "",
+    var ownerIp: String = "",
+    var players: MutableList<PlayerInfo> = mutableListOf(),
+    val maxPlayerCount:Int = 0,
+    val gamemode:String = "",
+    val gamemodeId: Int = 0,
+    val connection:String = "",
 ):java.io.Serializable

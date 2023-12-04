@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.game_app.FireBaseViewModel
+import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
 import com.example.game_app.data.Wrapper
 import java.io.IOException
@@ -19,6 +21,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
     private lateinit var reader: ObjectInputStream
     private lateinit var writer: ObjectOutputStream
     private lateinit var socket: Socket
+    private val fireBase = FireBaseViewModel()
 
     @Volatile
     private var isConnected = false
@@ -26,7 +29,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
     fun write(play: T) {
         try {
             if (::writer.isInitialized && isConnected) {
-                Log.i("Client", "${play} sending")
+                Log.i("Client", "$play sending")
                 writer.writeObject(play)
                 Log.i("Client", "Send")
                 writer.reset()
@@ -77,7 +80,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, ip: Str
                                 Log.i("Client", play.toString())
                                 play.apply{
                                     if (t != null) { gameLogic.turnHandling(t) }
-                                    if (seed != null) { gameLogic.startGame(seed) }
+                                    if (seed != null) { gameLogic.startGame(seed, SharedInformation.getLobby().value!!.players) }
                                 }
                             }
                         })

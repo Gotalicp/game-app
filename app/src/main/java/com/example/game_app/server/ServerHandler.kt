@@ -1,6 +1,8 @@
 package com.example.game_app.server
 
+import com.example.game_app.FireBaseViewModel
 import com.example.game_app.common.GameLogic
+import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.Wrapper
 import java.io.Serializable
 import java.net.InetAddress
@@ -8,13 +10,15 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.util.Enumeration
 
-class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>): Thread() {
+class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>, private val lobbyInfo: LobbyInfo): Thread() {
     private val serverThreads: ArrayList<ServerClass<T>> = ArrayList()
     private var isRunning = false
     private lateinit var serverSocket: ServerSocket
-
+    private val fireBase = FireBaseViewModel()
     override fun run() {
         super.run()
+        lobbyInfo.ownerIp = getLocalInetAddress()!!
+        fireBase.hostLobby(lobbyInfo)
         isRunning = true
         while(isRunning) {
             serverSocket = ServerSocket(8888)
@@ -38,7 +42,7 @@ class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>): Thre
             servers.write(Wrapper(t, null))
         }
     }
-    fun getLocalInetAddress(): InetAddress? {
+    fun getLocalInetAddress(): String? {
         try {
             val networkInterfaces: Enumeration<NetworkInterface> = NetworkInterface.getNetworkInterfaces()
             while (networkInterfaces.hasMoreElements()) {
@@ -47,7 +51,7 @@ class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>): Thre
                 while (addresses.hasMoreElements()) {
                     val address: InetAddress = addresses.nextElement()
                     if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
-                        return address
+                        return address.toString()
                     }
                 }
             }

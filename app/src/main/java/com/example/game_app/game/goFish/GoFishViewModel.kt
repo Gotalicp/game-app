@@ -17,9 +17,11 @@ class GoFishViewModel : ViewModel() {
     private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
 
     fun createGame(lobby: LobbyInfo){
-            server = ServerHandler(GoFishLogic(lobby.players))
+        server = ServerHandler(GoFishLogic(),lobby)
+        server.start()
     }
     fun joinGame(lobby: LobbyInfo){
-        client = ClientClass(GoFishLogic(lobby.players),lobby.ownerIp)
+        client = ClientClass(GoFishLogic(),lobby.ownerIp)
+        client.start()
     }
 }

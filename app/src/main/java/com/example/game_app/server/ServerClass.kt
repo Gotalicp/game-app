@@ -3,6 +3,8 @@ package com.example.game_app.server
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.game_app.FireBaseViewModel
+import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
 import com.example.game_app.data.Wrapper
 import java.io.IOException
@@ -90,7 +92,7 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
 
     fun startGame(){
         val seed = Random.nextLong()
-        gameLogic.startGame(seed)
+        gameLogic.startGame(seed, SharedInformation.getLobby().value!!.players)
         write(Wrapper(null,seed))
     }
 }

@@ -17,13 +17,14 @@ data class Play(
     val rank: Rank
 ):Serializable
 
-class GoFishLogic(override val players: MutableList<PlayerInfo>): GameLogic<Play> {
+class GoFishLogic : GameLogic<Play> {
     data class Player(
         val deck: MutableList<Card>,
         val info: PlayerInfo,
         var score: Int
     )
-    //Here i keep each players cards
+
+    //all the players
     private lateinit var gamePlayer : MutableList<Player>
     //Checking who's turn is it
     private val _playerToTakeTurn = MutableLiveData<Player>()
@@ -31,12 +32,18 @@ class GoFishLogic(override val players: MutableList<PlayerInfo>): GameLogic<Play
 
     //initiate deck
     private var deck = Deck()
-    override fun startGame(seed: Long) {
+    override fun startGame(seed: Long,players: MutableList<PlayerInfo>) {
         deck.showDeck()
         deck.shuffle(seed)
+        //create players
+        gamePlayer = players.map {
+            Player(mutableListOf(), it, 0)
+        }.toMutableList()
         //randomizes game turns
         gamePlayer.shuffle(Random(seed))
+        //sets first player to take turn
         _playerToTakeTurn.postValue(gamePlayer[0])
+        //gives cards to players
         gamePlayer = deck.deal(players,5, deck)
         deck.showDeck()
     }
