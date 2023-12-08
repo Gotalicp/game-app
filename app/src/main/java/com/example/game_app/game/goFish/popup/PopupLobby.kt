@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.SharedInformation
+import kotlinx.coroutines.flow.callbackFlow
 
 class PopupLobby(
     private val context: Context,

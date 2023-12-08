@@ -14,8 +14,8 @@ import com.example.game_app.data.adapters.BitmapReverser
 
 class PlayersRecycleView: RecyclerView.Adapter<PlayersRecycleView.PlayersViewHolder>() {
     private var bitmapAdapter = BitmapReverser()
-    private var items = listOf<PlayerInfo>()
-    var itemClickListener: itemClickListener<PlayerInfo>? = null
+    private var items = listOf<GoFishLogic.Player>()
+    var itemClickListener: itemClickListener<GoFishLogic.Player>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayersViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_go_fish_player_card, parent, false)
@@ -23,7 +23,7 @@ class PlayersRecycleView: RecyclerView.Adapter<PlayersRecycleView.PlayersViewHol
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateItems(players: List<PlayerInfo>){
+    fun updateItems(players: List<GoFishLogic.Player>){
         items = players
         notifyDataSetChanged()
     }
@@ -37,11 +37,13 @@ class PlayersRecycleView: RecyclerView.Adapter<PlayersRecycleView.PlayersViewHol
     inner class PlayersViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val profile = view.findViewById<ImageView>(R.id.profile)
         private val name = view.findViewById<TextView>(R.id.name)
+        private val cards = view.findViewById<TextView>(R.id.cards)
 
         @SuppressLint("SetTextI18n")
-        fun bind(player: PlayerInfo) {
-            profile.setImageBitmap(bitmapAdapter.adapt(player.image!!))
-            name.text = player.username
+        fun bind(player: GoFishLogic.Player) {
+            profile.setImageBitmap(bitmapAdapter.adapt(player.info.image!!))
+            name.text = player.info.username
+            cards.text = player.deck.size.toString()
             itemClickListener?.onItemClicked(player, absoluteAdapterPosition)
         }
     }

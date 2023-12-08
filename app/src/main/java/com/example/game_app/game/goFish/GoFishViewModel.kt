@@ -14,14 +14,13 @@ import kotlin.random.Random
 class GoFishViewModel : ViewModel() {
     private lateinit var server : ServerHandler<Play>
     private lateinit var client : ClientClass<Play>
-    private lateinit var viewModel: FireBaseViewModel
-    private var goFishLogic = GoFishLogic()
+    private var viewModel = FireBaseViewModel()
+    var goFishLogic = GoFishLogic()
 
-    private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
+    val sharedAccount = SharedInformation.getAcc().value?.uid
 
     fun createGame(lobby: LobbyInfo){
-        server = ServerHandler(goFishLogic,lobby)
-        server.start()
+        server = ServerHandler(goFishLogic,lobby).apply { start() }
     }
     fun joinGame(uid: String){
         viewModel.getLobby(uid) {
@@ -43,7 +42,7 @@ class GoFishViewModel : ViewModel() {
     fun disconnect(){
         client.disconnect()
     }
-    fun stopServer(finish: () -> Unit){
+    fun stopServer(){
         server.endGame()
     }
 }

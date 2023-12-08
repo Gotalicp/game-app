@@ -1,6 +1,7 @@
 package com.example.game_app.server
 
 import com.example.game_app.FireBaseViewModel
+import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.Wrapper
@@ -28,6 +29,7 @@ class ServerHandler<T : Serializable>(private val gameLogic: GameLogic<T>, priva
     }
     fun startGame(seed: Long){
         isRunning = false
+        gameLogic.startGame(seed, SharedInformation.getLobby().value!!.players)
         for(servers in serverThreads){
             servers.startGame(seed)
         }

@@ -42,6 +42,7 @@ class CardsRecycleView: RecyclerView.Adapter<CardsRecycleView.CardsViewHolder>()
                 "drawable",
                 itemView.context.packageName
             )
+            
             cardView.setImageDrawable(ContextCompat.getDrawable(itemView.context, drawableResId))
             itemClickListener?.onItemClicked(card, absoluteAdapterPosition)
         }
