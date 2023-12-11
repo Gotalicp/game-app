@@ -15,18 +15,24 @@ import java.net.Socket
 import java.util.concurrent.Executors
 import kotlin.random.Random
 
-class ServerClass<T : Serializable>(private val socket : Socket,private val gameLogic: GameLogic<T>) : Thread() {
+class ServerClass<T : Serializable>(private val socket : Socket,private val gameLogic: GameLogic<T>) {
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
 
     @Volatile
     private var isRunning = true
 
-    override fun run() {
+    init {
         try {
             inputStream = ObjectInputStream(socket.getInputStream())
-            outputStream    = ObjectOutputStream(socket.getOutputStream())
-        }catch (ex: IOException){ ex.printStackTrace() }
+            outputStream = ObjectOutputStream(socket.getOutputStream())
+        }catch (ex : IOException){
+            Log.d("Server", ex.toString())
+            ex.printStackTrace()
+        }
+    }
+    fun run() {
+        Log.d("Server", "someone joined")
             Thread {
                 while(isRunning){
                     try {

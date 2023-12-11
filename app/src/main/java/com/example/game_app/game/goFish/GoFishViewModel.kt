@@ -1,5 +1,6 @@
 package com.example.game_app.game.goFish
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import com.example.game_app.FireBaseUtility
 import com.example.game_app.FireBaseViewModel
@@ -18,8 +19,10 @@ class GoFishViewModel : ViewModel() {
     val sharedAccount = SharedInformation.getAcc().value?.uid
 
     fun createGame(lobby: LobbyInfo){
-        server = ServerHandler(goFishLogic,lobby).apply { start() }
+        server = ServerHandler(goFishLogic,lobby)
+        server.start()
     }
+    @SuppressLint("SuspiciousIndentation")
     fun joinGame(uid: String){
         firebaseUtility.getLobby(uid){
             if(it != null)

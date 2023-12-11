@@ -18,6 +18,6 @@ object SharedInformation {
     private val lobby = MutableLiveData<LobbyInfo>()
     fun getLobby(): LiveData<LobbyInfo> = lobby
     fun updateLobby(lobbyInfo: LobbyInfo?) {
-        lobby.value = lobbyInfo?: LobbyInfo()
+        lobby.postValue(lobbyInfo?: LobbyInfo())
     }
 }

@@ -15,18 +15,23 @@ class ServerHandler<T : Serializable>(
     private val lobbyInfo: LobbyInfo
 ) : Thread() {
     private val serverThreads: ArrayList<ServerClass<T>> = ArrayList()
-    private var isRunning = false
+    private var isRunning = true
     private lateinit var serverSocket: ServerSocket
     private val fireBaseUtility = FireBaseUtility()
     override fun run() {
         super.run()
         lobbyInfo.ownerIp = getLocalInetAddress() ?: ""
-        Log.d("lobby",lobbyInfo.ownerIp.toString())
+        Log.d("Server", lobbyInfo.ownerIp)
         fireBaseUtility.hostLobby(lobbyInfo)
-        isRunning = true
         serverSocket = ServerSocket(8888)
         while (isRunning) {
-            serverThreads.add(ServerClass(serverSocket.accept(), gameLogic))
+            Log.d("Server", "accepting")
+            val serverThread = ServerClass(serverSocket.accept().apply {
+                Log.d("Server", "accepted")
+            }, gameLogic)
+            serverThread.run()
+            Log.d("Server", "runned")
+            serverThreads.add(serverThread)
         }
     }
 

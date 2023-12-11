@@ -20,6 +20,7 @@ class GoFishActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        uid = intent.getStringExtra("lobbyUid")
         var playerViewAdapter =  PlayersRecycleView()
         var cardViewAdapter =  CardsRecycleView()
         binding.apply {

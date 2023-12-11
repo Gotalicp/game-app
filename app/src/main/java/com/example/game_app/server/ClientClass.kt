@@ -9,12 +9,14 @@ import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.Wrapper
+import java.io.DataInputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketAddress
 import java.util.concurrent.Executors
 
 class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private val lobbyInfo: LobbyInfo): Thread() {
@@ -34,10 +36,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
                 Log.i("Client", "Send")
                 writer.reset()
             } else {
-                Log.e(
-                    "Client",
-                    "Error writing message: outputStream not initialized or connection not established."
-                )
+                Log.e("Client", "Error writing message: outputStream not initialized or connection not established.")
             }
         } catch (ex: IOException) {
             ex.printStackTrace()
@@ -59,21 +58,20 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
     }
     override fun run() {
         try {
-            socket = Socket(lobbyInfo.ownerIp.removePrefix("/"), 8888)
+//            lobbyInfo.ownerIp.removePrefix("/")
+            socket = Socket()
+            socket.connect(InetSocketAddress("192.168.1.5", 8888), 2000)
             writer = ObjectOutputStream(socket.getOutputStream())
-            writer.flush()
             Log.d("Client", "Connection writer")
             reader = ObjectInputStream(socket.getInputStream())
             Log.d("Client", "Connection reader")
             isConnected = true
-            Log.d("Client","connected")
             fireBaseUtility.joinLobby(lobbyInfo)
-        } catch (ex: IOException) { ex.printStackTrace() }
-        Executors.newSingleThreadExecutor().execute(kotlinx.coroutines.Runnable {
-            kotlin.run {
+        } catch (ex: IOException) { ex.printStackTrace()
+        Log.e("Client" , ex.toString())}
+            Thread {
                 while (isConnected) {
-                    try {
-                        Log.d("Client", "reading")
+                    try { Log.d("Client", "reading")
                         val play = reader.readObject() as Wrapper<T>
                         Handler(Looper.getMainLooper()).post(Runnable {
                             kotlin.run {
@@ -92,7 +90,6 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
                         ex.printStackTrace()
                     }
                 }
-            }
-        })
+            }.start()
     }
 }
