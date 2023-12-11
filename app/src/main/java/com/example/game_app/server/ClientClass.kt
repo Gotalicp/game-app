@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.game_app.FireBaseViewModel
+import com.example.game_app.FireBaseUtility
 import com.example.game_app.SharedInformation
 import com.example.game_app.common.GameLogic
 import com.example.game_app.data.LobbyInfo
@@ -21,7 +21,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
     private lateinit var reader: ObjectInputStream
     private lateinit var writer: ObjectOutputStream
     private lateinit var socket: Socket
-    private val fireBase = FireBaseViewModel()
+    private val fireBaseUtility = FireBaseUtility()
 
     @Volatile
     private var isConnected = false
@@ -55,27 +55,25 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
             ex.printStackTrace()
             Log.e("Client", "Error closing resources: $ex")
         }
-        fireBase.leaveLobby(lobbyInfo)
+        fireBaseUtility.leaveLobby(lobbyInfo)
     }
-    @SuppressLint("SuspiciousIndentation")
     override fun run() {
         try {
-            socket = Socket()
-            val ip = InetSocketAddress(lobbyInfo.ownerIp, 8888)
-            socket.connect(ip, 1000)
+            socket = Socket(lobbyInfo.ownerIp.removePrefix("/"), 8888)
             writer = ObjectOutputStream(socket.getOutputStream())
             writer.flush()
-            Log.d("Client", "Connection established")
+            Log.d("Client", "Connection writer")
             reader = ObjectInputStream(socket.getInputStream())
-            Log.d("Client", "Connection established")
+            Log.d("Client", "Connection reader")
             isConnected = true
             Log.d("Client","connected")
-            fireBase.joinLobby(lobbyInfo)
+            fireBaseUtility.joinLobby(lobbyInfo)
         } catch (ex: IOException) { ex.printStackTrace() }
         Executors.newSingleThreadExecutor().execute(kotlinx.coroutines.Runnable {
             kotlin.run {
                 while (isConnected) {
                     try {
+                        Log.d("Client", "reading")
                         val play = reader.readObject() as Wrapper<T>
                         Handler(Looper.getMainLooper()).post(Runnable {
                             kotlin.run {

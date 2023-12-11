@@ -1,11 +1,9 @@
 package com.example.game_app.game.goFish
 
-import android.content.IntentSender.OnFinished
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.game_app.FireBaseUtility
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.SharedInformation
-import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.server.ClientClass
 import com.example.game_app.server.ServerHandler
@@ -14,7 +12,7 @@ import kotlin.random.Random
 class GoFishViewModel : ViewModel() {
     private lateinit var server : ServerHandler<Play>
     private lateinit var client : ClientClass<Play>
-    private var viewModel = FireBaseViewModel()
+    private var firebaseUtility = FireBaseUtility()
     var goFishLogic = GoFishLogic()
 
     val sharedAccount = SharedInformation.getAcc().value?.uid
@@ -23,7 +21,7 @@ class GoFishViewModel : ViewModel() {
         server = ServerHandler(goFishLogic,lobby).apply { start() }
     }
     fun joinGame(uid: String){
-        viewModel.getLobby(uid) {
+        firebaseUtility.getLobby(uid) {
             client = ClientClass(goFishLogic, it!!)
             client.start()
         }

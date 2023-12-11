@@ -14,7 +14,7 @@ import com.example.game_app.databinding.FragmentLoginBinding
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private var _binding: FragmentLoginBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
     private val authenticationViewModel: AuthenticationViewModel by activityViewModels()
     companion object {
         fun newInstance() = LoginFragment()
@@ -29,13 +29,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.apply {
+        binding?.apply {
             navigationRegister.setOnClickListener {
                 findNavController().navigate(R.id.LoginToRegister)
             }

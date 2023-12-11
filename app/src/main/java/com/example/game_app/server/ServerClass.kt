@@ -15,10 +15,9 @@ import java.net.Socket
 import java.util.concurrent.Executors
 import kotlin.random.Random
 
-class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameLogic<T>) : Thread() {
+class ServerClass<T : Serializable>(private val socket : Socket,private val gameLogic: GameLogic<T>) : Thread() {
     private lateinit var inputStream: ObjectInputStream
     private lateinit var outputStream: ObjectOutputStream
-    private var socket: Socket = socket
 
     @Volatile
     private var isRunning = true
@@ -26,13 +25,9 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
     override fun run() {
         try {
             inputStream = ObjectInputStream(socket.getInputStream())
-            outputStream = ObjectOutputStream(socket.getOutputStream())
-        }catch (ex: IOException){
-            ex.printStackTrace()
-            Log.i("Server","$ex")
-        }
-        Executors.newSingleThreadExecutor().execute(Runnable{
-            kotlin.run {
+            outputStream    = ObjectOutputStream(socket.getOutputStream())
+        }catch (ex: IOException){ ex.printStackTrace() }
+            Thread {
                 while(isRunning){
                     try {
                         val play = inputStream.readObject() as Result<T>
@@ -54,8 +49,7 @@ class ServerClass<T : Serializable>(socket : Socket,private val gameLogic: GameL
                         ex.printStackTrace()
                     }
                 }
-            }
-        })
+        }.start()
     }
 
     fun write(play: Wrapper<T>) {

@@ -6,9 +6,9 @@ import com.example.game_app.game.goFish.GoFishLogic
 import kotlin.random.Random
 
 enum class Suit {
-    HEARTS,
-    DIAMONDS,
-    CLUBS,
+    HEART,
+    DIAMOND,
+    CLUB,
     SPADES
 }
 

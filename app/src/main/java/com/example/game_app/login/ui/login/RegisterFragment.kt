@@ -13,7 +13,7 @@ import com.example.game_app.databinding.FragmentRegisterBinding
 class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     private var _binding: FragmentRegisterBinding?=null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     private val authenticationViewModel: AuthenticationViewModel by activityViewModels()
 
@@ -22,12 +22,12 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentRegisterBinding.inflate(inflater,container,false)
-        return binding.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.apply {
+        binding?.apply {
             navigationLogin.setOnClickListener {
                 findNavController().navigate(R.id.RegisterToLogin)
             }

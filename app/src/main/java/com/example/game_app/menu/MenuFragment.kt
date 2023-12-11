@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.game_app.FireBaseUtility
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
@@ -20,7 +21,7 @@ import com.example.game_app.login.AuthenticationActivity
 
 class MenuFragment : Fragment(R.layout.fragment_menu) {
     private var _binding: FragmentMenuBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding
 
     private val viewModel: FireBaseViewModel by activityViewModels()
 
@@ -30,9 +31,9 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentMenuBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,10 +42,9 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
                 itemClickListener = object : itemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
-                        FireBaseViewModel().joinLobby(item)
-                        startActivity(Intent(context, GoFishActivity::class.java), Bundle().apply{
-                            putString("lobbyUid", item.lobbyUid)
-                        })
+                        val intent = Intent(context, GoFishActivity::class.java)
+                        intent.putExtra("lobbyUid", item.lobbyUid)
+                        startActivity(intent)
                     }
                 }
             }
