@@ -1,6 +1,7 @@
 package com.example.game_app.game.goFish
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,13 +38,17 @@ class CardsRecycleView: RecyclerView.Adapter<CardsRecycleView.CardsViewHolder>()
 
         @SuppressLint("SetTextI18n", "DiscouragedApi")
         fun bind(card: Card) {
-            val drawableResId = itemView.context.resources.getIdentifier(
-                "${card.suit.name.lowercase()}_${card.rank.name.lowercase()}",
-                "drawable",
-                itemView.context.packageName
-            )
-            
-            cardView.setImageDrawable(ContextCompat.getDrawable(itemView.context, drawableResId))
+            try {
+                val drawableResId = itemView.context.resources.getIdentifier(
+                    "${card.suit.name.lowercase()}_${card.rank.name.lowercase()}",
+                    "drawable",
+                    itemView.context.packageName
+                )
+
+                cardView.setImageDrawable(ContextCompat.getDrawable(itemView.context, drawableResId))
+            }catch (e : Exception){
+                Log.e("error", "Card:${card} with error:${e}")
+            }
             itemClickListener?.onItemClicked(card, absoluteAdapterPosition)
         }
     }

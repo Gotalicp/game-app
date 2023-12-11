@@ -41,7 +41,7 @@ class PlayersRecycleView: RecyclerView.Adapter<PlayersRecycleView.PlayersViewHol
 
         @SuppressLint("SetTextI18n")
         fun bind(player: GoFishLogic.Player) {
-            profile.setImageBitmap(bitmapAdapter.adapt(player.info.image!!))
+            profile.setImageBitmap(player.info.image?.let { bitmapAdapter.adapt(it) })
             name.text = player.info.username
             cards.text = player.deck.size.toString()
             itemClickListener?.onItemClicked(player, absoluteAdapterPosition)

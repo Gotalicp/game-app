@@ -1,9 +1,7 @@
-package com.example.game_app.login.ui.login
+package com.example.game_app.data.adapters
 
-import android.graphics.Bitmap
 import com.example.game_app.common.Adapter
 import com.example.game_app.data.Account
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 
 class FireBaseAccAdapter : Adapter<DataSnapshot?, Account> {

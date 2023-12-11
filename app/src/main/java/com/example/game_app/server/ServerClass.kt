@@ -33,17 +33,15 @@ class ServerClass<T : Serializable>(private val socket : Socket,private val game
                         val play = inputStream.readObject() as Result<T>
                         play.fold(
                             onSuccess = {
-                                Handler(Looper.getMainLooper()).post(Runnable {
-                                    kotlin.run {
                                         Log.i("Server", play.toString())
-                                        gameLogic.turnHandling(play.getOrNull()!!)
+                                play.getOrNull()?.let {
+                                        gameLogic.turnHandling(it)}
                                         if (gameLogic.gameEnded()) {
                                             gameLogic.endGame()
-                                        }
-                                    }
-                                })
-                            },
-                            onFailure = {}
+                                        }},
+                            onFailure = {
+                                Log.d("Server", "failed")
+                            }
                         )
                     } catch (ex: IOException) {
                         ex.printStackTrace()

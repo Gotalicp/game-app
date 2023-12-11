@@ -20,16 +20,17 @@ class GoFishActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        uid = intent.getStringExtra("lobbyUid") ?: ""
-        var playerViewAdapter = PlayersRecycleView()
-        var cardViewAdapter = CardsRecycleView()
+        var playerViewAdapter =  PlayersRecycleView()
+        var cardViewAdapter =  CardsRecycleView()
         binding.apply {
             cardView.adapter = cardViewAdapter
             playerView.adapter = playerViewAdapter
         }
         goFishViewMode.goFishLogic.gamePlayers.observe(this) { players ->
-            cardViewAdapter.updateItems(players.find { it.info.uid == goFishViewMode.sharedAccount }!!.deck)
-            playerViewAdapter.updateItems(players.filter { it.info.uid != goFishViewMode.sharedAccount })
+            if (!players.isNullOrEmpty()) {
+                cardViewAdapter.updateItems(players.find { it.info.uid == goFishViewMode.sharedAccount }?.deck?: mutableListOf())
+                playerViewAdapter.updateItems(players.filter { it.info.uid != goFishViewMode.sharedAccount })
+            }
         }
 
         if (!uid.isNullOrEmpty()) {

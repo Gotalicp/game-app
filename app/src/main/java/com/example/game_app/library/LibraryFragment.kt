@@ -10,15 +10,13 @@ import com.example.game_app.databinding.FragmentLibraryBinding
 
 class LibraryFragment : Fragment(R.layout.fragment_library) {
     private var _binding: FragmentLibraryBinding? = null
-    private val binding get() = _binding!!
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val binding get() = _binding
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         _binding = FragmentLibraryBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
 }

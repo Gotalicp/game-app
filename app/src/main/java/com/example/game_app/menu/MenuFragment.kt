@@ -2,22 +2,18 @@ package com.example.game_app.menu
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.game_app.FireBaseUtility
 import com.example.game_app.FireBaseViewModel
 import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentMenuBinding
 import com.example.game_app.game.goFish.GoFishActivity
-import com.example.game_app.login.AuthenticationActivity
 
 class MenuFragment : Fragment(R.layout.fragment_menu) {
     private var _binding: FragmentMenuBinding? = null

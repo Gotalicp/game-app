@@ -23,7 +23,6 @@ data class Card(val suit: Suit, val rank: Rank)
 class Deck{
     private val cards: MutableList<Card> = mutableListOf()
     init {
-        Log.d("deck init", "deck init")
         for (suit in Suit.values()) {
             for (rank in Rank.values()) {
                 cards.add(Card(suit, rank))

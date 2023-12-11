@@ -1,10 +1,8 @@
 package com.example.game_app.login.ui.login
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +10,7 @@ import com.example.game_app.R
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.Account
 import com.example.game_app.data.adapters.BitmapConverter
-import com.google.android.material.snackbar.Snackbar
+import com.example.game_app.data.adapters.FireBaseAccAdapter
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import com.google.firebase.Firebase
@@ -21,7 +19,6 @@ class AuthenticationViewModel : ViewModel() {
     private val accAdapter = FireBaseAccAdapter()
     private val bitmapConverter = BitmapConverter()
     private val auth = Firebase.auth
-    private val sharedAccount: LiveData<Account> = SharedInformation.getAcc()
 
     private val _logged = MutableLiveData<Boolean>()
     val logged: LiveData<Boolean> get() = _logged

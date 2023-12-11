@@ -80,7 +80,11 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
                                 Log.i("Client", play.toString())
                                 play.apply{
                                     if (t != null) { gameLogic.turnHandling(t) }
-                                    if (seed != null) { gameLogic.startGame(seed, SharedInformation.getLobby().value!!.players) }
+                                    if (seed != null) {
+                                        SharedInformation.getLobby().value?.players?.let {
+                                            gameLogic.startGame(seed, it)
+                                        }
+                                    }
                                 }
                             }
                         })

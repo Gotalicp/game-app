@@ -21,13 +21,14 @@ class GoFishViewModel : ViewModel() {
         server = ServerHandler(goFishLogic,lobby).apply { start() }
     }
     fun joinGame(uid: String){
-        firebaseUtility.getLobby(uid) {
-            client = ClientClass(goFishLogic, it!!)
+        firebaseUtility.getLobby(uid){
+            if(it != null)
+            client = ClientClass(goFishLogic, it)
             client.start()
         }
     }
     fun startGame(){
-        var seed = Random.nextLong()
+        val seed = Random.nextLong()
         server.startGame(seed)
     }
     fun write(t:Play){

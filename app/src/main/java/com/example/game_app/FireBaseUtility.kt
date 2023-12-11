@@ -53,7 +53,7 @@ class FireBaseUtility {
         sharedAccount.value?.let {
             Log.d("hosted","hosted")
             lobby.lobbyUid = it.uid.toString()
-            lobby.players.add(PlayerInfo(it.username!!, it.uid!!, true, it.image))
+            lobby.players.add(PlayerInfo(it.username?:"", it.uid?:"", true, it.image))
             Firebase.database.getReference("lobby/${it.uid}").setValue(lobby)
         }
         databaseListenerThread = Thread {
@@ -74,7 +74,7 @@ class FireBaseUtility {
     //Add a player to selected lobby in database
     fun joinLobby(lobby: LobbyInfo) {
         sharedAccount.value?.let {
-            lobby.players.add(PlayerInfo(it.username!!, it.uid!!, false, it.image))
+            lobby.players.add(PlayerInfo(it.username?:"", it.uid?:"", false, it.image))
             Firebase.database.getReference("lobby/${lobby.lobbyUid}").setValue(lobby)
             SharedInformation.updateLobby(lobby)
         }
