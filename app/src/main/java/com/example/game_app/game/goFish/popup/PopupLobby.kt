@@ -14,11 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.SharedInformation
-import kotlinx.coroutines.flow.callbackFlow
 
 class PopupLobby(
     private val context: Context,
-    private val startGame: () -> Unit
+    private val startGame: (() -> Unit)? = null
 ){
 
     private val popupView: View
@@ -58,12 +57,13 @@ class PopupLobby(
             0,
             0
         )
-
-        popupView.findViewById<Button>(R.id.btn_start).setOnClickListener {
-            popupWindow.dismiss()
-            startGame.invoke()
+        popupView.findViewById<Button>(R.id.btn_start).apply {
+            visibility = if (startGame != null) View.VISIBLE else View.GONE
+            setOnClickListener {
+                popupWindow.dismiss()
+                startGame?.invoke()
+            }
         }
-
         popupView.findViewById<Button>(R.id.btn_exit).setOnClickListener {
             popupWindow.dismiss()
         }

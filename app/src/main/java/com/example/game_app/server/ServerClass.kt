@@ -36,19 +36,13 @@ class ServerClass<T : Serializable>(private val socket : Socket,private val game
             Thread {
                 while(isRunning){
                     try {
-                        val play = inputStream.readObject() as Result<T>
-                        play.fold(
-                            onSuccess = {
-                                        Log.i("Server", play.toString())
-                                play.getOrNull()?.let {
-                                        gameLogic.turnHandling(it)}
-                                        if (gameLogic.gameEnded()) {
-                                            gameLogic.endGame()
-                                        }},
-                            onFailure = {
-                                Log.d("Server", "failed")
-                            }
-                        )
+                        val play = inputStream.readObject() as T
+                                play.let {
+                                    gameLogic.turnHandling(it)
+                                    if (gameLogic.gameEnded()) {
+                                        gameLogic.endGame()
+                                    }
+                                }
                     } catch (ex: IOException) {
                         ex.printStackTrace()
                     }

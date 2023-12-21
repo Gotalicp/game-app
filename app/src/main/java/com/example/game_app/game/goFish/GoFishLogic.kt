@@ -33,6 +33,7 @@ class GoFishLogic : GameLogic<Play> {
 
     //Initiate deck
     private var deck = Deck()
+    fun getDeckSize() = deck.deckSize()
     override fun startGame(seed: Long,players: MutableList<PlayerInfo>) {
         deck.showDeck()
         deck.shuffle(seed)
@@ -42,9 +43,9 @@ class GoFishLogic : GameLogic<Play> {
         }.toMutableList()
         //Randomizes game turns
         if(_gamePlayers.value!=null) {
-            _gamePlayers.value?.shuffle(Random(seed))
+            _gamePlayers.value!!.shuffle(Random(seed))
             //Sets first player to take turn
-            _playerToTakeTurn.postValue(gamePlayers.value?.get(0))
+            _playerToTakeTurn.postValue(gamePlayers.value!!.get(0))
             //Gives cards to players
             _gamePlayers.value = deck.deal(players, 5, deck)
         }
@@ -68,10 +69,11 @@ class GoFishLogic : GameLogic<Play> {
                 }
             }
             // Check for books in the current player's hand
-            if (checkForBooks(player[indexOf(t.askingPlayer)])) {
+            if (!checkForBooks(player[indexOf(t.askingPlayer)])) {
                 // Sets next player
-                _playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer) + 1) % player.size])
+                _playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer)+1) % player.size])
             }
+            _gamePlayers.postValue(player)
             if (gameEnded()) {
                 endGame()
             }

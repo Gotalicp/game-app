@@ -34,17 +34,19 @@ class PlayersRecycleView: RecyclerView.Adapter<PlayersRecycleView.PlayersViewHol
     override fun getItemCount(): Int {
         return items.size
     }
-    inner class PlayersViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class PlayersViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         private val profile = view.findViewById<ImageView>(R.id.profile)
         private val name = view.findViewById<TextView>(R.id.name)
         private val cards = view.findViewById<TextView>(R.id.cards)
 
         @SuppressLint("SetTextI18n")
         fun bind(player: GoFishLogic.Player) {
-            profile.setImageBitmap(player.info.image?.let { bitmapAdapter.adapt(it) })
+//            profile.setImageBitmap(player.info.image?.let { bitmapAdapter.adapt(it) })
             name.text = player.info.username
             cards.text = player.deck.size.toString()
-            itemClickListener?.onItemClicked(player, absoluteAdapterPosition)
+            view.setOnClickListener {
+                itemClickListener?.onItemClicked(player, absoluteAdapterPosition)
+            }
         }
     }
 }

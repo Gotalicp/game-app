@@ -3,7 +3,6 @@ package com.example.game_app.game.goFish
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import com.example.game_app.FireBaseUtility
-import com.example.game_app.FireBaseViewModel
 import com.example.game_app.SharedInformation
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.server.ClientClass
@@ -18,6 +17,7 @@ class GoFishViewModel : ViewModel() {
 
     val sharedAccount = SharedInformation.getAcc().value?.uid
 
+    fun getDeck() = goFishLogic.getDeckSize()
     fun createGame(lobby: LobbyInfo){
         server = ServerHandler(goFishLogic,lobby)
         server.start()
@@ -35,11 +35,14 @@ class GoFishViewModel : ViewModel() {
         server.startGame(seed)
     }
     fun write(t:Play){
-        if (::server.isInitialized) {
-            server.send(t)
-        } else if (::client.isInitialized) {
-            client.write(t)
-        }
+        Thread {
+            if (::server.isInitialized) {
+                server.send(t)
+            } else if (::client.isInitialized) {
+                client.write(t)
+            }
+            goFishLogic.turnHandling(t)
+        }.start()
     }
     fun disconnect(){
         client.disconnect()

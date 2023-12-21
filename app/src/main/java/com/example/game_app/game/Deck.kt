@@ -75,4 +75,6 @@ class Deck{
     }
     fun drawCard() = if (cards.isNotEmpty()) { cards.removeAt(0) } else { null }
     fun isEmpty() = cards.isEmpty()
+
+    fun deckSize() = cards.size
 }

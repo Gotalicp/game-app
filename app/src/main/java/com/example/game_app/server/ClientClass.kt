@@ -33,6 +33,7 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
             if (::writer.isInitialized && isConnected) {
                 Log.i("Client", "$play sending")
                 writer.writeObject(play)
+                writer.flush();
                 Log.i("Client", "Send")
                 writer.reset()
             } else {
@@ -58,9 +59,8 @@ class ClientClass<T : Serializable>(private val gameLogic: GameLogic<T>, private
     }
     override fun run() {
         try {
-//            lobbyInfo.ownerIp.removePrefix("/")
             socket = Socket()
-            socket.connect(InetSocketAddress("192.168.1.5", 8888), 2000)
+            socket.connect(InetSocketAddress( lobbyInfo.ownerIp.removePrefix("/"), 8888), 2000)
             writer = ObjectOutputStream(socket.getOutputStream())
             Log.d("Client", "Connection writer")
             reader = ObjectInputStream(socket.getInputStream())

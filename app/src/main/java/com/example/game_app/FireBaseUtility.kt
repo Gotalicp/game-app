@@ -68,7 +68,7 @@ class FireBaseUtility {
                     }
                 })
         }
-        databaseListenerThread.start()
+         databaseListenerThread.start()
     }
 
     //Add a player to selected lobby in database

@@ -11,14 +11,14 @@ import com.example.game_app.R
 import com.example.game_app.common.itemClickListener
 import com.example.game_app.data.PlayerInfo
 
-class PopupLobbyRecycleView : RecyclerView.Adapter<PopupLobbyRecycleView.PopupCreateViewHolder>() {
+class PopupLobbyRecycleView : RecyclerView.Adapter<PopupLobbyRecycleView.PopupLobbyViewHolder>() {
 
     private var items = listOf<PlayerInfo>()
     var itemClickListener: itemClickListener<PlayerInfo>? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopupCreateViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopupLobbyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_popup_profile, parent, false)
-        return PopupCreateViewHolder(view)
+        return PopupLobbyViewHolder(view)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -26,14 +26,14 @@ class PopupLobbyRecycleView : RecyclerView.Adapter<PopupLobbyRecycleView.PopupCr
         items = players
         notifyDataSetChanged()
     }
-    override fun onBindViewHolder(holder: PopupCreateViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PopupLobbyViewHolder, position: Int) {
         holder.bind(items[position])
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
-    inner class PopupCreateViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class PopupLobbyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = view.findViewById<ImageView>(R.id.imageProfile)
         private val name = view.findViewById<TextView>(R.id.nameText)
 
