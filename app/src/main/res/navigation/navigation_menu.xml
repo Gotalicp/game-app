@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.game_app.HomeFragment"
+        android:name="com.example.game_app.ui.main.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -22,16 +22,16 @@
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
-        android:name="com.example.game_app.menu.MenuFragment"
+        android:name="com.example.game_app.ui.main.menu.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu" />
     <fragment
         android:id="@+id/libraryFragment"
-        android:name="com.example.game_app.library.LibraryFragment"
+        android:name="com.example.game_app.ui.main.library.LibraryFragment"
         android:label="LibraryFragment" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.game_app.SettingsFragment"
+        android:name="com.example.game_app.ui.main.settings.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

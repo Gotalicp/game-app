@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlayerInfo (
-    val username: String,
     val uid : String,
+    val username: String,
+    val image: String,
     val isHost: Boolean,
-    val image: String?
 ):java.io.Serializable

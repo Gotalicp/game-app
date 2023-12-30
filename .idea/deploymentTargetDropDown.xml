@@ -7,19 +7,28 @@
         <deviceKey>
           <Key>
             <type value="SERIAL_NUMBER" />
-            <value value="RF8R90G43ML" />
+            <value value="LGH815d23fd388" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2023-12-19T11:49:14.587546584Z" />
+    <timeTargetWasSelectedWithDropDown value="2023-12-30T20:37:53.578439900Z" />
     <runningDeviceTargetsSelectedWithDialog>
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
           <Key>
             <type value="SERIAL_NUMBER" />
-            <value value="a08d52a7" />
+            <value value="LGH815d23fd388" />
+          </Key>
+        </deviceKey>
+      </Target>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="SERIAL_NUMBER" />
+            <value value="5tgajbtgscqkh6pb" />
           </Key>
         </deviceKey>
       </Target>
