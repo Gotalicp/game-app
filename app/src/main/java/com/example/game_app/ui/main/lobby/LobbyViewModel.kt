@@ -1,4 +1,4 @@
-package com.example.game_app.ui.main.menu
+package com.example.game_app.ui.main.lobby
 
 import android.app.Application
 import android.util.Log
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.NetworkInterface
 
-class MenuViewModel(application: Application) : AndroidViewModel(application) {
+class LobbyViewModel(application: Application) : AndroidViewModel(application) {
     private val _lobbiesList = MutableLiveData<List<LobbyInfo>>()
     val lobbiesList: LiveData<List<LobbyInfo>> get() = _lobbiesList
     private val fireBaseUtility = FireBaseUtility()
@@ -24,8 +24,8 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val baseIpAddress = getLocalIpAddress()
             if (baseIpAddress != null) {
-                val startRange = 6
-                val endRange = 6
+                val startRange = 220
+                val endRange = 221
 
                 for (i in startRange..endRange) {
                     val ip = baseIpAddress + i.toString()

@@ -35,7 +35,7 @@ class ClientSearchLocalClass(private var ip: String) : Thread() {
                     InetSocketAddress(
                         ip.removePrefix("/"),
                         8888
-                    ), 2000
+                    ), 3000
                 )
             }
             writer = ObjectOutputStream(socket.getOutputStream())

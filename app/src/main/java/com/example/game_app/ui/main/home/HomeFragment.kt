@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.navigateUp
 import com.example.game_app.R
 import com.example.game_app.databinding.FragmentHomeBinding
 import com.example.game_app.ui.game.goFish.GoFishActivity
@@ -29,18 +30,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding?.apply {
-            btnPlay.setOnClickListener {
-                findNavController().navigate(R.id.HomeToMenu)
-            }
-            btnLibrary.setOnClickListener {
-                findNavController().navigate(R.id.HomeToLibrary)
-            }
             btnHost.setOnClickListener{
                 startActivity(Intent(context, GoFishActivity::class.java))
             }
-            btnSettings.setOnClickListener {
-//                findNavController().navigate(R.id.HomeToSettings)
-                auth.logout()
+            btnPlay.setOnClickListener {
+                findNavController().navigate(R.id.homeToLobby)
             }
         }
     }

@@ -24,8 +24,8 @@ class AuthenticationViewModel : ViewModel() {
     val logged: LiveData<Boolean> get() = _logged
 
     init {
-        if(auth.currentUser == null){
-            SharedInformation.updateAcc(Account(null,null,null))
+        if (auth.currentUser == null) {
+            SharedInformation.updateAcc(Account(null, null, null))
             _logged.postValue(false)
         } else {
             getAccountInfo {
@@ -34,12 +34,13 @@ class AuthenticationViewModel : ViewModel() {
             }
         }
     }
-    fun createAcc(username: String,email: String , password: String, context: Context){
+
+    fun createAcc(username: String, email: String, password: String, context: Context) {
         Firebase.auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val image = BitmapFactory.decodeResource(context.resources, R.drawable.image)
-                    val account = Account(username, auth.uid,bitmapConverter.adapt(image))
+                    val account = Account(username, auth.uid, bitmapConverter.adapt(image))
                     _logged.postValue(true)
                     SharedInformation.updateAcc(account)
                     try {
@@ -49,10 +50,11 @@ class AuthenticationViewModel : ViewModel() {
                         println("Error: ${e.message}")
                     }
                 } else {
-                    SharedInformation.updateAcc(Account(null,null,null))
+                    SharedInformation.updateAcc(Account(null, null, null))
+                }
             }
-        }
     }
+
     fun logIn(email: String, password: String) {
         Firebase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -66,19 +68,21 @@ class AuthenticationViewModel : ViewModel() {
                 }
             }
     }
+
     private fun getAccountInfo(callback: (Account) -> Unit) {
         try {
             Firebase.database.getReference("user/${auth.uid}").get()
                 .addOnSuccessListener { documentSnapshot ->
                     callback(accAdapter.adapt(documentSnapshot))
                 }
-        }catch(ex:Exception){
+        } catch (ex: Exception) {
             Log.e("firebase", "Error getting data", ex)
-            callback(Account(null,null,null))
+            callback(Account(null, null, null))
             logout()
-            }
         }
-    fun logout(){
+    }
+
+    fun logout() {
         _logged.postValue(false)
         auth.signOut()
     }

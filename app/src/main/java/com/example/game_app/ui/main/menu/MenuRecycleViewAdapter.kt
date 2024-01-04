@@ -1,4 +1,4 @@
-package com.example.game_app.ui.main.library
+package com.example.game_app.ui.main.menu
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,24 +11,24 @@ import com.example.game_app.R
 import com.example.game_app.data.itemClickListener
 import com.example.game_app.data.LibraryGame
 
-class LibraryRecycleViewAdapter : RecyclerView.Adapter<LibraryRecycleViewAdapter.LibraryViewHolder>() {
+class MenuRecycleViewAdapter : RecyclerView.Adapter<MenuRecycleViewAdapter.MenuViewHolder>() {
 
     private var items = ArrayList<LibraryGame>()
     var itemClickListener: itemClickListener<LibraryGame>? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LibraryViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_library, parent, false)
-        return LibraryViewHolder(view)
+        return MenuViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: LibraryViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MenuViewHolder, position: Int) {
         holder.bind(items[position])
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
-    inner class LibraryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MenuViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private var image = view.findViewById<ImageView>(R.id.game_image)
         private val button = view.findViewById<Button>(R.id.install_button)
         fun bind(game: LibraryGame) {

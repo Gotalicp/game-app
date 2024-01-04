@@ -1,4 +1,4 @@
-package com.example.game_app.ui.main.menu
+package com.example.game_app.ui.main.lobby
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

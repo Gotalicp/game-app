@@ -4,34 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_menu"
     app:startDestination="@id/homeFragment">
-
+    <fragment
+        android:id="@+id/moreFragment"
+        android:name="com.example.game_app.ui.main.more.MoreFragment"
+        android:label="fragment_more"
+        tools:layout="@layout/fragment_more" />
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.example.game_app.ui.main.menu.MenuFragment"
+        android:label="LibraryFragment" />
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.game_app.ui.main.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/HomeToMenu"
-            app:destination="@id/menuFragment" />
-        <action
-            android:id="@+id/HomeToLibrary"
-            app:destination="@id/libraryFragment" />
-        <action
-            android:id="@+id/HomeToSettings"
-            app:destination="@id/settingsFragment" />
+            android:id="@+id/homeToLobby"
+            app:destination="@id/lobbyFragment" />
     </fragment>
     <fragment
-        android:id="@+id/menuFragment"
-        android:name="com.example.game_app.ui.main.menu.MenuFragment"
-        android:label="fragment_menu"
-        tools:layout="@layout/fragment_menu" />
-    <fragment
-        android:id="@+id/libraryFragment"
-        android:name="com.example.game_app.ui.main.library.LibraryFragment"
-        android:label="LibraryFragment" />
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.game_app.ui.main.settings.SettingsFragment"
-        android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        android:id="@+id/lobbyFragment"
+        android:name="com.example.game_app.ui.main.lobby.LobbyFragment"
+        android:label="LobbyFragment" >
+        <action
+            android:id="@+id/lobbyToHome"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>
