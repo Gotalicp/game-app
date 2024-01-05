@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.game_app.R
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.Account
@@ -14,6 +15,8 @@ import com.example.game_app.domain.firebase.FireBaseAccAdapter
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import kotlin.math.log
 
 class AuthenticationViewModel : ViewModel() {
     private val accAdapter = FireBaseAccAdapter()
@@ -25,12 +28,16 @@ class AuthenticationViewModel : ViewModel() {
 
     init {
         if (auth.currentUser == null) {
-            SharedInformation.updateAcc(Account(null, null, null))
             _logged.postValue(false)
         } else {
             getAccountInfo {
-                SharedInformation.updateAcc(it)
-                _logged.postValue(true)
+                if(it is Account) {
+                    SharedInformation.updateAcc(it)
+                    _logged.postValue(true)
+                }else{
+                    logout()
+                    _logged.postValue(false)
+                }
             }
         }
     }
@@ -40,17 +47,14 @@ class AuthenticationViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val image = BitmapFactory.decodeResource(context.resources, R.drawable.image)
-                    val account = Account(username, auth.uid, bitmapConverter.adapt(image))
-                    _logged.postValue(true)
-                    SharedInformation.updateAcc(account)
-                    try {
-                        Firebase.database.getReference("user/${auth.uid}")
-                            .setValue(account)
-                    } catch (e: Exception) {
-                        println("Error: ${e.message}")
+                    Account(username, auth.uid, bitmapConverter.adapt(image)).let {
+                        try {
+                            Firebase.database.getReference("user/${auth.uid}")
+                                .setValue(it)
+                            SharedInformation.updateAcc(it)
+                            _logged.postValue(true)
+                        } catch (_: Exception) { logout() }
                     }
-                } else {
-                    SharedInformation.updateAcc(Account(null, null, null))
                 }
             }
     }
@@ -61,7 +65,8 @@ class AuthenticationViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     _logged.postValue(true)
                     getAccountInfo {
-                        SharedInformation.updateAcc(it)
+                        if (it is Account)
+                            SharedInformation.updateAcc(it)
                     }
                 } else {
                     logout()
@@ -69,16 +74,20 @@ class AuthenticationViewModel : ViewModel() {
             }
     }
 
-    private fun getAccountInfo(callback: (Account) -> Unit) {
+    private fun getAccountInfo(callback: (Any) -> Unit) {
         try {
             Firebase.database.getReference("user/${auth.uid}").get()
                 .addOnSuccessListener { documentSnapshot ->
-                    callback(accAdapter.adapt(documentSnapshot))
+                    accAdapter.adapt(documentSnapshot)?.let {
+                        callback(it)
+                    } ?: run {
+                        callback(mutableListOf(null))
+                    }
                 }
         } catch (ex: Exception) {
             Log.e("firebase", "Error getting data", ex)
-            callback(Account(null, null, null))
             logout()
+            callback(mutableListOf(null))
         }
     }
 

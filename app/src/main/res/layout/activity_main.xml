@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/white"
+        style="@style/custom_bottom_nav_style"
         app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/nav_host_main"
         app:menu="@menu/bottom_nav_menu" />
