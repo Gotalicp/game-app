@@ -24,8 +24,8 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val baseIpAddress = getLocalIpAddress()
             if (baseIpAddress != null) {
-                val startRange = 220
-                val endRange = 221
+                val startRange = 113
+                val endRange = 114
 
                 for (i in startRange..endRange) {
                     val ip = baseIpAddress + i.toString()
@@ -38,10 +38,11 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
                                 fireBaseUtility.getLobby(it) { lobbyInfo ->
                                     if (lobbyInfo != null) {
                                         foundLobbies.add(lobbyInfo)
+                                        _lobbiesList.postValue(foundLobbies)
+                                        uid.removeObserver{}
                                         Log.d("Lobby found on $ip","exz")
                                     }
                                 }
-                                uid.removeObserver{}
                             }
                         }
                     }

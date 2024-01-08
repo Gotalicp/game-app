@@ -8,8 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.game_app.R
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentLobbyBinding
 import com.example.game_app.ui.game.goFish.GoFishActivity

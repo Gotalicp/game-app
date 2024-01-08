@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.data.LobbyInfo
 
 class LobbiesRecycleView : RecyclerView.Adapter<LobbiesRecycleView.LobbiesViewHolder>() {

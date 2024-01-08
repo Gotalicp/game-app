@@ -8,7 +8,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.game_app.R
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.data.LibraryGame
 
 class MenuRecycleViewAdapter : RecyclerView.Adapter<MenuRecycleViewAdapter.MenuViewHolder>() {

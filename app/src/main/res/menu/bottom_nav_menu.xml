@@ -6,7 +6,7 @@
         android:enabled="true"
         android:icon="@drawable/play"/>
     <item
-        android:id="@+id/homeFragment"
+        android:id="@+id/profileFragment"
         android:title="Profile"
         android:enabled="true"
         android:icon="@drawable/profile"/>

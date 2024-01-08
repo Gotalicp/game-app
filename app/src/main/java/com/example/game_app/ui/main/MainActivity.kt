@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         AppBarConfiguration(
             setOf(
                 R.id.menuFragment,
-                R.id.homeFragment,
+                R.id.profileFragment,
                 R.id.moreFragment
             )
         )

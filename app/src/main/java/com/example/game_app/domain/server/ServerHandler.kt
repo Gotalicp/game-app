@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.game_app.domain.FireBaseUtility
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.GameLogic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.Serializable
 import java.net.NetworkInterface
 import java.net.ServerSocket

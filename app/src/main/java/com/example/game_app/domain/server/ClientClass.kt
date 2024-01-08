@@ -20,7 +20,7 @@ class ClientClass<T : Serializable>(
     private lateinit var writer: ObjectOutputStream
     private lateinit var socket: Socket
     private val fireBaseUtility = FireBaseUtility()
-    private val expectedTClazz: Class<T> = TODO()
+    private lateinit var expectedTClazz: Class<T>
 
     @Volatile
     private var isConnected = false
@@ -82,12 +82,14 @@ class ClientClass<T : Serializable>(
                 try {
                     Log.d("Client", "reading")
                     reader.readObject().let { read ->
-                        if (expectedTClazz.isInstance(read)) {
-                            gameLogic.turnHandling(read as T)
-                        } else if (read is Long) {
+                        if (read is Long) {
                             SharedInformation.getLobby().value?.players?.let {
                                 gameLogic.startGame(read, it)
                             }
+                        } else if (read !is String) {
+                            gameLogic.turnHandling(read as T)
+                        } else {
+
                         }
                     }
                 } catch (ex: IOException) {

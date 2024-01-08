@@ -1,17 +1,14 @@
 package com.example.game_app.ui.game.goFish
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.map
 import com.example.game_app.R
-import com.example.game_app.data.Account
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
-import com.example.game_app.domain.Card
 import com.example.game_app.domain.Rank
 import com.example.game_app.ui.game.goFish.popup.PopupLobby
 import com.example.game_app.ui.game.goFish.popup.PopupPickCard

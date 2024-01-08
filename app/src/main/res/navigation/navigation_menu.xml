@@ -30,4 +30,8 @@
             android:id="@+id/lobbyToHome"
             app:destination="@id/homeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.game_app.ui.main.profile.ProfileFragment"
+        android:label="ProfileFragment" />
 </navigation>

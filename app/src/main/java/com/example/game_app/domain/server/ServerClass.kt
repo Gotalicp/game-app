@@ -2,6 +2,8 @@ package com.example.game_app.domain.server
 
 import android.util.Log
 import com.example.game_app.data.GameLogic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -30,6 +32,7 @@ class ServerClass<T : Serializable>(
 
     fun run() {
         Thread {
+//        withContext(Dispatchers.Default){
             while (isRunning) {
                 try {
                     inputStream.readObject().let {
@@ -40,6 +43,7 @@ class ServerClass<T : Serializable>(
                     ex.printStackTrace()
                 }
             }
+//        }
         }.start()
     }
 

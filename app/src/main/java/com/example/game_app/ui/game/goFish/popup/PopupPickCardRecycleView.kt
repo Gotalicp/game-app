@@ -9,7 +9,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.domain.Card
 import com.example.game_app.domain.Rank
 

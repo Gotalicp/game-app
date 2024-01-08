@@ -2,7 +2,7 @@ package com.example.game_app.domain.bitmap
 
 import android.graphics.Bitmap
 import android.util.Base64
-import com.example.game_app.data.Adapter
+import com.example.game_app.data.common.Adapter
 import java.io.ByteArrayOutputStream
 
 class BitmapConverter : Adapter<Bitmap, String> {

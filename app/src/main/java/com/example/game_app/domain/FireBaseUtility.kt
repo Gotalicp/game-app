@@ -67,7 +67,7 @@ class FireBaseUtility {
     //Add a player to selected lobby in database
     fun joinLobby(uid: String) {
         acc.value?.let { acc ->
-            lobbyReference = Firebase.database.getReference("lobby/$uid").apply {
+            lobbyReference = Firebase.database.getReference("lobby/$uid/players").apply {
                 addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         SharedInformation.updateLobby(singleLobbyAdapter.adapt(snapshot))

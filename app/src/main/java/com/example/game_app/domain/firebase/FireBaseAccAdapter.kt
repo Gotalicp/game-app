@@ -1,6 +1,6 @@
 package com.example.game_app.domain.firebase
 
-import com.example.game_app.data.Adapter
+import com.example.game_app.data.common.Adapter
 import com.example.game_app.data.Account
 import com.google.firebase.database.DataSnapshot
 

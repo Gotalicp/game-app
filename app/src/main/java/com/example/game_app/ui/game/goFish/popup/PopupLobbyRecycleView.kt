@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.data.PlayerInfo
-import com.example.game_app.data.itemClickListener
+import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.domain.bitmap.BitmapReverser
 
 class PopupLobbyRecycleView : RecyclerView.Adapter<PopupLobbyRecycleView.PopupLobbyViewHolder>() {
