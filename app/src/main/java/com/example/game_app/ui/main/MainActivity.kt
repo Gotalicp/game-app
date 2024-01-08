@@ -8,17 +8,29 @@ import androidx.navigation.ui.AppBarConfiguration
 import com.example.game_app.R
 import com.example.game_app.databinding.ActivityMainBinding
 import com.example.game_app.ui.login.AuthenticationActivity
-import com.example.game_app.ui.login.AuthenticationViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import androidx.navigation.findNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import com.example.game_app.data.SharedInformation
+import com.example.game_app.domain.FireBaseUtility
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val authenticationViewModel: AuthenticationViewModel by viewModels()
+    init {
+        if(Firebase.auth.currentUser === null){
+            FireBaseUtility().logout()
+        }else{
+            FireBaseUtility().getAccountInfo {
+                SharedInformation.updateAcc(it)
+            }
+        }
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -29,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
 
         //Here I check if there is a current user logged in and if not i go to AuthenticationActivity
-        authenticationViewModel.logged.observe(this) {
+        SharedInformation.getLogged().observe(this) {
             if (!it) {
                 startActivity(Intent(this, AuthenticationActivity::class.java))
             }

@@ -9,13 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.game_app.R
 import com.example.game_app.databinding.FragmentLoginBinding
-import com.example.game_app.ui.login.AuthenticationViewModel
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding
-    private val authenticationViewModel: AuthenticationViewModel by activityViewModels()
+    private val viewModel: LoginViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,6 +23,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding?.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
@@ -32,13 +32,13 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }
             btnLogin.setOnClickListener {
                 if (password.text.toString() != "" && email.text.toString() != "") {
-                    authenticationViewModel.logIn(
+                    viewModel.logIn(
                         email.text.toString(),
                         password.text.toString()
                     )
                 }
             }
-            checkBoxShowPassword.setOnCheckedChangeListener{ _, isChecked ->
+            checkBoxShowPassword.setOnCheckedChangeListener { _, isChecked ->
                 password.inputType = if (isChecked) {
                     android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 } else {

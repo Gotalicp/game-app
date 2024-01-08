@@ -7,9 +7,7 @@ import androidx.lifecycle.MutableLiveData
 object SharedInformation {
     //Current User
     private val account = MutableLiveData<Account>()
-    fun getAcc(): LiveData<Account> {
-        return account
-    }
+    fun getAcc() = account
     fun updateAcc(acc: Account) {
         account.value = acc
     }
@@ -17,5 +15,10 @@ object SharedInformation {
     fun getLobby(): LiveData<LobbyInfo> = lobby
     fun updateLobby(lobbyInfo: LobbyInfo?) {
         lobby.postValue(lobbyInfo?: LobbyInfo())
+    }
+    private val logged = MutableLiveData<Boolean>()
+    fun getLogged() = logged
+    fun updateLogged(log: Boolean) {
+        logged.value = log
     }
 }

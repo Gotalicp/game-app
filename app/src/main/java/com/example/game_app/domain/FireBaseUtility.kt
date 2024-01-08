@@ -6,9 +6,11 @@ import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.data.PlayerInfo
+import com.example.game_app.domain.firebase.FireBaseAccAdapter
 import com.example.game_app.domain.firebase.LobbyAdapter
 import com.example.game_app.domain.firebase.SingleLobbyAdapter
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -19,7 +21,9 @@ class FireBaseUtility {
     //Adapter that turns snapshot data in lobbyInfo
     private val lobbyAdapter = LobbyAdapter()
     private val singleLobbyAdapter = SingleLobbyAdapter()
+    private val accAdapter = FireBaseAccAdapter()
     private var lobbyReference: DatabaseReference? = null
+    private val auth = Firebase.auth
 
     private val acc: LiveData<Account> = SharedInformation.getAcc()
 
@@ -42,7 +46,7 @@ class FireBaseUtility {
     fun hostLobby(ip: String) {
         acc.value?.let {
             val lobby = LobbyInfo(ownerIp = ip, lobbyUid = it.uid.toString())
-            lobby.players.add(PlayerInfo(it.uid?:"",it.username?:"",it.image?:"",true))
+            lobby.players.add(PlayerInfo(it.uid ?: "", it.username ?: "", it.image ?: "", true))
             lobbyReference = Firebase.database.getReference("lobby/${it.uid}").apply {
                 setValue(lobby)
                 SharedInformation.updateLobby(lobby)
@@ -73,7 +77,14 @@ class FireBaseUtility {
                         Log.e("bug in firebase observe", "bug")
                     }
                 })
-                child("${acc.uid}").setValue(PlayerInfo(acc.uid ?: "", acc.username!!,acc.image?:"",false))
+                child("${acc.uid}").setValue(
+                    PlayerInfo(
+                        acc.uid ?: "",
+                        acc.username!!,
+                        acc.image ?: "",
+                        false
+                    )
+                )
             }
         }
     }
@@ -98,5 +109,28 @@ class FireBaseUtility {
             override fun onDataChange(snapshot: DataSnapshot) {}
             override fun onCancelled(error: DatabaseError) {}
         })
+    }
+
+    fun logout() {
+        auth.signOut()
+        SharedInformation.updateLogged(false)
+    }
+
+    fun getAccountInfo(callback: (Account) -> Unit) {
+        try {
+            Firebase.database.getReference("user/${auth.uid}").get()
+                .addOnSuccessListener {
+                    Log.d("logged", "sicces")
+                    accAdapter.adapt(it)?.let {acc->
+                        callback(acc)
+                        SharedInformation.updateLogged(true)
+                    }
+                }
+                .addOnCanceledListener { logout() }
+                .addOnFailureListener { logout() }
+        } catch (ex: Exception) {
+            Log.e("firebase", "Error getting data", ex)
+            logout()
+        }
     }
 }

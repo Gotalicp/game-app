@@ -1,4 +1,4 @@
-package com.example.game_app.ui.login
+package com.example.game_app.ui.login.register
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,7 +15,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private var _binding: FragmentRegisterBinding?=null
     private val binding get() = _binding
 
-    private val authenticationViewModel: AuthenticationViewModel by activityViewModels()
+    private val viewModel: RegisterViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +36,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     && repassword.text.toString() == password.text.toString()
                     && email.text.toString() != ""
                     && password.text.toString() != "" ) {
-                    authenticationViewModel.createAcc(
+                    viewModel.createAcc(
                         usenname.text.toString(),
                         email.text.toString(),
                         password.text.toString(),
