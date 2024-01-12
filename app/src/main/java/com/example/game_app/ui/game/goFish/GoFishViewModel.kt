@@ -25,20 +25,20 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     private lateinit var client: ClientClass<Play>
     var goFishLogic = GoFishLogic()
 
-    val sharedAccount = SharedInformation.getAcc().value?.uid
+    val uid = SharedInformation.getAcc().value?.uid
     fun createGame() {
         server = ServerHandler(goFishLogic).apply { start() }
     }
 
     fun joinGame(uid: String , ip: String) {
-        client = ClientClass(goFishLogic, uid, ip).apply { start() }
+        client = ClientClass(goFishLogic, uid, ip, Play::class.java).apply { start() }
     }
 
     fun startGame() {
         val seed = Random.nextLong()
         server.startGame(seed)
         _state.value =
-            State.MyTurn((goFishLogic.playerToTakeTurn.value?.info?.uid === sharedAccount))
+            State.MyTurn((goFishLogic.playerToTakeTurn.value?.info?.uid === uid))
     }
 
     fun write(t: Play) {
@@ -50,7 +50,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             }
             goFishLogic.turnHandling(t)
             _state.value =
-                State.MyTurn((goFishLogic.playerToTakeTurn.value!!.info.uid === sharedAccount))
+                State.MyTurn((goFishLogic.playerToTakeTurn.value!!.info.uid === uid))
         }.start()
     }
 

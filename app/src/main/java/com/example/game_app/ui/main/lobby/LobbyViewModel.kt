@@ -24,8 +24,8 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val baseIpAddress = getLocalIpAddress()
             if (baseIpAddress != null) {
-                val startRange = 113
-                val endRange = 114
+                val startRange = 21
+                val endRange = 21
 
                 for (i in startRange..endRange) {
                     val ip = baseIpAddress + i.toString()

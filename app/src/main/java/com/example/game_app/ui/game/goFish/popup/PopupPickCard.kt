@@ -49,7 +49,7 @@ class PopupPickCard(
 
     fun showPopup(anchorView: View, player: PlayerInfo, yourDeck: List<Card> ){
         this.player = player
-        adapter.updateItems(yourDeck)
+        adapter.updateItems(yourDeck.distinctBy { it.rank }.map{it.rank})
         popupWindow = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.WRAP_CONTENT,

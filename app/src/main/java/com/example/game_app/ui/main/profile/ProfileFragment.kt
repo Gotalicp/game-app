@@ -29,9 +29,11 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.apply {
-            profilePhoto.setImageBitmap(viewModel.getImage())
-            username.text = viewModel.acc?.username
-            email.text = Firebase.auth.currentUser?.email
+            viewModel.acc.observe(viewLifecycleOwner) {
+                profilePhoto.setImageBitmap(viewModel.getImage())
+                username.text = it.username
+                email.text = Firebase.auth.currentUser?.email
+            }
         }
     }
 

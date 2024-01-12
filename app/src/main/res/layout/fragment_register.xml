@@ -7,7 +7,17 @@
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".ui.login.register.RegisterFragment">
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/loading"
+        android:visibility="gone"
+        android:background="@color/white"
+        android:elevation="10dp">
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    </LinearLayout>
     <ImageView
         android:id="@+id/logo"
         android:layout_width="120dp"

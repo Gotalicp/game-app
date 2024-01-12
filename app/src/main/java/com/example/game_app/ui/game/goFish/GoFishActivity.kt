@@ -64,7 +64,7 @@ class GoFishActivity : AppCompatActivity() {
                                     dismiss()
                                     goFishViewModel.write(
                                         Play(
-                                            goFishViewModel.sharedAccount!!, player.info.uid, item
+                                            goFishViewModel.uid!!, player.info.uid, item
                                         )
                                     )
                                 }
@@ -80,11 +80,9 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         goFishLogic.gamePlayers.observe(this) { players ->
-            players.find { it.info.uid == goFishViewModel.sharedAccount }?.deck?.let {
-                    cardViewAdapter.updateItems(it)
-            }
-            players.filter { it.info.uid != goFishViewModel.sharedAccount }.let {
-                playerViewAdapter.updateItems(it)
+            players.partition { it.info.uid == goFishViewModel.uid }.let {
+                playerViewAdapter.updateItems(it.second)
+                cardViewAdapter.updateItems(it.first.first().deck)
             }
             findViewById<TextView>(R.id.deckSize).text = goFishLogic.getDeckSize().toString()
         }
@@ -97,19 +95,17 @@ class GoFishActivity : AppCompatActivity() {
                     override fun run() {
                         runOnUiThread { visibility = View.GONE }
                     }
-                }, 2000)
+                }, 3000)
             }
         }
     }
 
     private fun updateContent(data: GoFishUiModel) {
-        with(binding) {
             if (data.showLobby) {
                 lobbyPopup.showPopup(findViewById(android.R.id.content))
             } else {
                 lobbyPopup.dismissPopup()
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
-        }
     }
 }

@@ -9,18 +9,15 @@ import com.example.game_app.data.common.BaseAdapter
 import com.example.game_app.data.common.itemClickListener
 import com.example.game_app.domain.bitmap.BitmapReverser
 
-//    fun updateItems(players: List<GoFishLogic.Player>) {
-//        items = players
-//        notifyDataSetChanged()
 class PlayersRecycleView : BaseAdapter<GoFishLogic.Player>(
-    areItemsTheSame = { oldItem, newItem -> oldItem == newItem },
-    areContentsTheSame = { oldItem, newItem -> oldItem == newItem },
-    layoutResId = R.layout.item_go_fish_player_card
+    { oldItem, newItem -> oldItem == newItem },
+    { oldItem, newItem -> oldItem == newItem },
+    R.layout.item_go_fish_player_card
 ) {
     var itemClickListener: itemClickListener<GoFishLogic.Player>? = null
     var isYourTurn: Boolean = false
-    override fun createViewHolder(view: View) : PlayersViewHolder = PlayersViewHolder(view)
-    inner class PlayersViewHolder(view: View) : BaseViewHolder(view) {
+    override fun createViewHolder(view: View) = PlayersViewHolder(view)
+    inner class PlayersViewHolder(private val view: View) : BaseViewHolder(view) {
         private val profile = view.findViewById<ImageView>(R.id.profile)
         private val name = view.findViewById<TextView>(R.id.name)
         private val cards = view.findViewById<TextView>(R.id.cards)
@@ -31,7 +28,7 @@ class PlayersRecycleView : BaseAdapter<GoFishLogic.Player>(
             profile.setImageBitmap(item.info.image.let { BitmapReverser().adapt(it) })
             name.text = item.info.username
             cards.text = item.deck.size.toString()
-            itemView.setOnClickListener {
+            view.setOnClickListener {
                 if (isYourTurn) {
                     itemClickListener?.onItemClicked(item, absoluteAdapterPosition)
                 }

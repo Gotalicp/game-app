@@ -3,14 +3,13 @@ package com.example.game_app.domain.server
 import android.util.Log
 import com.example.game_app.data.GameLogic
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.Socket
 
-class ServerClass<T : Serializable>(
+class   ServerClass<T : Serializable>(
     private val socket: Socket,
     private val gameLogic: GameLogic<T>
 ) {
@@ -18,7 +17,7 @@ class ServerClass<T : Serializable>(
     private lateinit var outputStream: ObjectOutputStream
 
     @Volatile
-    private var isRunning = true
+    var isRunning = true
 
     init {
         try {
@@ -32,18 +31,17 @@ class ServerClass<T : Serializable>(
 
     fun run() {
         Thread {
-//        withContext(Dispatchers.Default){
             while (isRunning) {
                 try {
                     inputStream.readObject().let {
                         it as T
+                        write(it)
                         gameLogic.turnHandling(it)
                     }
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
             }
-//        }
         }.start()
     }
 

@@ -22,7 +22,7 @@ class GoFishLogic : GameLogic<Play> {
         val deck: MutableList<Card>,
         val info: PlayerInfo,
         var score: Int
-    )
+    ):Serializable
 
     //All the players
     private val _gamePlayers = MutableLiveData<MutableList<Player>>()
@@ -39,9 +39,7 @@ class GoFishLogic : GameLogic<Play> {
         deck.showDeck()
         deck.shuffle(seed)
         //Create players
-        _gamePlayers.postValue(players.map {
-            Player(mutableListOf(), it, 0)
-        }.toMutableList())
+        _gamePlayers.value = players.map { Player(mutableListOf(), it, 0) }.toMutableList()
         //Randomizes game turns
         if (_gamePlayers.value != null) {
             val temp = _gamePlayers.value!!

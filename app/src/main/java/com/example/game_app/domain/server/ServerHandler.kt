@@ -7,6 +7,8 @@ import com.example.game_app.data.GameLogic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.Serializable
+import java.net.Inet4Address
+import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
 
@@ -37,6 +39,7 @@ class ServerHandler<T : Serializable>(
 
     fun startGame(seed: Long) {
         canJoinServer = false
+        cleanupServers()
         lobby.value?.players?.let { gameLogic.startGame(seed, it) }
         send(seed)
     }
@@ -73,5 +76,15 @@ class ServerHandler<T : Serializable>(
             e.printStackTrace()
         }
         return null
+    }
+
+    private fun cleanupServers() {
+        serverThreads.iterator().let {
+            while (it.hasNext()) {
+                if (!it.next().isRunning) {
+                    it.remove()
+                }
+            }
+        }
     }
 }

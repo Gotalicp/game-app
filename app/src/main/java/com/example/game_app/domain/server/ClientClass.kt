@@ -14,13 +14,13 @@ import java.net.Socket
 class ClientClass<T : Serializable>(
     private val gameLogic: GameLogic<T>,
     private val lobbyUid: String,
-    private val lobbyIp: String
+    private val lobbyIp: String,
+    private val expectedTClazz: Class<T>
 ) : Thread() {
     private lateinit var reader: ObjectInputStream
     private lateinit var writer: ObjectOutputStream
     private lateinit var socket: Socket
     private val fireBaseUtility = FireBaseUtility()
-    private lateinit var expectedTClazz: Class<T>
 
     @Volatile
     private var isConnected = false
@@ -86,7 +86,7 @@ class ClientClass<T : Serializable>(
                             SharedInformation.getLobby().value?.players?.let {
                                 gameLogic.startGame(read, it)
                             }
-                        } else if (read !is String) {
+                        } else if (expectedTClazz.isInstance(read)) {
                             gameLogic.turnHandling(read as T)
                         } else {
 

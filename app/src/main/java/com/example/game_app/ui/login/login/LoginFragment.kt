@@ -1,14 +1,22 @@
 package com.example.game_app.ui.login.login
 
+import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import com.example.game_app.R
 import com.example.game_app.databinding.FragmentLoginBinding
+import com.example.game_app.ui.game.goFish.GoFishUiMapper
+import com.example.game_app.ui.game.goFish.GoFishUiModel
+import com.example.game_app.ui.login.AuthenticationUIMapper
+import com.example.game_app.ui.login.AuthenticationUiModel
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
@@ -26,6 +34,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.state.map { AuthenticationUIMapper.map(it) }
+            .observe(viewLifecycleOwner) { updateContent(it) }
+
         binding?.apply {
             navigationRegister.setOnClickListener {
                 findNavController().navigate(R.id.LoginToRegister)
@@ -45,6 +57,15 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
                 }
             }
+        }
+    }
+
+    private fun updateContent(data: AuthenticationUiModel) {
+        data.apply {
+            if (failed) {
+
+            }
+            binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
         }
     }
 }
