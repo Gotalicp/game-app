@@ -60,19 +60,17 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
                     networkInterface.inetAddresses.toList().forEach { inetAddress ->
                         if (!inetAddress.isLoopbackAddress && inetAddress is InetAddress) {
                             val ip = inetAddress.hostAddress
-                            if (ip.contains(":")
-                                    .not()
-                            ) { // Check if it's an IPv4 address
-                                // Assuming the last part of the IP address represents the device on the local network
-                                val parts = ip.split(".")
-                                if (parts.size == 4) {
-                                    val baseIpAddress =
-                                        "${parts[0]}.${parts[1]}.${parts[2]}."
-                                    Log.d(
-                                        "Local IP",
-                                        "Detected base IP address: $baseIpAddress"
-                                    )
-                                    return baseIpAddress
+                            if (ip.contains(":").not()) {
+                                ip?.split(".")?.let {
+                                    if (it.size == 4) {
+                                        val baseIpAddress =
+                                            "${it[0]}.${it[1]}.${it[2]}."
+                                        Log.d(
+                                            "Local IP",
+                                            "Detected base IP address: $baseIpAddress"
+                                        )
+                                        return baseIpAddress
+                                    }
                                 }
                             }
                         }

@@ -5,11 +5,14 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.map
 import com.example.game_app.R
-import com.example.game_app.data.common.itemClickListener
+import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.Rank
+import com.example.game_app.ui.game.goFish.popup.PopupEnd
 import com.example.game_app.ui.game.goFish.popup.PopupLobby
 import com.example.game_app.ui.game.goFish.popup.PopupPickCard
 import java.util.Timer
@@ -24,6 +27,8 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
+    private var isHost: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         goFishLogic = goFishViewModel.goFishLogic
@@ -34,6 +39,7 @@ class GoFishActivity : AppCompatActivity() {
 
         intent.getStringExtra("lobbyUid")?.let { uid ->
             intent.getStringExtra("lobbyIp")?.let {
+                isHost = true
                 goFishViewModel.joinGame(uid, it)
                 findViewById<View>(android.R.id.content).post {
                     lobbyPopup = PopupLobby(this)
@@ -41,15 +47,16 @@ class GoFishActivity : AppCompatActivity() {
                 }
             }
         } ?: run {
+            isHost = false
             goFishViewModel.createGame()
             findViewById<View>(android.R.id.content).post {
-                lobbyPopup = PopupLobby(this) { goFishViewModel.startGame() }
+                lobbyPopup = PopupLobby(this) { goFishViewModel.initGame() }
                 goFishViewModel.showLobby()
             }
         }
 
         playerViewAdapter.apply {
-            itemClickListener = object : itemClickListener<GoFishLogic.Player> {
+            itemClickListener = object : ItemClickListener<GoFishLogic.Player> {
                 override fun onItemClicked(
                     item: GoFishLogic.Player, itemPosition: Int
                 ) {
@@ -59,7 +66,7 @@ class GoFishActivity : AppCompatActivity() {
                                 findViewById(android.R.id.content), player.info, item.deck
 
                             )
-                            adapter.itemClickListener = object : itemClickListener<Rank> {
+                            adapter.itemClickListener = object : ItemClickListener<Rank> {
                                 override fun onItemClicked(item: Rank, itemPosition: Int) {
                                     dismiss()
                                     goFishViewModel.write(
@@ -101,11 +108,28 @@ class GoFishActivity : AppCompatActivity() {
     }
 
     private fun updateContent(data: GoFishUiModel) {
-            if (data.showLobby) {
-                lobbyPopup.showPopup(findViewById(android.R.id.content))
-            } else {
-                lobbyPopup.dismissPopup()
+        if (data.showLobby) {
+            lobbyPopup.showPopup(findViewById(android.R.id.content))
+        } else {
+            lobbyPopup.dismissPopup()
+        }
+        playerViewAdapter.isYourTurn = data.isYourTurn
+        if (data.showScores) {
+            goFishLogic.gamePlayers.value?.let {
+                PopupEnd(
+                    this,
+                    it
+                ).showPopup(findViewById(android.R.id.content))
             }
-            playerViewAdapter.isYourTurn = data.isYourTurn
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isHost) {
+            goFishViewModel.stopServer()
+        } else {
+            goFishViewModel.disconnect()
+        }
     }
 }

@@ -5,16 +5,16 @@ import android.widget.Button
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.example.game_app.R
-import com.example.game_app.data.common.itemClickListener
+import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.data.LibraryGame
-import com.example.game_app.data.common.BaseAdapter
+import com.example.game_app.data.common.RecycleViewAdapter
 
-class MenuRecycleViewAdapter : BaseAdapter<LibraryGame>(
+class MenuRecycleViewAdapter : RecycleViewAdapter<LibraryGame>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_library
 ) {
-    var itemClickListener: itemClickListener<LibraryGame>? = null
+    var itemClickListener: ItemClickListener<LibraryGame>? = null
     override fun createViewHolder(view:View)= MenuViewHolder(view)
     inner class MenuViewHolder(view: View) : BaseViewHolder(view) {
         private var image = view.findViewById<ImageView>(R.id.game_image)

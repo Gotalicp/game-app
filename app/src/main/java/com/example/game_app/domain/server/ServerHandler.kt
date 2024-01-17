@@ -40,8 +40,19 @@ class ServerHandler<T : Serializable>(
     fun startGame(seed: Long) {
         canJoinServer = false
         cleanupServers()
-        lobby.value?.players?.let { gameLogic.startGame(seed, it) }
-        send(seed)
+
+        lobby.value?.players?.let {
+            gameLogic.setPlayer(it)
+            gameLogic.startGame(seed)
+            send(seed)
+        }
+    }
+
+    fun startAgain(seed: Long) {
+        lobby.value?.players?.let {
+            gameLogic.startGame(seed)
+            send(seed)
+        }
     }
 
     fun endGame() {

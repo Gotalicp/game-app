@@ -20,8 +20,9 @@ enum class Rank(val value: Int) {
 
 data class Card(val suit: Suit, val rank: Rank)
 
-class Deck{
+class Deck {
     private val cards: MutableList<Card> = mutableListOf()
+
     init {
         for (suit in Suit.values()) {
             for (rank in Rank.values()) {
@@ -30,24 +31,15 @@ class Deck{
         }
     }
 
-    //Gives Each Player (N) Number Of Cards
-    fun deal(players: MutableList<PlayerInfo>, numberOfCardsPerPlayer: Int, deck: Deck): MutableList<GoFishLogic.Player> {
-        //create empty temporary list to return later
-        val playersHands = mutableListOf<GoFishLogic.Player>()
-        for(player in players){
-            //create hand for every player
-            playersHands.add(GoFishLogic.Player(mutableListOf(),player,0))
-        }
-        //Gives Card To Players
-        for (i in 1..numberOfCardsPerPlayer) {
-            for(player in playersHands) {
-                player.deck.add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
+    fun deal(players: MutableList<GoFishLogic.Player>, numberOfCardsPerPlayer: Int, deck: Deck) =
+        players.apply {
+            for (i in 1..numberOfCardsPerPlayer) {
+                for (player in players) {
+                    player.deck.add(deck.drawCard() ?: throw IllegalStateException("Deck is empty"))
+                }
             }
         }
-        return playersHands
-    }
 
-    //Gives players all the cards
     fun deal(players: List<Int>, deck: Deck): MutableList<Pair<Int, MutableList<Card>>> {
         val playerHands = mutableMapOf<Int, MutableList<Card>>()
         // Initialize hands for each player
@@ -64,16 +56,23 @@ class Deck{
         // Convert playerHands to a list of pairs
         return playerHands.toList().toMutableList()
     }
+
     fun shuffle(seed: Long) {
         cards.shuffle(Random(seed))
-        Log.d("deck shuffle", "deck"+ showDeck())
     }
+
     fun showDeck() {
         for (card in cards) {
-            Log.d("ShowDeck","${card.rank} of ${card.suit}")
+            Log.d("ShowDeck", "${card.rank} of ${card.suit}")
         }
     }
-    fun drawCard() = if (cards.isNotEmpty()) { cards.removeAt(0) } else { null }
+
+    fun drawCard() = if (cards.isNotEmpty()) {
+        cards.removeAt(0)
+    } else {
+        null
+    }
+
     fun isEmpty() = cards.isEmpty()
 
     fun deckSize() = cards.size

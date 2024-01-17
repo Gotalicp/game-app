@@ -1,7 +1,9 @@
 package com.example.game_app.data
 
 interface GameLogic <T>{
-    fun startGame(seed : Long, players : MutableList<PlayerInfo>)
+
+    fun startGame(seed : Long)
+    fun setPlayer(players : MutableList<PlayerInfo>)
     fun turnHandling(t: T)
-    fun endGame(): Boolean
+    fun checkEndGame(): Boolean
 }

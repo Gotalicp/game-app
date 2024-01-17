@@ -5,16 +5,16 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.game_app.R
-import com.example.game_app.data.common.BaseAdapter
-import com.example.game_app.data.common.itemClickListener
+import com.example.game_app.data.common.RecycleViewAdapter
+import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.domain.bitmap.BitmapReverser
 
-class PlayersRecycleView : BaseAdapter<GoFishLogic.Player>(
+class PlayersRecycleView : RecycleViewAdapter<GoFishLogic.Player>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_go_fish_player_card
 ) {
-    var itemClickListener: itemClickListener<GoFishLogic.Player>? = null
+    var itemClickListener: ItemClickListener<GoFishLogic.Player>? = null
     var isYourTurn: Boolean = false
     override fun createViewHolder(view: View) = PlayersViewHolder(view)
     inner class PlayersViewHolder(private val view: View) : BaseViewHolder(view) {

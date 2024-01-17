@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BaseAdapter<T>(
+abstract class RecycleViewAdapter<T>(
     private val areItemsTheSame: (oldItem: T, newItem: T) -> Boolean,
-        private val areContentsTheSame: (oldItem: T, newItem: T) -> Boolean,
+    private val areContentsTheSame: (oldItem: T, newItem: T) -> Boolean,
     private val layoutResId: Int,
-) : RecyclerView.Adapter<BaseAdapter<T>.BaseViewHolder>() {
+) : RecyclerView.Adapter<RecycleViewAdapter<T>.BaseViewHolder>() {
 
     private val items = ArrayList<T>()
     private var diffUtil: GenericDiffUtil<T>? = null

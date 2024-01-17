@@ -55,7 +55,7 @@ class ClientClass<T : Serializable>(
             ex.printStackTrace()
             Log.e("Client", "Error closing resources: $ex")
         }
-        fireBaseUtility.leaveLobby(lobbyUid)
+        fireBaseUtility.leaveLobby()
     }
 
     override fun run() {

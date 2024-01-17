@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish.popup
 
+import android.app.Activity
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -7,45 +8,82 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.Spinner
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.data.SharedInformation
+import com.example.game_app.data.common.CustomSpinnerAdapter
+import com.example.game_app.data.common.ItemSelectedListener
+import com.example.game_app.domain.FireBaseUtility
+import kotlinx.coroutines.flow.callbackFlow
 
 class PopupLobby(
-    context: Context,
+    private val context: Context,
     private val startGame: (() -> Unit)? = null
-){
-
+) {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
-    private val recyclerView: RecyclerView
+    private val playersView: RecyclerView
     private val adapter: PopupLobbyRecycleView
-    private val sharedLobby = SharedInformation.getLobby()
+    private val lobby = SharedInformation.getLobby()
+    private val acc = SharedInformation.getAcc()
+    private val fireBaseUtility = FireBaseUtility()
+    private var canChangeSettings = false
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         popupView = inflater.inflate(R.layout.window_lobby, null)
-        recyclerView = popupView.findViewById(R.id.recyclerView)
+        playersView = popupView.findViewById(R.id.playerRecycleView)
         adapter = PopupLobbyRecycleView()
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
+        playersView.layoutManager = LinearLayoutManager(context)
+        playersView.adapter = adapter
 
-        sharedLobby.observe(context as LifecycleOwner){
-            adapter.updateItems(it.players)
+
+        lobby.observe(context as LifecycleOwner) { lobbyInfo ->
+            adapter.updateItems(lobbyInfo.players)
+            lobbyInfo.players.find { acc.value?.uid == it.uid }.let {
+                canChangeSettings = it?.isHost ?: false
+            }
         }
-
-        popupView.findViewById<TextView>(R.id.lobbyName).text = "Test"
-        popupView.findViewById<TextView>(R.id.gamemode).text = "Gamemode Name: gofish"
-        popupView.findViewById<TextView>(R.id.rounds).text = "Round: 0"
-
-        popupView.setBackgroundColor(ContextCompat.getColor(context, androidx.appcompat.R.color.material_blue_grey_800))
+        popupView.findViewById<Spinner>(R.id.playerLimit).let {
+            it.adapter =
+                CustomSpinnerAdapter(context, listOf(2, 3, 4, 5, 6), object :
+                    ItemSelectedListener<Int> {
+                    override fun onItemSelected(item: Int) {
+                        fireBaseUtility.updateLobby(playerLimit = item)
+                    }
+                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+        }
+        popupView.findViewById<Spinner>(R.id.roundLimit).let {
+            it.adapter =
+                CustomSpinnerAdapter(context, listOf(1, 2, 3, 4, 5, 6), object :
+                    ItemSelectedListener<Int> {
+                    override fun onItemSelected(item: Int) {
+                        fireBaseUtility.updateLobby(rounds = item)
+                    }
+                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+        }
+        popupView.findViewById<Spinner>(R.id.turnTimeLimit).let {
+            it.adapter =
+                CustomSpinnerAdapter(context, listOf("No limit", "15", "30", "45", "60"), object :
+                    ItemSelectedListener<String> {
+                    override fun onItemSelected(item: String) {
+                        fireBaseUtility.updateLobby(secPerTurn = item)
+                    }
+                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+        }
+        popupView.setBackgroundColor(
+            ContextCompat.getColor(
+                context,
+                androidx.appcompat.R.color.material_blue_grey_800
+            )
+        )
     }
 
-    fun showPopup(anchorView: View){
+    fun showPopup(anchorView: View) {
         popupWindow = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -66,10 +104,12 @@ class PopupLobby(
             }
             popupView.findViewById<Button>(R.id.btn_exit).setOnClickListener {
                 dismiss()
+                (context as? Activity)?.finish()
             }
         }
     }
-    fun dismissPopup(){
+
+    fun dismissPopup() {
         popupWindow?.dismiss()
     }
 }

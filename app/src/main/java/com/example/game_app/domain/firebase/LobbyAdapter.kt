@@ -10,15 +10,7 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
     override fun adapt(t: DataSnapshot): ArrayList<LobbyInfo> {
         val lobbyInfoList = ArrayList<LobbyInfo>()
         for (info in t.children) {
-            val lobbyName = info.child("lobbyName").getValue(String::class.java)
-            val ownerIp = info.child("ownerIp").getValue(String::class.java)
-            val lobbyUid = info.child("lobbyUid").getValue(String::class.java)
             val players = mutableListOf<PlayerInfo>()
-            val maxPlayerCount = info.child("maxPlayerCount").getValue(Int::class.java)
-            val gamemode = info.child("gamemode").getValue(String::class.java)
-            val gamemodeId = info.child("gamemodeId").getValue(Int::class.java)
-            val connection = info.child("connection").getValue(String::class.java)
-
             for (playerInfo in info.child("players").children) {
                 val player = PlayerInfo(
                     username = playerInfo.child("username").getValue(String::class.java)?:"",
@@ -28,17 +20,17 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
                 )
                 players.add(player)
             }
-            val lobby = LobbyInfo(
-                lobbyName = lobbyName?:"",
-                lobbyUid = lobbyUid?:"",
-                ownerIp = ownerIp?:"",
-                players = players?: mutableListOf(),
-                maxPlayerCount = maxPlayerCount?:-1,
-                gamemode = gamemode?:"",
-                gamemodeId = gamemodeId?:-1,
-                connection = connection?:""
-            )
-            lobbyInfoList.add(lobby)
+            LobbyInfo(
+                lobbyName = info.child("lobbyName").getValue(String::class.java)?:"",
+                lobbyUid = info.child("lobbyUid").getValue(String::class.java)?:"",
+                ownerIp = info.child("ownerIp").getValue(String::class.java)?:"",
+                players = players,
+                maxPlayerCount = info.child("maxPlayerCount").getValue(Int::class.java)?:-1,
+                gamemode = info.child("gamemode").getValue(String::class.java)?:"",
+                gamemodeId = info.child("gamemodeId").getValue(Int::class.java)?:-1,
+                rounds = info.child("rounds").getValue(Int::class.java)?:1,
+                secPerTurn = info.child("secPerTurn").getValue(String::class.java)?:"no limit"
+            ).let { lobbyInfoList.add(it) }
         }
         return lobbyInfoList
     }

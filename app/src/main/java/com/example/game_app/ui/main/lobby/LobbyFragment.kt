@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.game_app.data.common.itemClickListener
+import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.databinding.FragmentLobbyBinding
 import com.example.game_app.ui.game.goFish.GoFishActivity
@@ -31,12 +31,13 @@ class LobbyFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         _binding?.apply {
             val lobbiesRecycleView = LobbiesRecycleView().apply {
-                itemClickListener = object : itemClickListener<LobbyInfo> {
+                itemClickListener = object : ItemClickListener<LobbyInfo> {
                     override fun onItemClicked(item: LobbyInfo, itemPosition: Int) {
-                        val intent = Intent(context, GoFishActivity::class.java)
-                        intent.putExtra("lobbyUid", item.lobbyUid)
-                        intent.putExtra("lobbyIp", item.ownerIp)
-                        startActivity(intent)
+                        Intent(context, GoFishActivity::class.java).let {
+                            it.putExtra("lobbyUid", item.lobbyUid)
+                            it.putExtra("lobbyIp", item.ownerIp)
+                            startActivity(it)
+                        }
                     }
                 }
             }

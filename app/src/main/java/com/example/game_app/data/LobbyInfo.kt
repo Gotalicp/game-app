@@ -11,5 +11,6 @@ data class LobbyInfo (
     val maxPlayerCount:Int = 0,
     val gamemode:String = "",
     val gamemodeId: Int = 0,
-    val connection:String = "",
+    val rounds: Int = 1,
+    val secPerTurn: String = "no limit"
 ):java.io.Serializable

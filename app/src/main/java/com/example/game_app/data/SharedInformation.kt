@@ -2,6 +2,7 @@ package com.example.game_app.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.database.DatabaseReference
 
 //An object of information to share between all fragments and viewModels
 object SharedInformation {
@@ -20,5 +21,10 @@ object SharedInformation {
     fun getLogged() = logged
     fun updateLogged(log: Boolean) {
         logged.value = log
+    }
+    private var lobbyReference = MutableLiveData<DatabaseReference>()
+    fun getLobbyReference() = lobbyReference
+    fun updateLobbyReference(reference: DatabaseReference){
+        lobbyReference.postValue(reference)
     }
 }
