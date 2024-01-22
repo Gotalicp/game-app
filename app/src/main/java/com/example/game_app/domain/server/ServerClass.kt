@@ -1,5 +1,7 @@
 package com.example.game_app.domain.server
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.game_app.data.GameLogic
 import kotlinx.coroutines.Dispatchers
@@ -8,8 +10,9 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.Socket
+import java.util.concurrent.Executors
 
-class   ServerClass<T : Serializable>(
+class ServerClass<T : Serializable>(
     private val socket: Socket,
     private val gameLogic: GameLogic<T>
 ) {
@@ -19,7 +22,7 @@ class   ServerClass<T : Serializable>(
     @Volatile
     var isRunning = true
 
-    init {
+    fun run() {
         try {
             inputStream = ObjectInputStream(socket.getInputStream())
             outputStream = ObjectOutputStream(socket.getOutputStream())
@@ -27,22 +30,28 @@ class   ServerClass<T : Serializable>(
             Log.d("Server", ex.toString())
             ex.printStackTrace()
         }
-    }
 
-    fun run() {
-        Thread {
-            while (isRunning) {
-                try {
-                    inputStream.readObject().let {
-                        it as T
-                        write(it)
-                        gameLogic.turnHandling(it)
+        val executors = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
+        executors.execute(Runnable {
+            kotlin.run {
+                while (isRunning) {
+                    try {
+                        inputStream.readObject().let {
+                            handler.post(Runnable {
+                                kotlin.run {
+                                    it as T
+                                    write(it)
+                                    gameLogic.turnHandling(it)
+                                }
+                            })
+                        }
+                    } catch (ex: IOException) {
+                        ex.printStackTrace()
                     }
-                } catch (ex: IOException) {
-                    ex.printStackTrace()
                 }
             }
-        }.start()
+        })
     }
 
     fun <J> write(play: J) {

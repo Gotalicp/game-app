@@ -70,4 +70,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

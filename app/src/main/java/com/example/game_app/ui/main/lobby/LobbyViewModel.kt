@@ -22,10 +22,10 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
         val foundLobbies = mutableListOf<LobbyInfo>()
 
         try {
-            val baseIpAddress = getLocalIpAddress()
+            val baseIpAddress = getLocalInetAddress()
             if (baseIpAddress != null) {
-                val startRange = 21
-                val endRange = 21
+                val startRange = 113
+                val endRange = 113
 
                 for (i in startRange..endRange) {
                     val ip = baseIpAddress + i.toString()
@@ -34,13 +34,13 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
                         ClientSearchLocalClass(ip).apply {
                             start()
                             uid.observeForever {
-                                Log.d("uid is ","$it")
+                                Log.d("uid is ", "$it")
                                 fireBaseUtility.getLobby(it) { lobbyInfo ->
                                     if (lobbyInfo != null) {
                                         foundLobbies.add(lobbyInfo)
                                         _lobbiesList.postValue(foundLobbies)
-                                        uid.removeObserver{}
-                                        Log.d("Lobby found on $ip","exz")
+                                        uid.removeObserver {}
+                                        Log.d("Lobby found on $ip", "exz")
                                     }
                                 }
                             }
@@ -79,7 +79,42 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-
         return null
+    }
+
+    private fun getLocalInetAddress(): String? {
+        try {
+            NetworkInterface.getNetworkInterfaces().let { network ->
+                while (network.hasMoreElements()) {
+                    network.nextElement().inetAddresses.let { addresses ->
+                        while (addresses.hasMoreElements()) {
+                            addresses.nextElement().let { address ->
+                                if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
+                                    val ip = address.toString()
+                                    if (ip.contains(":").not()) {
+                                        ip.split(".").let {
+                                            if (it.size == 4) {
+                                                val baseIpAddress =
+                                                    "${it[0]}.${it[1]}.${it[2]}."
+                                                Log.d(
+                                                    "Local IP",
+                                                    "Detected base IP address: $baseIpAddress"
+                                                )
+                                                return baseIpAddress
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+
+            ex.printStackTrace()
+        }
+        return null
+
     }
 }

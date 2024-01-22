@@ -68,4 +68,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

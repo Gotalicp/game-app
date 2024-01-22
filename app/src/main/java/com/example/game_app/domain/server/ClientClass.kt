@@ -47,9 +47,15 @@ class ClientClass<T : Serializable>(
     fun disconnect() {
         try {
             isConnected = false
-            writer.close()
-            reader.close()
-            socket.close()
+            if (this::writer.isInitialized) {
+                writer.close()
+            }
+            if (this::reader.isInitialized) {
+                reader.close()
+            }
+            if (this::socket.isInitialized) {
+                socket.close()
+            }
             Log.i("Client", "Closed streams and socket")
         } catch (ex: IOException) {
             ex.printStackTrace()
@@ -84,7 +90,7 @@ class ClientClass<T : Serializable>(
                     reader.readObject().let { read ->
                         if (read is Long) {
                             SharedInformation.getLobby().value?.players?.let {
-                                gameLogic.startGame(read, it)
+                                gameLogic.startGame(read)
                             }
                         } else if (expectedTClazz.isInstance(read)) {
                             gameLogic.turnHandling(read as T)

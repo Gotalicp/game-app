@@ -117,6 +117,7 @@ class GoFishActivity : AppCompatActivity() {
         if (data.showScores) {
             goFishLogic.gamePlayers.value?.let {
                 PopupEnd(
+
                     this,
                     it
                 ).showPopup(findViewById(android.R.id.content))
@@ -131,5 +132,6 @@ class GoFishActivity : AppCompatActivity() {
         } else {
             goFishViewModel.disconnect()
         }
+
     }
 }

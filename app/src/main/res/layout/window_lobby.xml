@@ -6,6 +6,27 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:id="@+id/lobbyNameLayout"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:boxStrokeWidthFocused="0dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="wrap_content"
+            android:id="@+id/lobbyNameText"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <TextView
         android:id="@+id/lobbyName"
         android:layout_width="wrap_content"
@@ -37,16 +58,16 @@
             android:layout_width="wrap_content"
             android:layout_height="20dp"
             android:text="Max players:"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/playerLimit"
-            app:layout_constraintTop_toTopOf="@id/playerLimit"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintTop_toTopOf="@id/playerLimit" />
 
         <Spinner
             android:id="@+id/playerLimit"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:hint="Max players"
             android:layout_marginTop="10dp"
+            android:hint="Max players"
             app:layout_constraintLeft_toRightOf="@+id/text1"
             app:layout_constraintTop_toBottomOf="@+id/gamemode" />
 
@@ -73,14 +94,14 @@
             android:layout_height="20dp"
             android:text="Time per Turn:"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/turnTimeLimit"/>
+            app:layout_constraintTop_toTopOf="@+id/turnTimeLimit" />
 
         <Spinner
             android:id="@+id/turnTimeLimit"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:hint="Max time per turn"
             android:layout_marginTop="10dp"
+            android:hint="Max time per turn"
             app:layout_constraintLeft_toRightOf="@+id/text3"
             app:layout_constraintTop_toBottomOf="@+id/roundLimit" />
     </androidx.constraintlayout.widget.ConstraintLayout>

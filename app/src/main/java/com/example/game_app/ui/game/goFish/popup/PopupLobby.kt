@@ -3,12 +3,14 @@ package com.example.game_app.ui.game.goFish.popup
 import android.app.Activity
 import android.content.Context
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +20,8 @@ import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.common.CustomSpinnerAdapter
 import com.example.game_app.data.common.ItemSelectedListener
 import com.example.game_app.domain.FireBaseUtility
-import kotlinx.coroutines.flow.callbackFlow
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class PopupLobby(
     private val context: Context,
@@ -34,53 +37,85 @@ class PopupLobby(
     private var canChangeSettings = false
 
     init {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        popupView = inflater.inflate(R.layout.window_lobby, null)
-        playersView = popupView.findViewById(R.id.playerRecycleView)
-        adapter = PopupLobbyRecycleView()
-        playersView.layoutManager = LinearLayoutManager(context)
-        playersView.adapter = adapter
+        popupView =
+            (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+                R.layout.window_lobby,
+                null
+            ).apply {
+                playersView = findViewById(R.id.playerRecycleView)
+                adapter = PopupLobbyRecycleView()
+                playersView.layoutManager = LinearLayoutManager(context)
+                playersView.adapter = adapter
 
+                val lobbyEdit = findViewById<TextInputEditText>(R.id.lobbyNameText)
+                val lobbyLayout = findViewById<TextInputLayout>(R.id.lobbyNameLayout)
+                val lobbyName = findViewById<TextView>(R.id.lobbyName).apply {
+                    setOnClickListener {
+                        lobbyLayout.visibility = View.VISIBLE
+                        lobbyEdit.requestFocus()
+                    }
+                }
+                lobbyEdit.apply {
+                    setOnFocusChangeListener { _, focus ->
+                        if (!focus) {
+                            lobbyLayout.visibility = View.GONE
+                        }
+                    }
+                    setOnKeyListener { _, keyCode, event ->
+                        if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                            fireBaseUtility.updateLobby(lobbyName = text.toString())
+                            clearFocus()
+                            true
+                        } else {
+                            false
+                        }
+                    }
 
-        lobby.observe(context as LifecycleOwner) { lobbyInfo ->
-            adapter.updateItems(lobbyInfo.players)
-            lobbyInfo.players.find { acc.value?.uid == it.uid }.let {
-                canChangeSettings = it?.isHost ?: false
+                }
+                lobby.observe(context as LifecycleOwner) { lobbyInfo ->
+                    adapter.updateItems(lobbyInfo.players)
+                    lobbyName.text = lobbyInfo.lobbyName
+                    lobbyInfo.players.find { acc.value?.uid == it.uid }.let {
+                        canChangeSettings = it?.isHost ?: false
+                    }
+                }
+                findViewById<Spinner>(R.id.playerLimit).let {
+                    it.adapter =
+                        CustomSpinnerAdapter(context, listOf(2, 3, 4, 5, 6), object :
+                            ItemSelectedListener<Int> {
+                            override fun onItemSelected(item: Int) {
+                                fireBaseUtility.updateLobby(playerLimit = item)
+                            }
+                        }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+                }
+                findViewById<Spinner>(R.id.roundLimit).let {
+                    it.adapter =
+                        CustomSpinnerAdapter(context, listOf(1, 2, 3, 4, 5, 6), object :
+                            ItemSelectedListener<Int> {
+                            override fun onItemSelected(item: Int) {
+                                fireBaseUtility.updateLobby(rounds = item)
+                            }
+                        }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+                }
+                findViewById<Spinner>(R.id.turnTimeLimit).let {
+                    it.adapter =
+                        CustomSpinnerAdapter(
+                            context,
+                            listOf("No limit", "15", "30", "45", "60"),
+                            object :
+                                ItemSelectedListener<String> {
+                                override fun onItemSelected(item: String) {
+                                    fireBaseUtility.updateLobby(secPerTurn = item)
+                                }
+                            }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
+                }
+                setBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        androidx.appcompat.R.color.material_blue_grey_800
+                    )
+                )
             }
-        }
-        popupView.findViewById<Spinner>(R.id.playerLimit).let {
-            it.adapter =
-                CustomSpinnerAdapter(context, listOf(2, 3, 4, 5, 6), object :
-                    ItemSelectedListener<Int> {
-                    override fun onItemSelected(item: Int) {
-                        fireBaseUtility.updateLobby(playerLimit = item)
-                    }
-                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
-        }
-        popupView.findViewById<Spinner>(R.id.roundLimit).let {
-            it.adapter =
-                CustomSpinnerAdapter(context, listOf(1, 2, 3, 4, 5, 6), object :
-                    ItemSelectedListener<Int> {
-                    override fun onItemSelected(item: Int) {
-                        fireBaseUtility.updateLobby(rounds = item)
-                    }
-                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
-        }
-        popupView.findViewById<Spinner>(R.id.turnTimeLimit).let {
-            it.adapter =
-                CustomSpinnerAdapter(context, listOf("No limit", "15", "30", "45", "60"), object :
-                    ItemSelectedListener<String> {
-                    override fun onItemSelected(item: String) {
-                        fireBaseUtility.updateLobby(secPerTurn = item)
-                    }
-                }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
-        }
-        popupView.setBackgroundColor(
-            ContextCompat.getColor(
-                context,
-                androidx.appcompat.R.color.material_blue_grey_800
-            )
-        )
     }
 
     fun showPopup(anchorView: View) {
