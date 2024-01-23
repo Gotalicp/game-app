@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.example.game_app.data.GameLogic
-import kotlinx.coroutines.Dispatchers
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -20,25 +19,23 @@ class ServerClass<T : Serializable>(
     private lateinit var outputStream: ObjectOutputStream
 
     @Volatile
-    var isRunning = true
+    var isRunning = false
 
     fun run() {
         try {
             inputStream = ObjectInputStream(socket.getInputStream())
             outputStream = ObjectOutputStream(socket.getOutputStream())
+            isRunning = true
         } catch (ex: IOException) {
-            Log.d("Server", ex.toString())
             ex.printStackTrace()
         }
 
-        val executors = Executors.newSingleThreadExecutor()
-        val handler = Handler(Looper.getMainLooper())
-        executors.execute(Runnable {
+        Executors.newSingleThreadExecutor().execute(Runnable {
             kotlin.run {
                 while (isRunning) {
                     try {
                         inputStream.readObject().let {
-                            handler.post(Runnable {
+                            Handler(Looper.getMainLooper()).post(Runnable {
                                 kotlin.run {
                                     it as T
                                     write(it)

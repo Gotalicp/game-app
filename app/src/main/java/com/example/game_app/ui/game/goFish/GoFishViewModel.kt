@@ -7,7 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.server.ClientClass
+import com.example.game_app.domain.server.OkClientClass
+import com.example.game_app.domain.server.OkServerClass
 import com.example.game_app.domain.server.ServerHandler
+import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -23,18 +26,19 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     private val _state = MutableLiveData<State>()
     val state: LiveData<State> = _state
 
-    private lateinit var server: ServerHandler<Play>
-    private lateinit var client: ClientClass<Play>
+    private lateinit var server: OkServerClass<Play>
+    private lateinit var client: OkClientClass<Play>
     private var lobby = SharedInformation.getLobby().value
     var goFishLogic = GoFishLogic()
 
     val uid = SharedInformation.getAcc().value?.uid
     fun createGame() {
-        server = ServerHandler(goFishLogic).apply { start() }
+        server = OkServerClass(goFishLogic)
     }
 
     fun joinGame(uid: String, ip: String) {
-        client = ClientClass(goFishLogic, uid, ip, Play::class.java).apply { start() }
+        client = OkClientClass(goFishLogic, ConnectionInfo("62.176.88.52",8888) ,uid)
+        client.join()
     }
 
     fun initGame() {
@@ -59,7 +63,8 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun startGame(time: Int) {
         _state.value = State.StartingIn(time)
-        server.startGame(Random.nextLong())
+//        server.startGame(Random.nextLong())
+        server.send("moqt tekst za teb")
         viewModelScope.launch {
             goFishLogic.playerToTakeTurn.observeForever {
                 _state.value = State.MyTurn((goFishLogic.playerToTakeTurn.value?.info?.uid === uid))
@@ -72,7 +77,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             if (::server.isInitialized) {
                 server.send(t)
             } else if (::client.isInitialized) {
-                client.write(t)
+                client.send(t)
             }
             goFishLogic.turnHandling(t)
             _state.value =
@@ -85,10 +90,8 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun disconnect() {
-        client.disconnect()
-    }
-
-    fun stopServer() {
-        server.endGame()
+        if(::client.isInitialized){
+            client.disconnect()
+        }
     }
 }

@@ -27,8 +27,6 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
-    private var isHost: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         goFishLogic = goFishViewModel.goFishLogic
@@ -39,7 +37,6 @@ class GoFishActivity : AppCompatActivity() {
 
         intent.getStringExtra("lobbyUid")?.let { uid ->
             intent.getStringExtra("lobbyIp")?.let {
-                isHost = true
                 goFishViewModel.joinGame(uid, it)
                 findViewById<View>(android.R.id.content).post {
                     lobbyPopup = PopupLobby(this)
@@ -47,7 +44,6 @@ class GoFishActivity : AppCompatActivity() {
                 }
             }
         } ?: run {
-            isHost = false
             goFishViewModel.createGame()
             findViewById<View>(android.R.id.content).post {
                 lobbyPopup = PopupLobby(this) { goFishViewModel.initGame() }
@@ -127,11 +123,6 @@ class GoFishActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isHost) {
-            goFishViewModel.stopServer()
-        } else {
-            goFishViewModel.disconnect()
-        }
-
+        goFishViewModel.disconnect()
     }
 }

@@ -46,12 +46,15 @@ class LobbyFragment : Fragment() {
                 layoutManager = LinearLayoutManager(requireContext())
             }
             questionButton.setOnClickListener {
-                viewModel.checkLocalServers()
+                Intent(context, GoFishActivity::class.java).let {
+                    it.putExtra("lobbyUid", "prGaKzub0XS14sxCI12vNC6O6EN2")
+                    it.putExtra("lobbyIp", "192.168.1.6")
+                    startActivity(it)
+                }
             }
             viewModel.lobbiesList.observe(viewLifecycleOwner) {
                 lobbiesRecycleView.updateItems(it)
             }
-//            viewModel.checkLocalServers()
         }
     }
 

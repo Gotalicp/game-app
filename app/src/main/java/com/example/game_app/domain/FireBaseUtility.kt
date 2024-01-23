@@ -35,7 +35,7 @@ class FireBaseUtility {
                     callback(null)
                 }
             }.addOnFailureListener { exception ->
-                Log.e("firebase", "Error getting data", exception)
+                Log.e("Firebase", "Error getting data", exception)
                 callback(null)
             }
     }
@@ -55,10 +55,9 @@ class FireBaseUtility {
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Log.e("bug in firebase observe", "bug")
+                            Log.e("Firebase", "Cancelled HostLobby")
                         }
                     })
-                    Log.d("hosted", "hosted")
                 })
         }
     }
@@ -74,7 +73,7 @@ class FireBaseUtility {
                         }
 
                         override fun onCancelled(error: DatabaseError) {
-                            Log.e("bug in firebase observe", "bug")
+                            Log.e("Firebase", "Cancelled JoinLobby")
                         }
                     })
                     child("${acc.uid}").setValue(
@@ -117,7 +116,6 @@ class FireBaseUtility {
         rounds: Int? = null,
         secPerTurn: String? = null
     ) {
-        Log.d("it changed", "it changed")
         lobbyReference?.apply {
             playerLimit?.let {
                 child("maxPlayerCount").setValue(it)
@@ -143,7 +141,7 @@ class FireBaseUtility {
         try {
             Firebase.database.getReference("user/${auth.uid}").get()
                 .addOnSuccessListener {
-                    Log.d("logged", "sicces")
+                    Log.d("Firebase", "Get Account")
                     accAdapter.adapt(it)?.let { acc ->
                         callback(acc)
                         SharedInformation.updateLogged(true)
@@ -152,7 +150,7 @@ class FireBaseUtility {
                 .addOnCanceledListener { logout() }
                 .addOnFailureListener { logout() }
         } catch (ex: Exception) {
-            Log.e("firebase", "Error getting data", ex)
+            Log.e("Firebase", "Error getting data", ex)
             logout()
         }
     }
