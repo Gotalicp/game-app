@@ -5,16 +5,16 @@ import androidx.lifecycle.LiveData
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.data.PlayerInfo
+import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.firebase.FireBaseAccAdapter
 import com.example.game_app.domain.firebase.SingleLobbyAdapter
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
     //    private val lobbyAdapter = LobbyAdapter()
@@ -44,7 +44,7 @@ class FireBaseUtility {
     fun hostLobby(ip: String) {
         acc.value?.let {
             val lobby = LobbyInfo(ownerIp = ip, lobbyUid = it.uid.toString())
-            lobby.players.add(PlayerInfo(it.uid ?: "", it.username ?: "", it.image ?: "", true))
+            lobby.players.add(it.uid ?: "")
             SharedInformation.updateLobbyReference(
                 Firebase.database.getReference("lobby/${it.uid}").apply {
                     setValue(lobby)
@@ -76,14 +76,7 @@ class FireBaseUtility {
                             Log.e("Firebase", "Cancelled JoinLobby")
                         }
                     })
-                    child("${acc.uid}").setValue(
-                        PlayerInfo(
-                            acc.uid ?: "",
-                            acc.username!!,
-                            acc.image ?: "",
-                            false
-                        )
-                    )
+                    child("${acc.uid}").setValue(acc.uid ?: "")
                 })
         }
     }
@@ -137,21 +130,20 @@ class FireBaseUtility {
         SharedInformation.updateLogged(false)
     }
 
-    fun getAccountInfo(callback: (Account) -> Unit) {
+    suspend fun getUserInfo(uid: String): Account? {
+        var tempUser: Account? = null
         try {
-            Firebase.database.getReference("user/${auth.uid}").get()
+            Firebase.database.getReference("user/${uid}").get()
                 .addOnSuccessListener {
                     Log.d("Firebase", "Get Account")
                     accAdapter.adapt(it)?.let { acc ->
-                        callback(acc)
-                        SharedInformation.updateLogged(true)
+                        tempUser = acc
                     }
-                }
-                .addOnCanceledListener { logout() }
-                .addOnFailureListener { logout() }
+                }.await()
         } catch (ex: Exception) {
             Log.e("Firebase", "Error getting data", ex)
             logout()
         }
+        return tempUser
     }
 }

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.data.GameLogic
-import com.example.game_app.data.PlayerInfo
 import com.example.game_app.domain.Card
 import com.example.game_app.domain.Deck
 import com.example.game_app.domain.Rank
@@ -22,7 +21,7 @@ data class Play(
 class GoFishLogic : GameLogic<Play> {
     data class Player(
         val deck: MutableList<Card>,
-        val info: PlayerInfo,
+        val uid: String,
         var score: Int
     ) : Serializable
 
@@ -41,7 +40,7 @@ class GoFishLogic : GameLogic<Play> {
     private lateinit var deck: Deck
     private fun resetDeck() = Deck()
     fun getDeckSize() = deck.deckSize()
-    override fun setPlayer(players: MutableList<PlayerInfo>) {
+    override fun setPlayer(players: MutableList<String>) {
         _gamePlayers.value = players.map { Player(mutableListOf(), it, 0) }.toMutableList()
     }
 
@@ -111,5 +110,5 @@ class GoFishLogic : GameLogic<Play> {
         (deck.isEmpty() && gamePlayers.value?.all { it.deck.isEmpty() } ?: true)
 
     //Gets index of player with this uid
-    private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.info.uid == uid } ?: 0
+    private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.uid == uid } ?: 0
 }

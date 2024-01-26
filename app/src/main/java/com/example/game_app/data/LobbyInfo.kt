@@ -7,7 +7,7 @@ data class LobbyInfo (
     val lobbyName: String = "",
     var lobbyUid: String = "",
     var ownerIp: String = "",
-    var players: MutableList<PlayerInfo> = mutableListOf(),
+    var players: MutableList<String> = mutableListOf(),
     val maxPlayerCount:Int = 0,
     val gamemode:String = "",
     val gamemodeId: Int = 0,

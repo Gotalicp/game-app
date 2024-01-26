@@ -13,19 +13,19 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.PlayerInfo
+import com.example.game_app.data.Account
 import com.example.game_app.domain.bitmap.BitmapReverser
 import com.example.game_app.domain.Card
 
 @SuppressLint("ClickableViewAccessibility")
 class PopupPickCard(
     context: Context
-){
+) {
 
     private val popupView: View
     private val recyclerView: RecyclerView
     val adapter: PopupPickCardRecycleView
-    private lateinit var player : PlayerInfo
+    private lateinit var player: Account
     private var popupWindow: PopupWindow? = null
 
     init {
@@ -33,12 +33,13 @@ class PopupPickCard(
         popupView = inflater.inflate(R.layout.window_pick_card, null)
         recyclerView = popupView.findViewById(R.id.cards)
         adapter = PopupPickCardRecycleView()
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = adapter
 
         popupView.setBackgroundColor(ContextCompat.getColor(context, R.color.blue))
 
-        if(::player.isInitialized) {
+        if (::player.isInitialized) {
             popupView.findViewById<TextView>(R.id.name).text = player.username
             player.image?.let {
                 popupView.findViewById<ImageView>(R.id.image)
@@ -47,9 +48,9 @@ class PopupPickCard(
         }
     }
 
-    fun showPopup(anchorView: View, player: PlayerInfo, yourDeck: List<Card> ){
+    fun showPopup(anchorView: View,player:Account, yourDeck: List<Card>) {
         this.player = player
-        adapter.updateItems(yourDeck.distinctBy { it.rank }.map{it.rank})
+        adapter.updateItems(yourDeck.distinctBy { it.rank }.map { it.rank })
         popupWindow = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.WRAP_CONTENT,

@@ -9,6 +9,7 @@ import com.xuhao.didi.core.iocore.interfaces.ISendable
 import com.xuhao.didi.core.pojo.OriginalData
 import com.xuhao.didi.socket.client.sdk.OkSocket
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
+import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions
 import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter
 import java.io.Serializable
 import java.lang.Exception
@@ -25,6 +26,7 @@ class OkClientClass<T : Serializable>(
     private val fireBaseUtility = FireBaseUtility()
 
     init {
+        OkSocketOptions.setIsDebug(true);
         Log.d("OkClient", "Init")
         manager.apply {
             registerReceiver(object : SocketActionAdapter() {

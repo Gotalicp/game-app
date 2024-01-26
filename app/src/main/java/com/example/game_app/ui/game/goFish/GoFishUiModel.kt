@@ -6,4 +6,5 @@ data class GoFishUiModel(
     val showScores: Boolean = false,
     val showLobby: Boolean = false,
     val startingIn: Int = 0,
+    val playerToTakeTurn: String? = null
 )

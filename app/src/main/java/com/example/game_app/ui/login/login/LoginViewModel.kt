@@ -4,11 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.FireBaseUtility
 import com.example.game_app.ui.login.AuthenticationState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -19,8 +23,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         _state.value = AuthenticationState.Loading(true)
         Firebase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener {
-                FireBaseUtility().getAccountInfo {
-                    SharedInformation.updateAcc(it)
+                Firebase.auth.uid?.let { uid ->
+                    viewModelScope.launch {
+                        PlayerCache.instance.get(uid)
+                            ?.let { SharedInformation.updateAcc(it) }
+                    }
                 }
             }
             .addOnCanceledListener {

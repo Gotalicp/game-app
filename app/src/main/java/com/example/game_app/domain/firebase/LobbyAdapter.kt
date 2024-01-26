@@ -2,7 +2,6 @@ package com.example.game_app.domain.firebase
 
 import com.example.game_app.data.common.Adapter
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.data.PlayerInfo
 import com.google.firebase.database.DataSnapshot
 import java.util.ArrayList
 
@@ -10,14 +9,9 @@ class LobbyAdapter : Adapter<DataSnapshot, ArrayList<LobbyInfo>> {
     override fun adapt(t: DataSnapshot): ArrayList<LobbyInfo> {
         val lobbyInfoList = ArrayList<LobbyInfo>()
         for (info in t.children) {
-            val players = mutableListOf<PlayerInfo>()
+            val players = mutableListOf<String>()
             for (playerInfo in info.child("players").children) {
-                val player = PlayerInfo(
-                    username = playerInfo.child("username").getValue(String::class.java)?:"",
-                    uid = playerInfo.child("uid").getValue(String::class.java)?:"",
-                    image = playerInfo.child("image").getValue(String::class.java)?:"",
-                    isHost = playerInfo.child("host").getValue(Boolean::class.java)?:false,
-                )
+                val player = playerInfo.child("uid").getValue(String::class.java)?:""
                 players.add(player)
             }
             LobbyInfo(

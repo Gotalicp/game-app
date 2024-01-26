@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 import com.example.game_app.R
+import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.common.RecycleViewAdapter
 import com.example.game_app.ui.game.goFish.GoFishLogic
 
@@ -20,7 +21,7 @@ class PopupEndRecycleView: RecycleViewAdapter<GoFishLogic.Player>(
         @SuppressLint("SetTextI18n")
         override fun bind(item: GoFishLogic.Player) {
             score.text = item.score.toString()
-            name.text = item.info.username
+            name.text = item.uid
         }
     }
 }

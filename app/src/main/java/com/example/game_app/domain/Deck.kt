@@ -1,7 +1,6 @@
 package com.example.game_app.domain
 
 import android.util.Log
-import com.example.game_app.data.PlayerInfo
 import com.example.game_app.ui.game.goFish.GoFishLogic
 import kotlin.random.Random
 

@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.xuhao.didi.core.iocore.interfaces.ISendable
 import com.xuhao.didi.core.pojo.OriginalData
 import com.xuhao.didi.socket.client.sdk.OkSocket
+import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClient
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClientIOCallback
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClientPool
@@ -24,6 +25,7 @@ class OkServerClass<T : Serializable>(
     private val fireBaseUtility = FireBaseUtility()
     private val register = OkSocket.server(8888)
     init {
+        OkSocketOptions.setIsDebug(true);
         fireBaseUtility.hostLobby(getLocalInetAddress() ?: "")
     }
     private var serverManager = register.registerReceiver(object : IServerActionListener {

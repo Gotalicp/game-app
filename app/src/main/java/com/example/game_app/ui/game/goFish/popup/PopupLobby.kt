@@ -2,6 +2,7 @@ package com.example.game_app.ui.game.goFish.popup
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -16,26 +17,34 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
+import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.common.CustomSpinnerAdapter
 import com.example.game_app.data.common.ItemSelectedListener
 import com.example.game_app.domain.FireBaseUtility
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.coroutineContext
 
+@OptIn(DelicateCoroutinesApi::class)
 class PopupLobby(
     private val context: Context,
+    private val canChangeSettings: Boolean,
     private val startGame: (() -> Unit)? = null
 ) {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
     private val playersView: RecyclerView
     private val adapter: PopupLobbyRecycleView
-    private val lobby = SharedInformation.getLobby()
-    private val acc = SharedInformation.getAcc()
     private val fireBaseUtility = FireBaseUtility()
-    private var canChangeSettings = false
-
+    private val cache = PlayerCache.instance
     init {
         popupView =
             (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
@@ -72,12 +81,15 @@ class PopupLobby(
                     }
 
                 }
-                lobby.observe(context as LifecycleOwner) { lobbyInfo ->
-                    adapter.updateItems(lobbyInfo.players)
-                    lobbyName.text = lobbyInfo.lobbyName
-                    lobbyInfo.players.find { acc.value?.uid == it.uid }.let {
-                        canChangeSettings = it?.isHost ?: false
+                SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
+                    CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
+                        lobbyInfo.players.mapNotNull{
+                        it.toString()
+                            cache.get(it) }.let {
+                            adapter.updateItems(it)
+                        }
                     }
+                    lobbyName.text = lobbyInfo.lobbyName
                 }
                 findViewById<Spinner>(R.id.playerLimit).let {
                     it.adapter =

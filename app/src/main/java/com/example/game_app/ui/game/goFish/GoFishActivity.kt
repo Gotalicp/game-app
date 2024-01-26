@@ -1,74 +1,76 @@
 package com.example.game_app.ui.game.goFish
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.map
 import com.example.game_app.R
+import com.example.game_app.data.Account
+import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.Rank
 import com.example.game_app.ui.game.goFish.popup.PopupEnd
 import com.example.game_app.ui.game.goFish.popup.PopupLobby
 import com.example.game_app.ui.game.goFish.popup.PopupPickCard
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
 
 class GoFishActivity : AppCompatActivity() {
     private val goFishViewModel: GoFishViewModel by viewModels()
-    private lateinit var goFishLogic: GoFishLogic
     private lateinit var binding: ActivityGoFishBinding
     private lateinit var lobbyPopup: PopupLobby
 
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        goFishLogic = goFishViewModel.goFishLogic
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
 
         intent.getStringExtra("lobbyUid")?.let { uid ->
-            intent.getStringExtra("lobbyIp")?.let {
-                goFishViewModel.joinGame(uid, it)
+            intent.getStringExtra("lobbyIp")?.let { ip ->
+                goFishViewModel.joinGame(uid, ip)
                 findViewById<View>(android.R.id.content).post {
-                    lobbyPopup = PopupLobby(this)
+                    lobbyPopup = PopupLobby(this, false)
                     goFishViewModel.showLobby()
                 }
             }
         } ?: run {
             goFishViewModel.createGame()
             findViewById<View>(android.R.id.content).post {
-                lobbyPopup = PopupLobby(this) { goFishViewModel.initGame() }
+                lobbyPopup = PopupLobby(this, true) { goFishViewModel.initGame() }
                 goFishViewModel.showLobby()
             }
         }
 
         playerViewAdapter.apply {
-            itemClickListener = object : ItemClickListener<GoFishLogic.Player> {
+            itemClickListener = object : ItemClickListener<Pair<GoFishLogic.Player, Account>> {
                 override fun onItemClicked(
-                    item: GoFishLogic.Player, itemPosition: Int
+                    item:Pair<GoFishLogic.Player, Account>, itemPosition: Int
                 ) {
                     PopupPickCard(applicationContext).apply {
                         item.let { player ->
                             showPopup(
-                                findViewById(android.R.id.content), player.info, item.deck
-
+                                findViewById(android.R.id.content),
+                                item.second,
+                                item.first.deck
                             )
                             adapter.itemClickListener = object : ItemClickListener<Rank> {
                                 override fun onItemClicked(item: Rank, itemPosition: Int) {
                                     dismiss()
                                     goFishViewModel.write(
-                                        Play(
-                                            goFishViewModel.uid!!, player.info.uid, item
-                                        )
+                                        Play(goFishViewModel.uid!!, player.first.uid, item)
                                     )
                                 }
                             }
@@ -82,24 +84,18 @@ class GoFishActivity : AppCompatActivity() {
             playerView.adapter = playerViewAdapter
         }
 
-        goFishLogic.gamePlayers.observe(this) { players ->
-            players.partition { it.info.uid == goFishViewModel.uid }.let {
-                playerViewAdapter.updateItems(it.second)
-                cardViewAdapter.updateItems(it.first.first().deck)
-            }
-            findViewById<TextView>(R.id.deckSize).text = goFishLogic.getDeckSize().toString()
-        }
-
-        goFishLogic.playerToTakeTurn.observe(this) { turn ->
-            findViewById<TextView>(R.id.playerTurn).apply {
-                text = "It's ${turn.info.username}'s turn"
-                visibility = View.VISIBLE
-                Timer().schedule(object : TimerTask() {
-                    override fun run() {
-                        runOnUiThread { visibility = View.GONE }
+        goFishViewModel.goFishLogic.gamePlayers.observe(this) { players ->
+            players.partition { it.uid == goFishViewModel.uid }.let { player ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    player.first.map { Pair(it,PlayerCache.instance.get(it.uid)!!) }
+                        .let {
+                        playerViewAdapter.updateItems(it)
                     }
-                }, 3000)
+                }
+                cardViewAdapter.updateItems(player.first.first().deck)
             }
+            findViewById<TextView>(R.id.deckSize).text =
+                "${goFishViewModel.goFishLogic.getDeckSize()}"
         }
     }
 
@@ -109,11 +105,21 @@ class GoFishActivity : AppCompatActivity() {
         } else {
             lobbyPopup.dismissPopup()
         }
+        data.playerToTakeTurn?.let {
+            findViewById<TextView>(R.id.playerTurn).apply {
+                text = "It's ${it}'s turn"
+                visibility = View.VISIBLE
+                Timer().schedule(object : TimerTask() {
+                    override fun run() {
+                        runOnUiThread { visibility = View.GONE }
+                    }
+                }, 3000)
+            }
+        }
         playerViewAdapter.isYourTurn = data.isYourTurn
         if (data.showScores) {
-            goFishLogic.gamePlayers.value?.let {
+            goFishViewModel.goFishLogic.gamePlayers.value?.let {
                 PopupEnd(
-
                     this,
                     it
                 ).showPopup(findViewById(android.R.id.content))
