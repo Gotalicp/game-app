@@ -37,7 +37,7 @@ class GoFishLogic : GameLogic<Play> {
     val hasEnded: StateFlow<Boolean> get() = _hasEnded
 
     //Initiate deck
-    private lateinit var deck: Deck
+    private var deck = Deck()
     private fun resetDeck() = Deck()
     fun getDeckSize() = deck.deckSize()
     override fun setPlayer(players: MutableList<String>) {

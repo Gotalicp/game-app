@@ -2,7 +2,6 @@ package com.example.game_app.ui.game.goFish.popup
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -25,15 +24,9 @@ import com.example.game_app.domain.FireBaseUtility
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.coroutineContext
 
-@OptIn(DelicateCoroutinesApi::class)
 class PopupLobby(
     private val context: Context,
     private val canChangeSettings: Boolean,
@@ -84,7 +77,6 @@ class PopupLobby(
                 SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
                     CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
                         lobbyInfo.players.mapNotNull{
-                        it.toString()
                             cache.get(it) }.let {
                             adapter.updateItems(it)
                         }

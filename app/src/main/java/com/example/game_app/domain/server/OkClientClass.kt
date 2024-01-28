@@ -1,7 +1,11 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
+import com.example.game_app.data.DataType
 import com.example.game_app.data.GameLogic
+import com.example.game_app.data.IPulseSendablePulse
+import com.example.game_app.data.ISendableData
+import com.example.game_app.data.LobbyInfo
 import com.example.game_app.domain.FireBaseUtility
 import com.google.gson.Gson
 import com.xuhao.didi.core.iocore.interfaces.IPulseSendable
@@ -33,7 +37,7 @@ class OkClientClass<T : Serializable>(
                 override fun onSocketConnectionSuccess(info: ConnectionInfo?, action: String?) {
                     super.onSocketConnectionSuccess(info, action)
                     Log.d("OkClient", "Connected")
-                    pulseManager.pulseSendable = Pulse("pulse")
+                    pulseManager.pulseSendable = IPulseSendablePulse("pulse")
                     pulseManager.pulse()
                     fireBaseUtility.joinLobby(lobbyUid)
                 }
@@ -71,31 +75,11 @@ class OkClientClass<T : Serializable>(
     }
 
     fun send(t: T) {
-        manager.send(SendData(Gson().toJson(t).toString()))
+        when (t) {
+            is LobbyInfo -> DataType.LOBBY_INFO
+            is Long -> DataType.LONG
+            is String -> DataType.STRING
+            else -> null
+        }?.let { manager.send(ISendableData(it, Gson().toJson(t).toString())) }
     }
-
-    inner class SendData(private var str: String) : ISendable {
-        override fun parse(): ByteArray {
-            val body = str.toByteArray(Charset.defaultCharset())
-            ByteBuffer.allocate(4 + body.size).apply {
-                order(ByteOrder.BIG_ENDIAN)
-                putInt(body.size)
-                put(body)
-                return array()
-            }
-        }
-    }
-
-    inner class Pulse(private var str: String) : IPulseSendable {
-        override fun parse(): ByteArray {
-            val body = str.toByteArray(Charset.defaultCharset())
-            ByteBuffer.allocate(4 + body.size).apply {
-                order(ByteOrder.BIG_ENDIAN)
-                putInt(body.size)
-                put(body)
-                return array()
-            }
-        }
-    }
-
 }

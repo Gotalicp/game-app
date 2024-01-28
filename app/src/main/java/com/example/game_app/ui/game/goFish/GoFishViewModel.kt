@@ -5,16 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.game_app.data.Account
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.SharedInformation
-import com.example.game_app.domain.server.ClientClass
 import com.example.game_app.domain.server.OkClientClass
 import com.example.game_app.domain.server.OkServerClass
-import com.example.game_app.domain.server.ServerHandler
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class GoFishViewModel(application: Application) : AndroidViewModel(application) {
     sealed interface State {
@@ -30,7 +26,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     private lateinit var server: OkServerClass<Play>
     private lateinit var client: OkClientClass<Play>
-    private var lobby = SharedInformation.getLobby().value
+    private var lobby = SharedInformation.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
 
@@ -44,19 +40,21 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun initGame() {
-        var rounds = lobby?.rounds
-        goFishLogic.setPlayer(lobby!!.players)
-        startGame(0)
-        viewModelScope.launch {
-            goFishLogic.hasEnded.collect { hasEnded ->
-                if (hasEnded) {
-                    rounds?.let {
-                        if (it == 0) {
-                            _state.value =
-                                State.EndGame(true)
-                        } else {
-                            rounds = it - 1
-                            startGame(10)
+        var rounds = lobby.value?.rounds
+        lobby.value?.players?.let { players ->
+            goFishLogic.setPlayer(players)
+            startGame(0)
+            viewModelScope.launch {
+                goFishLogic.hasEnded.collect { hasEnded ->
+                    if (hasEnded) {
+                        rounds?.let {
+                            if (it == 0) {
+                                _state.value =
+                                    State.EndGame(true)
+                            } else {
+                                rounds = it - 1
+                                startGame(10)
+                            }
                         }
                     }
                 }

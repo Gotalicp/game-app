@@ -1,7 +1,9 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
+import com.example.game_app.data.DataType
 import com.example.game_app.data.GameLogic
+import com.example.game_app.data.ISendableData
 import com.example.game_app.domain.FireBaseUtility
 import com.google.gson.Gson
 import com.xuhao.didi.core.iocore.interfaces.ISendable
@@ -24,10 +26,12 @@ class OkServerClass<T : Serializable>(
 ) {
     private val fireBaseUtility = FireBaseUtility()
     private val register = OkSocket.server(8888)
+
     init {
         OkSocketOptions.setIsDebug(true);
         fireBaseUtility.hostLobby(getLocalInetAddress() ?: "")
     }
+
     private var serverManager = register.registerReceiver(object : IServerActionListener {
         override fun onServerListening(serverPort: Int) {
             Log.d("OkServer", "Listening")
@@ -53,9 +57,10 @@ class OkServerClass<T : Serializable>(
                     client: IClient?,
                     clientPool: IClientPool<IClient, String>?
                 ) {
+                    sendable?.let { resendData(it) }
                     Log.d("OkServer", "Client Wrote")
                 }
-            });
+            })
         }
 
         override fun onClientDisconnected(
@@ -85,27 +90,18 @@ class OkServerClass<T : Serializable>(
 
     fun <J> send(data: J) {
         serverManager.clientPool.sendToAll(
-            SendData(
-                when (data) {
-                    is Long -> data.toString()
-                    is String -> data
-                    else -> Gson().toJson(data).toString()
-                }
-            )
+            when (data) {
+                is Long -> ISendableData(DataType.LONG, data.toString())
+                is String -> ISendableData(DataType.STRING, data)
+                else -> ISendableData(DataType.LONG, Gson().toJson(data).toString())
+            }
         )
     }
 
-    inner class SendData(private var str: String) : ISendable {
-        override fun parse(): ByteArray {
-            val body = str.toByteArray(Charset.defaultCharset())
-            ByteBuffer.allocate(4 + body.size).apply {
-                order(ByteOrder.BIG_ENDIAN)
-                putInt(body.size)
-                put(body)
-                return array()
-            }
-        }
+    fun resendData(send: ISendable) {
+        serverManager.clientPool.sendToAll(send)
     }
+
     private fun getLocalInetAddress(): String? {
         try {
             NetworkInterface.getNetworkInterfaces().let { network ->
