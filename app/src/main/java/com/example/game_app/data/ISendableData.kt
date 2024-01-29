@@ -5,14 +5,13 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
 
-class ISendableData(private val type: DataType, private var str: String) : ISendable {
+class ISendableData(private var str: String) : ISendable {
     override fun parse(): ByteArray {
-        str.toByteArray(Charset.defaultCharset()).let {
-            ByteBuffer.allocate(4 + it.size).apply {
+        str.toByteArray(Charset.defaultCharset()).let { payload ->
+            ByteBuffer.allocate(4 + payload.size).apply {
                 order(ByteOrder.BIG_ENDIAN)
-                putInt(it.size)
-                put(type.code)
-                put(it)
+                putInt(payload.size)
+                put(payload)
                 return array()
             }
         }

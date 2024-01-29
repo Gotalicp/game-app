@@ -2,6 +2,7 @@ package com.example.game_app.domain.server
 
 import android.util.Log
 import com.example.game_app.data.DataType
+import com.example.game_app.data.DeserializeData
 import com.example.game_app.data.GameLogic
 import com.example.game_app.data.IPulseSendablePulse
 import com.example.game_app.data.ISendableData
@@ -33,13 +34,12 @@ class OkClientClass<T : Serializable>(
         OkSocketOptions.setIsDebug(true);
         Log.d("OkClient", "Init")
         manager.apply {
+            option(OkSocketOptions.Builder(option).setMaxReadDataMB(10).build())
             registerReceiver(object : SocketActionAdapter() {
                 override fun onSocketConnectionSuccess(info: ConnectionInfo?, action: String?) {
                     super.onSocketConnectionSuccess(info, action)
-                    Log.d("OkClient", "Connected")
-                    pulseManager.pulseSendable = IPulseSendablePulse("pulse")
-                    pulseManager.pulse()
-                    fireBaseUtility.joinLobby(lobbyUid)
+                    Log.d("OkClient", "Connected ${info?.ip}")
+                        fireBaseUtility.joinLobby(lobbyUid)
                 }
 
                 override fun onSocketReadResponse(
@@ -48,9 +48,9 @@ class OkClientClass<T : Serializable>(
                     data: OriginalData?
                 ) {
                     super.onSocketReadResponse(info, action, data)
-                    Log.d("data", data.toString())
+                    data?.bodyBytes?.let { DeserializeData().adapt(it).toString() }
+                        ?.let { Log.d("DATA", it) }
 //                    gameLogic.turnHandling()
-                    pulseManager.feed()
                 }
 
                 override fun onSocketDisconnection(
@@ -75,11 +75,6 @@ class OkClientClass<T : Serializable>(
     }
 
     fun send(t: T) {
-        when (t) {
-            is LobbyInfo -> DataType.LOBBY_INFO
-            is Long -> DataType.LONG
-            is String -> DataType.STRING
-            else -> null
-        }?.let { manager.send(ISendableData(it, Gson().toJson(t).toString())) }
+        manager.send(ISendableData(Gson().toJson(t).toString()))
     }
 }

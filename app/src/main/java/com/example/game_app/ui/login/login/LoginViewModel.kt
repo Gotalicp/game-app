@@ -26,7 +26,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 Firebase.auth.uid?.let { uid ->
                     viewModelScope.launch {
                         PlayerCache.instance.get(uid)
-                            ?.let { SharedInformation.updateAcc(it) }
+                            ?.let {
+                                SharedInformation.updateAcc(it)
+                                _state.value = AuthenticationState.Success(true)
+                                SharedInformation.updateLogged(true)
+                            }
                     }
                 }
             }

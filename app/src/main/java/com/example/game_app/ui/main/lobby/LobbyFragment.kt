@@ -48,7 +48,7 @@ class LobbyFragment : Fragment() {
             questionButton.setOnClickListener {
                 Intent(context, GoFishActivity::class.java).let {
                     it.putExtra("lobbyUid", "prGaKzub0XS14sxCI12vNC6O6EN2")
-                    it.putExtra("lobbyIp", "192.168.1.6")
+                    it.putExtra("lobbyIp", "192.168.164.195")
                     startActivity(it)
                 }
             }

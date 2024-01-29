@@ -62,7 +62,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private fun updateContent(data: AuthenticationUiModel) {
         data.apply {
-            if (failed) {
+            if (success) {
 
             }
             binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }

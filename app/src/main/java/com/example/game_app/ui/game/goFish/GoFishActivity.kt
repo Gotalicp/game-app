@@ -57,7 +57,7 @@ class GoFishActivity : AppCompatActivity() {
         playerViewAdapter.apply {
             itemClickListener = object : ItemClickListener<Pair<GoFishLogic.Player, Account>> {
                 override fun onItemClicked(
-                    item:Pair<GoFishLogic.Player, Account>, itemPosition: Int
+                    item: Pair<GoFishLogic.Player, Account>, itemPosition: Int
                 ) {
                     PopupPickCard(applicationContext).apply {
                         item.let { player ->
@@ -87,10 +87,12 @@ class GoFishActivity : AppCompatActivity() {
         goFishViewModel.goFishLogic.gamePlayers.observe(this) { players ->
             players.partition { it.uid == goFishViewModel.uid }.let { player ->
                 GlobalScope.launch(Dispatchers.Main) {
-                    player.first.map { Pair(it,PlayerCache.instance.get(it.uid)!!) }
-                        .let {
-                        playerViewAdapter.updateItems(it)
-                    }
+                    playerViewAdapter.updateItems(player.second.map {
+                        Pair(
+                            it,
+                            PlayerCache.instance.get(it.uid)!!
+                        )
+                    })
                 }
                 cardViewAdapter.updateItems(player.first.first().deck)
             }

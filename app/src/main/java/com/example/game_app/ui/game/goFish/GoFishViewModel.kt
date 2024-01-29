@@ -1,6 +1,7 @@
 package com.example.game_app.ui.game.goFish
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import com.example.game_app.domain.server.OkClientClass
 import com.example.game_app.domain.server.OkServerClass
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class GoFishViewModel(application: Application) : AndroidViewModel(application) {
     sealed interface State {
@@ -62,8 +64,18 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private fun startGame(time: Int) {
+    private fun startGame(time: Int, seed: Long? = null) {
         _state.value = State.StartingIn(time)
+        seed?.let {
+            goFishLogic.startGame(it)
+        } ?: run {
+            Random.nextLong().let {
+                goFishLogic.startGame(it)
+                if (::server.isInitialized) {
+                    server.send(it)
+                }
+            }
+        }
         goFishLogic.playerToTakeTurn.observeForever { player ->
             viewModelScope.launch {
                 _state.value = cache.get(player.uid)?.username?.let {

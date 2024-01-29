@@ -1,10 +1,12 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
-import com.example.game_app.data.DataType
+import com.example.game_app.data.DeserializeData
 import com.example.game_app.data.GameLogic
 import com.example.game_app.data.ISendableData
 import com.example.game_app.domain.FireBaseUtility
+import com.example.game_app.domain.Rank
+import com.example.game_app.ui.game.goFish.Play
 import com.google.gson.Gson
 import com.xuhao.didi.core.iocore.interfaces.ISendable
 import com.xuhao.didi.core.pojo.OriginalData
@@ -17,9 +19,6 @@ import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServer
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerShutdown
 import java.io.Serializable
 import java.net.NetworkInterface
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.Charset
 
 class OkServerClass<T : Serializable>(
     private val gameLogic: GameLogic<T>
@@ -42,6 +41,7 @@ class OkServerClass<T : Serializable>(
             serverPort: Int,
             clientPool: IClientPool<*, *>?
         ) {
+            send(Play("gosho", "gosho", Rank.ACE))
             Log.d("OkServer", "Client connected")
             client?.addIOCallback(object : IClientIOCallback {
                 override fun onClientRead(
@@ -49,7 +49,12 @@ class OkServerClass<T : Serializable>(
                     client: IClient?,
                     clientPool: IClientPool<IClient, String>?
                 ) {
-                    Log.d("OkServer", "Client Read")
+                    Log.d("OkServer", "Client Wrote")
+                    originalData?.bodyBytes?.let { DeserializeData().adapt(it).toString() }
+                        ?.let {
+                            Log.d("DATA", it)
+//                    sendable?.let { resendData(it) }
+                        }
                 }
 
                 override fun onClientWrite(
@@ -57,8 +62,7 @@ class OkServerClass<T : Serializable>(
                     client: IClient?,
                     clientPool: IClientPool<IClient, String>?
                 ) {
-                    sendable?.let { resendData(it) }
-                    Log.d("OkServer", "Client Wrote")
+                    Log.d("OkServer", "Client Read")
                 }
             })
         }
@@ -89,17 +93,10 @@ class OkServerClass<T : Serializable>(
     }
 
     fun <J> send(data: J) {
+        Log.d("data", "sended ${data.toString()}")
         serverManager.clientPool.sendToAll(
-            when (data) {
-                is Long -> ISendableData(DataType.LONG, data.toString())
-                is String -> ISendableData(DataType.STRING, data)
-                else -> ISendableData(DataType.LONG, Gson().toJson(data).toString())
-            }
+            ISendableData(Gson().toJson(data).toString())
         )
-    }
-
-    fun resendData(send: ISendable) {
-        serverManager.clientPool.sendToAll(send)
     }
 
     private fun getLocalInetAddress(): String? {

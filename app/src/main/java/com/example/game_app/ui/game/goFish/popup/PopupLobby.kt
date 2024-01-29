@@ -38,6 +38,7 @@ class PopupLobby(
     private val adapter: PopupLobbyRecycleView
     private val fireBaseUtility = FireBaseUtility()
     private val cache = PlayerCache.instance
+
     init {
         popupView =
             (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
@@ -76,8 +77,9 @@ class PopupLobby(
                 }
                 SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
                     CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
-                        lobbyInfo.players.mapNotNull{
-                            cache.get(it) }.let {
+                        lobbyInfo.players.mapNotNull {
+                            cache.get(it)
+                        }.let {
                             adapter.updateItems(it)
                         }
                     }
@@ -88,7 +90,9 @@ class PopupLobby(
                         CustomSpinnerAdapter(context, listOf(2, 3, 4, 5, 6), object :
                             ItemSelectedListener<Int> {
                             override fun onItemSelected(item: Int) {
-                                fireBaseUtility.updateLobby(playerLimit = item)
+                                if (canChangeSettings) {
+                                    fireBaseUtility.updateLobby(playerLimit = item)
+                                }
                             }
                         }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
@@ -97,7 +101,9 @@ class PopupLobby(
                         CustomSpinnerAdapter(context, listOf(1, 2, 3, 4, 5, 6), object :
                             ItemSelectedListener<Int> {
                             override fun onItemSelected(item: Int) {
-                                fireBaseUtility.updateLobby(rounds = item)
+                                if (canChangeSettings) {
+                                    fireBaseUtility.updateLobby(rounds = item)
+                                }
                             }
                         }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
@@ -109,7 +115,9 @@ class PopupLobby(
                             object :
                                 ItemSelectedListener<String> {
                                 override fun onItemSelected(item: String) {
-                                    fireBaseUtility.updateLobby(secPerTurn = item)
+                                    if (canChangeSettings) {
+                                        fireBaseUtility.updateLobby(secPerTurn = item)
+                                    }
                                 }
                             }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }

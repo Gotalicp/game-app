@@ -22,7 +22,7 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
         val foundLobbies = mutableListOf<LobbyInfo>()
 
         try {
-            val baseIpAddress = getLocalInetAddress()
+            val baseIpAddress = getLocalIpAddress()
             if (baseIpAddress != null) {
                 val startRange = 113
                 val endRange = 113
@@ -80,41 +80,5 @@ class LobbyViewModel(application: Application) : AndroidViewModel(application) {
             ex.printStackTrace()
         }
         return null
-    }
-
-    private fun getLocalInetAddress(): String? {
-        try {
-            NetworkInterface.getNetworkInterfaces().let { network ->
-                while (network.hasMoreElements()) {
-                    network.nextElement().inetAddresses.let { addresses ->
-                        while (addresses.hasMoreElements()) {
-                            addresses.nextElement().let { address ->
-                                if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
-                                    val ip = address.toString()
-                                    if (ip.contains(":").not()) {
-                                        ip.split(".").let {
-                                            if (it.size == 4) {
-                                                val baseIpAddress =
-                                                    "${it[0]}.${it[1]}.${it[2]}."
-                                                Log.d(
-                                                    "Local IP",
-                                                    "Detected base IP address: $baseIpAddress"
-                                                )
-                                                return baseIpAddress
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-
-            ex.printStackTrace()
-        }
-        return null
-
     }
 }
