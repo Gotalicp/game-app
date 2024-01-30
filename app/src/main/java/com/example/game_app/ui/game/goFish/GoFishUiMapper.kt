@@ -6,6 +6,7 @@ object GoFishUiMapper {
         is GoFishViewModel.State.Loading -> GoFishUiModel()
         is GoFishViewModel.State.MyTurn -> GoFishUiModel(isYourTurn = true)
         is GoFishViewModel.State.EndGame -> GoFishUiModel(showScores = true)
+        is GoFishViewModel.State.StartingIn -> GoFishUiModel(startingIn = 5)
         else -> {
             GoFishUiModel()
         }

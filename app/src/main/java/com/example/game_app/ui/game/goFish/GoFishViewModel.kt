@@ -11,6 +11,9 @@ import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.server.OkClientClass
 import com.example.game_app.domain.server.OkServerClass
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -20,7 +23,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         data class PreGame(val showLobbyInfo: Boolean) : State
         data class MyTurn(val allowPlay: Boolean, val playerToTakeTurn: String) : State
         data class EndGame(val showScores: Boolean) : State
-        data class StartingIn(val startingIN: Int) : State
+        data class StartingIn(val startingIn: Int) : State
     }
 
     private val _state = MutableLiveData<State>()
@@ -28,35 +31,63 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     private lateinit var server: OkServerClass<Play>
     private lateinit var client: OkClientClass<Play>
+    private lateinit var endCollector: Unit
     private var lobby = SharedInformation.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
 
     val uid = SharedInformation.getAcc().value?.uid
+
+    init {
+        viewModelScope.launch {
+            goFishLogic.playerToTakeTurn.observeForever { player ->
+                player?.let {
+                    viewModelScope.launch {
+                        _state.value = cache.get(player.uid)?.username?.let {
+                            State.MyTurn((player.uid == uid), it)
+                        }
+                    }
+                }
+            }
+            goFishLogic.seed.collect { seed ->
+                if (seed != null) {
+                    if (!::endCollector.isInitialized) {
+                        endCollector = startGame()
+                    }
+                    Log.d("sedd", seed.toString())
+                    _state.value = State.StartingIn(5)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        delay(5000L)
+                        goFishLogic.startGame(seed)
+                    }
+                }
+            }
+        }
+    }
+
     fun createGame() {
-        server = OkServerClass(goFishLogic)
+        server = OkServerClass(goFishLogic,Play::class.java)
     }
 
     fun joinGame(uid: String, ip: String) {
-        client = OkClientClass(goFishLogic, ConnectionInfo(ip, 8888), uid).apply { join() }
+        client = OkClientClass(goFishLogic,Play::class.java ,ConnectionInfo(ip, 8888), uid).apply { join() }
     }
 
-    fun initGame() {
+
+    private fun startGame() {
+        Log.d("started", "started")
         var rounds = lobby.value?.rounds
-        lobby.value?.players?.let { players ->
-            goFishLogic.setPlayer(players)
-            startGame(0)
+        rounds?.let {
             viewModelScope.launch {
                 goFishLogic.hasEnded.collect { hasEnded ->
                     if (hasEnded) {
-                        rounds?.let {
-                            if (it == 0) {
-                                _state.value =
-                                    State.EndGame(true)
-                            } else {
-                                rounds = it - 1
-                                startGame(10)
-                            }
+                        _state.value =
+                            State.EndGame(true)
+                        if (rounds != 0) {
+                            rounds--
+                            createSeed()
+                        } else {
+                            goFishLogic.playerToTakeTurn.removeObserver {}
                         }
                     }
                 }
@@ -64,23 +95,11 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private fun startGame(time: Int, seed: Long? = null) {
-        _state.value = State.StartingIn(time)
-        seed?.let {
-            goFishLogic.startGame(it)
-        } ?: run {
+    fun createSeed() {
+        if (::server.isInitialized) {
             Random.nextLong().let {
-                goFishLogic.startGame(it)
-                if (::server.isInitialized) {
-                    server.send(it)
-                }
-            }
-        }
-        goFishLogic.playerToTakeTurn.observeForever { player ->
-            viewModelScope.launch {
-                _state.value = cache.get(player.uid)?.username?.let {
-                    State.MyTurn((player.uid == uid), it)
-                }
+                server.send(it)
+                goFishLogic.updateSeed(it)
             }
         }
     }
@@ -92,7 +111,6 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             } else if (::client.isInitialized) {
                 client.send(t)
             }
-            goFishLogic.turnHandling(t)
         }
     }
 
@@ -103,6 +121,8 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     fun disconnect() {
         if (::client.isInitialized) {
             client.disconnect()
+        } else if (::server.isInitialized) {
+            server.stopServer()
         }
     }
 }

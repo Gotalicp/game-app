@@ -6,4 +6,5 @@ interface GameLogic <T>{
     fun setPlayer(players : MutableList<String>)
     fun turnHandling(t: T)
     fun checkEndGame(): Boolean
+    fun updateSeed(seed:Long)
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.data.GameLogic
+import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.Card
 import com.example.game_app.domain.Deck
 import com.example.game_app.domain.Rank
@@ -36,6 +37,9 @@ class GoFishLogic : GameLogic<Play> {
     private val _hasEnded = MutableStateFlow(false)
     val hasEnded: StateFlow<Boolean> get() = _hasEnded
 
+    private val _seed = MutableStateFlow<Long?>(null)
+    val seed: StateFlow<Long?> get() = _seed
+
     //Initiate deck
     private var deck = Deck()
     private fun resetDeck() = Deck()
@@ -44,7 +48,14 @@ class GoFishLogic : GameLogic<Play> {
         _gamePlayers.value = players.map { Player(mutableListOf(), it, 0) }.toMutableList()
     }
 
+    override fun updateSeed(seed: Long) {
+        _seed.value = seed
+    }
+
     override fun startGame(seed: Long) {
+        if (_gamePlayers.value == null) {
+            SharedInformation.getLobby().value?.players?.let { setPlayer(it) }
+        }
         _hasEnded.value = false
         deck = resetDeck()
         deck.shuffle(seed)
@@ -64,24 +75,26 @@ class GoFishLogic : GameLogic<Play> {
         gamePlayers.value?.let { player ->
             val cardsReceived = player[indexOf(t.askedPlayer)].deck.filter { it.rank == t.rank }
             if (cardsReceived.isNotEmpty()) {
-                player[indexOf(t.askingPlayer)].deck.addAll(cardsReceived)
-                player[indexOf(t.askedPlayer)].deck.removeAll(cardsReceived)
-                checkForEmptyHand(player[indexOf(t.askedPlayer)])
-            } else {
-                // If no cards received, draw a card from the deck
-                deck.drawCard()?.let {
-                    player[indexOf(t.askingPlayer)].deck.add(it)
+                player.find { it.uid == t.askingPlayer }?.deck?.addAll(cardsReceived)
+                player.find { it.uid == t.askedPlayer }?.deck?.removeAll(cardsReceived)
+                player.find { it.uid == t.askedPlayer }?.let { checkForEmptyHand(it) }
+            } else
+            // If no cards received, draw a card from the deck
+                deck.drawCard()?.let { card ->
+                    player.find { it.uid == t.askingPlayer }?.deck?.add(card)
                 }
-            }
+
             // Check for books in the current player's hand
-            if (!checkForBooks(player[indexOf(t.askingPlayer)])) {
+            if (!player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }!!) {
                 // Sets next player
-                _playerToTakeTurn.value = player[(indexOf(t.askingPlayer) + 1) % player.size]
+                _playerToTakeTurn.value =
+                    player[(player.indexOf(player.find { it.uid == t.askedPlayer }) + 1) % player.size]
             }
             _gamePlayers.postValue(player)
             _hasEnded.value = checkEndGame()
         }
     }
+
 
     private fun checkForBooks(hand: Player): Boolean {
         hand.deck.groupBy { it.rank }.let { card ->

@@ -4,10 +4,13 @@ import android.util.Log
 import com.example.game_app.data.DeserializeData
 import com.example.game_app.data.GameLogic
 import com.example.game_app.data.ISendableData
+import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.FireBaseUtility
 import com.example.game_app.domain.Rank
 import com.example.game_app.ui.game.goFish.Play
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import com.xuhao.didi.core.iocore.interfaces.ISendable
 import com.xuhao.didi.core.pojo.OriginalData
 import com.xuhao.didi.socket.client.sdk.OkSocket
@@ -21,7 +24,9 @@ import java.io.Serializable
 import java.net.NetworkInterface
 
 class OkServerClass<T : Serializable>(
-    private val gameLogic: GameLogic<T>
+    private val gameLogic: GameLogic<T>,
+    private val expectedTClazz: Class<T>
+
 ) {
     private val fireBaseUtility = FireBaseUtility()
     private val register = OkSocket.server(8888)
@@ -41,7 +46,7 @@ class OkServerClass<T : Serializable>(
             serverPort: Int,
             clientPool: IClientPool<*, *>?
         ) {
-            send(Play("gosho", "gosho", Rank.ACE))
+            send(SharedInformation.getAcc().value?.uid.toString())
             Log.d("OkServer", "Client connected")
             client?.addIOCallback(object : IClientIOCallback {
                 override fun onClientRead(
@@ -50,11 +55,24 @@ class OkServerClass<T : Serializable>(
                     clientPool: IClientPool<IClient, String>?
                 ) {
                     Log.d("OkServer", "Client Wrote")
-                    originalData?.bodyBytes?.let { DeserializeData().adapt(it).toString() }
-                        ?.let {
-                            Log.d("DATA", it)
-//                    sendable?.let { resendData(it) }
-                        }
+                    originalData?.bodyBytes?.let { body ->
+                        DeserializeData().adapt(body).toString().let {
+                                try {
+                                    send(body)
+                                    Gson().fromJson(it, expectedTClazz).let {play->
+                                    Log.d("DATA", play.toString())
+                                    gameLogic.turnHandling(play)
+                                    }
+                                } catch (_: JsonSyntaxException) {
+                                }
+
+                                try {
+                                    val data = Gson().fromJson(it, String::class.java)
+                                    Log.d("DATA", data.toString())
+                                } catch (_: JsonSyntaxException) {
+                                }
+                            }
+                    }
                 }
 
                 override fun onClientWrite(
@@ -93,10 +111,13 @@ class OkServerClass<T : Serializable>(
     }
 
     fun <J> send(data: J) {
-        Log.d("data", "sended ${data.toString()}")
         serverManager.clientPool.sendToAll(
-            ISendableData(Gson().toJson(data).toString())
+            ISendableData(Gson().toJson(data))
         )
+    }
+
+    fun stopServer() {
+        serverManager.shutdown()
     }
 
     private fun getLocalInetAddress(): String? {

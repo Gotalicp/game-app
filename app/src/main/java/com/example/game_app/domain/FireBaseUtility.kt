@@ -66,7 +66,7 @@ class FireBaseUtility {
     fun joinLobby(uid: String) {
         acc.value?.let { acc ->
             SharedInformation.updateLobbyReference(
-                Firebase.database.getReference("lobby/$uid/players").apply {
+                Firebase.database.getReference("lobby/$uid").apply {
                     addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             SharedInformation.updateLobby(lobbyAdapter.adapt(snapshot))
@@ -76,7 +76,7 @@ class FireBaseUtility {
                             Log.e("Firebase", "Cancelled JoinLobby")
                         }
                     })
-                    child("${acc.uid}").setValue(acc.uid ?: "")
+                        child("players").child("${acc.uid}").setValue(acc.uid ?: "")
                 })
         }
     }
