@@ -64,32 +64,35 @@ class GoFishLogic : GameLogic<Play> {
             _gamePlayers.value?.let {
                 it.shuffle(Random(seed))
                 _gamePlayers.postValue(it)
-                _playerToTakeTurn.value = it[0]
                 _gamePlayers.postValue(deck.deal(it, 5, deck))
+                _playerToTakeTurn.postValue(it[0])
             }
         }
     }
 
     override fun turnHandling(t: Play) {
         // Check if the asked player has any cards of the requested rank
-        gamePlayers.value?.let { player ->
+        _gamePlayers.value?.let { player ->
             val cardsReceived = player[indexOf(t.askedPlayer)].deck.filter { it.rank == t.rank }
             if (cardsReceived.isNotEmpty()) {
                 player.find { it.uid == t.askingPlayer }?.deck?.addAll(cardsReceived)
                 player.find { it.uid == t.askedPlayer }?.deck?.removeAll(cardsReceived)
                 player.find { it.uid == t.askedPlayer }?.let { checkForEmptyHand(it) }
-            } else
-            // If no cards received, draw a card from the deck
+                player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }
+                _playerToTakeTurn.postValue(player[indexOf(t.askingPlayer)])
+            } else {
+                // If no cards received, draw a card from the deck
                 deck.drawCard()?.let { card ->
                     player.find { it.uid == t.askingPlayer }?.deck?.add(card)
-                }
-
-            // Check for books in the current player's hand
-            if (!player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }!!) {
-                // Sets next player
-                _playerToTakeTurn.value =
-                    player[(player.indexOf(player.find { it.uid == t.askedPlayer }) + 1) % player.size]
+                    if (player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }!!) {
+                        // Sets next player
+                        _playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer) +1) % player.size])
+                    }else{
+                        _playerToTakeTurn.postValue(player[indexOf(t.askingPlayer)])
+                    }
+                }?:_playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer) +1) % player.size])
             }
+            // Check for books in the current player's hand
             _gamePlayers.postValue(player)
             _hasEnded.value = checkEndGame()
         }

@@ -2,6 +2,7 @@ package com.example.game_app.ui.game.goFish
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -16,6 +17,7 @@ import com.example.game_app.domain.Rank
 import com.example.game_app.ui.game.goFish.popup.PopupEnd
 import com.example.game_app.ui.game.goFish.popup.PopupLobby
 import com.example.game_app.ui.game.goFish.popup.PopupPickCard
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -30,6 +32,7 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
@@ -40,14 +43,14 @@ class GoFishActivity : AppCompatActivity() {
         intent.getStringExtra("lobbyUid")?.let { uid ->
             intent.getStringExtra("lobbyIp")?.let { ip ->
                 goFishViewModel.joinGame(uid, ip)
-                findViewById<View>(android.R.id.content).post {
+                binding.root.post {
                     lobbyPopup = PopupLobby(this, false)
                     goFishViewModel.showLobby()
                 }
             }
         } ?: run {
             goFishViewModel.createGame()
-            findViewById<View>(android.R.id.content).post {
+            binding.root.post {
                 lobbyPopup = PopupLobby(this, true) { goFishViewModel.createSeed() }
                 goFishViewModel.showLobby()
             }
@@ -56,16 +59,17 @@ class GoFishActivity : AppCompatActivity() {
         playerViewAdapter.apply {
             itemClickListener = object : ItemClickListener<Pair<GoFishLogic.Player, Account>> {
                 override fun onItemClicked(
-                    item: Pair<GoFishLogic.Player, Account>, itemPosition: Int
+                    item: Pair<GoFishLogic.Player, Account>,
+                    itemPosition: Int
                 ) {
                     PopupPickCard(applicationContext).apply {
                         item.let { player ->
-                            goFishViewModel.goFishLogic.gamePlayers.value?.find { it.uid == goFishViewModel.uid }?.deck?.let {
-                                showPopup(
-                                    findViewById(android.R.id.content),
-                                    item.second,
-                                    it
-                                )
+                            goFishViewModel.goFishLogic.gamePlayers.value?.find {
+                                it.uid == goFishViewModel.uid
+                            }?.deck?.let {
+                                if (isYourTurn) {
+                                    showPopup(binding.root, item.second, it)
+                                }
                             }
                             adapter.itemClickListener = object : ItemClickListener<Rank> {
                                 override fun onItemClicked(item: Rank, itemPosition: Int) {
@@ -88,16 +92,14 @@ class GoFishActivity : AppCompatActivity() {
         goFishViewModel.goFishLogic.gamePlayers.observe(this) { players ->
             players.partition { it.uid == goFishViewModel.uid }.let { player ->
                 GlobalScope.launch(Dispatchers.Main) {
-                    playerViewAdapter.updateItems(player.second.map {
-                        Pair(
-                            it,
-                            PlayerCache.instance.get(it.uid)!!
-                        )
-                    })
+                    playerViewAdapter.updateItems(
+                        player.second.map {
+                            Pair(it, PlayerCache.instance.get(it.uid)!!)
+                        })
                 }
                 cardViewAdapter.updateItems(player.first.first().deck)
             }
-            findViewById<TextView>(R.id.deckSize).text =
+            binding.deckSize.text =
                 "${goFishViewModel.goFishLogic.getDeckSize()}"
         }
     }
@@ -105,9 +107,9 @@ class GoFishActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateContent(data: GoFishUiModel) {
         if (data.showLobby) {
-            lobbyPopup.showPopup(findViewById(android.R.id.content))
+            lobbyPopup.showPopup(binding.root)
         } else {
-            if(::lobbyPopup.isInitialized) {
+            if (::lobbyPopup.isInitialized) {
                 lobbyPopup.dismissPopup()
             }
         }
@@ -123,12 +125,13 @@ class GoFishActivity : AppCompatActivity() {
             }
         }
         playerViewAdapter.isYourTurn = data.isYourTurn
+        Log.d(
+            "updateContent",
+            "isyourTurn: ${data.isYourTurn}, PlayerToTakeTurn: ${data.playerToTakeTurn}"
+        )
         if (data.showScores) {
             goFishViewModel.goFishLogic.gamePlayers.value?.let {
-                PopupEnd(
-                    this,
-                    it
-                ).showPopup(findViewById(android.R.id.content))
+                PopupEnd(this, it).showPopup(binding.root)
             }
         }
         binding.cooldown.visibility = if (data.startingIn == 0) {

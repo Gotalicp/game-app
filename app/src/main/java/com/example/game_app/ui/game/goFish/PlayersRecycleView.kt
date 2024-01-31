@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,7 +11,7 @@ import com.example.game_app.data.common.ItemClickListener
 import com.example.game_app.domain.bitmap.BitmapReverser
 
 class PlayersRecycleView : RecycleViewAdapter<Pair<GoFishLogic.Player, Account>>(
-    { oldItem, newItem -> oldItem == newItem },
+    { oldItem, newItem -> oldItem != newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_go_fish_player_card
 ) {
@@ -24,9 +25,9 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<GoFishLogic.Player, Account>>
 
         override fun bind(item: Pair<GoFishLogic.Player, Account>) {
             super.bind(item)
+            Log.d("pog", "${item.first.deck}")
             profile.setImageBitmap(item.second.image?.let { BitmapReverser().adapt(it) })
             name.text = item.second.username
-
             cards.text = item.first.deck.size.toString()
             view.setOnClickListener {
                 if (isYourTurn) {

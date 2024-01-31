@@ -21,7 +21,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     sealed interface State {
         data class Loading(val showLoading: Boolean) : State
         data class PreGame(val showLobbyInfo: Boolean) : State
-        data class MyTurn(val allowPlay: Boolean, val playerToTakeTurn: String) : State
+        data class MyTurn(val isYourTurn: Boolean, val playerToTakeTurn: String) : State
         data class EndGame(val showScores: Boolean) : State
         data class StartingIn(val startingIn: Int) : State
     }
@@ -39,23 +39,24 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     val uid = SharedInformation.getAcc().value?.uid
 
     init {
-        viewModelScope.launch {
-            goFishLogic.playerToTakeTurn.observeForever { player ->
-                player?.let {
-                    viewModelScope.launch {
-                        _state.value = cache.get(player.uid)?.username?.let {
-                            State.MyTurn((player.uid == uid), it)
-                        }
-                    }
+        goFishLogic.playerToTakeTurn.observeForever { player ->
+            player?.let {
+                viewModelScope.launch {
+                    Log.d("GoFishViewModel", "Player To Take Turn: $it")
+                    _state.postValue(cache.get(it.uid)?.username?.let {name->
+                        State.MyTurn(( it.uid == uid), name)
+                    })
                 }
             }
+        }
+        viewModelScope.launch {
             goFishLogic.seed.collect { seed ->
                 if (seed != null) {
                     if (!::endCollector.isInitialized) {
                         endCollector = startGame()
                     }
-                    Log.d("sedd", seed.toString())
-                    _state.value = State.StartingIn(5)
+                    Log.d("GoFishViewModel", "Seed: $seed")
+                    _state.postValue(State.StartingIn(5))
                     CoroutineScope(Dispatchers.Main).launch {
                         delay(5000L)
                         goFishLogic.startGame(seed)
@@ -66,11 +67,16 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun createGame() {
-        server = OkServerClass(goFishLogic,Play::class.java)
+        server = OkServerClass(goFishLogic, Play::class.java)
     }
 
     fun joinGame(uid: String, ip: String) {
-        client = OkClientClass(goFishLogic,Play::class.java ,ConnectionInfo(ip, 8888), uid).apply { join() }
+        client = OkClientClass(
+            goFishLogic,
+            Play::class.java,
+            ConnectionInfo(ip, 8888),
+            uid
+        ).apply { join() }
     }
 
 
@@ -86,8 +92,6 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
                         if (rounds != 0) {
                             rounds--
                             createSeed()
-                        } else {
-                            goFishLogic.playerToTakeTurn.removeObserver {}
                         }
                     }
                 }
@@ -108,6 +112,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             if (::server.isInitialized) {
                 server.send(t)
+                goFishLogic.turnHandling(t)
             } else if (::client.isInitialized) {
                 client.send(t)
             }

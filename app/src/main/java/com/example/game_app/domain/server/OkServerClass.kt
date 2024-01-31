@@ -58,10 +58,10 @@ class OkServerClass<T : Serializable>(
                     originalData?.bodyBytes?.let { body ->
                         DeserializeData().adapt(body).toString().let {
                                 try {
-                                    send(body)
                                     Gson().fromJson(it, expectedTClazz).let {play->
-                                    Log.d("DATA", play.toString())
-                                    gameLogic.turnHandling(play)
+                                        send(play)
+                                        Log.d("DATA", play.toString())
+                                        gameLogic.turnHandling(play)
                                     }
                                 } catch (_: JsonSyntaxException) {
                                 }
