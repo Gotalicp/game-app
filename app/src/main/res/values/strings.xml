@@ -4,7 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_go_fish">GoFishActivity</string>
 
-    //
+    //spas beshe tuk
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
 
@@ -15,7 +15,10 @@
     <string name="start">Start</string>
     <string name="register">Register</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="show_password">Show Password</string>
+    <string name="play">Play</string>
+    <string name="host">Host</string>
 
     //hints
     <string name="password">Password</string>
@@ -26,8 +29,8 @@
     //text views
     <string name="scoreboard">Scoreboard</string>
     <string name="game_starts_in_5">Game Starts In 5</string>
-    <string name="game_mode">Gamemode</string>
-    <string name="lobby_name">Lobby Name</string>
+    <string name="game_mode">Game Mode</string>
+    <string name="lobby_code">Lobby Code</string>
     <string name="max_players">Max Players:</string>
     <string name="time_per_round">Time Per Round</string>
     <string name="rounds">Rounds</string>

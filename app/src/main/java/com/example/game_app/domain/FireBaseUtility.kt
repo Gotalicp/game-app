@@ -5,9 +5,10 @@ import androidx.lifecycle.LiveData
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.data.Account
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.data.PlayerCache
-import com.example.game_app.domain.firebase.FireBaseAccAdapter
-import com.example.game_app.domain.firebase.SingleLobbyAdapter
+import com.example.game_app.domain.firebase.AccAdapter
+import com.example.game_app.domain.firebase.CodeAdapter
+import com.example.game_app.domain.firebase.GenerateCode
+import com.example.game_app.domain.firebase.LobbyAdapter
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
@@ -18,8 +19,8 @@ import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
     //    private val lobbyAdapter = LobbyAdapter()
-    private val lobbyAdapter = SingleLobbyAdapter()
-    private val accAdapter = FireBaseAccAdapter()
+    private val lobbyAdapter = LobbyAdapter()
+    private val accAdapter = AccAdapter()
     private var lobbyReference = SharedInformation.getLobbyReference().value
     private val auth = Firebase.auth
 
@@ -40,13 +41,28 @@ class FireBaseUtility {
             }
     }
 
+    fun useCode(code: String, callback: (Pair<String, String>?) -> Unit) {
+        Firebase.database.getReference("lobby/$code").get()
+            .addOnSuccessListener {
+                CodeAdapter().adapt(it).let(callback)
+            }.addOnFailureListener {
+                callback(null)
+            }.addOnCanceledListener {
+                callback(null)
+            }
+    }
+
     //Create a instance of hosted lobby in the database
-    fun hostLobby(ip: String) {
-        acc.value?.let {
-            val lobby = LobbyInfo(ownerIp = ip, lobbyUid = it.uid.toString())
-            lobby.players.add(it.uid ?: "")
+    fun hostLobby(ip: String, clazz: Class<*>) {
+        acc.value?.uid?.let {
+            val lobby = LobbyInfo(
+                ownerIp = ip,
+                lobbyUid = it,
+                code = GenerateCode(clazz.toString(), it).generateCode()
+            )
+            lobby.players.add(it)
             SharedInformation.updateLobbyReference(
-                Firebase.database.getReference("lobby/${it.uid}").apply {
+                Firebase.database.getReference("lobby/${it}").apply {
                     setValue(lobby)
                     SharedInformation.updateLobby(lobby)
                     addValueEventListener(object : ValueEventListener {
@@ -76,7 +92,7 @@ class FireBaseUtility {
                             Log.e("Firebase", "Cancelled JoinLobby")
                         }
                     })
-                        child("players").child("${acc.uid}").setValue(acc.uid ?: "")
+                    child("players").child("${acc.uid}").setValue(acc.uid ?: "")
                 })
         }
     }

@@ -50,8 +50,8 @@ class GoFishActivity : AppCompatActivity() {
         } ?: run {
             goFishViewModel.createGame()
             binding.root.post {
-                    lobbyPopup = PopupLobby(this, true) {goFishViewModel.createSeed() }
-                    goFishViewModel.showLobby()
+                lobbyPopup = PopupLobby(this, true) { goFishViewModel.createSeed() }
+                goFishViewModel.showLobby()
             }
         }
 
@@ -87,16 +87,16 @@ class GoFishActivity : AppCompatActivity() {
             cardView.adapter = cardViewAdapter
             playerView.adapter = playerViewAdapter
         }
-        goFishViewModel.goFishLogic.play.observe(this){plays->
+        goFishViewModel.goFishLogic.play.observe(this) { plays ->
 
         }
 
         goFishViewModel.goFishLogic.gamePlayers.observe(this) { players ->
             players.partition { it.uid == goFishViewModel.uid }.let { player ->
-                    playerViewAdapter.updateItems(
-                        player.second.map {map->
-                            Pair(map, goFishViewModel.players?.find { it.uid == map.uid })
-                        })
+                playerViewAdapter.updateItems(
+                    player.second.map { map ->
+                        Pair(map, goFishViewModel.players?.find { it.uid == map.uid })
+                    })
                 cardViewAdapter.updateItems(player.first.first().deck)
             }
             binding.deckSize.text =
@@ -125,10 +125,6 @@ class GoFishActivity : AppCompatActivity() {
             }
         }
         playerViewAdapter.isYourTurn = data.isYourTurn
-        Log.d(
-            "updateContent",
-            "isyourTurn: ${data.isYourTurn}, PlayerToTakeTurn: ${data.playerToTakeTurn}"
-        )
         if (data.showScores) {
             goFishViewModel.goFishLogic.gamePlayers.value?.let {
                 PopupEnd(this, it).showPopup(binding.root)

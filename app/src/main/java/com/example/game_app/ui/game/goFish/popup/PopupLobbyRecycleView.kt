@@ -21,7 +21,6 @@ class PopupLobbyRecycleView : RecycleViewAdapter<Account>(
     inner class PopupLobbyViewHolder(view: View) : BaseViewHolder(view) {
         private val image = view.findViewById<ImageView>(R.id.imageProfile)
         private val name = view.findViewById<TextView>(R.id.nameText)
-        private val isHost = view.findViewById<TextView>(R.id.isHost)
 
         @SuppressLint("SetTextI18n")
         override fun bind(item: Account) {

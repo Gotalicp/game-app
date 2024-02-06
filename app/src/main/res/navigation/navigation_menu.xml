@@ -17,19 +17,7 @@
         android:id="@+id/homeFragment"
         android:name="com.example.game_app.ui.main.home.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/homeToLobby"
-            app:destination="@id/lobbyFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/lobbyFragment"
-        android:name="com.example.game_app.ui.main.lobby.LobbyFragment"
-        android:label="LobbyFragment" >
-        <action
-            android:id="@+id/lobbyToHome"
-            app:destination="@id/homeFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.game_app.ui.main.profile.ProfileFragment"

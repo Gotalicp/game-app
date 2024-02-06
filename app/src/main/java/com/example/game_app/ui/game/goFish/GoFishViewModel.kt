@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.game_app.data.Account
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.SharedInformation
+import com.example.game_app.domain.FireBaseUtility
+import com.example.game_app.domain.GetLocalIp
 import com.example.game_app.domain.server.OkClientClass
 import com.example.game_app.domain.server.OkServerClass
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
@@ -76,6 +78,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     fun createGame() {
         server = OkServerClass(goFishLogic, Play::class.java)
+        FireBaseUtility().hostLobby(GetLocalIp().getLocalInetAddress()?:"", getApplication())
     }
 
     fun joinGame(uid: String, ip: String) {
