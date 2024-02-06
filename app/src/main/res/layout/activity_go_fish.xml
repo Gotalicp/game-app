@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-        android:elevation="10dp"
         android:gravity="center_horizontal"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -26,8 +25,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="50sp"
-            android:text="Game Starts in 5sec" />
+            android:text="@string/game_starts_in_5"
+            android:textSize="50sp" />
     </LinearLayout>
 
     <ImageView
@@ -65,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dp"
-        android:text="0"
+        android:text=""
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -101,8 +100,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#FF0000"
-        android:text="its player 1 turn"
-        android:textSize="50dp"
+        android:text=""
+        android:textSize="50sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

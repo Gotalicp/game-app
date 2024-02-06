@@ -32,7 +32,6 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
@@ -57,9 +56,9 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         playerViewAdapter.apply {
-            itemClickListener = object : ItemClickListener<Pair<GoFishLogic.Player, Account>> {
+            itemClickListener = object : ItemClickListener<Pair<GoFishLogic.Player, Account?>> {
                 override fun onItemClicked(
-                    item: Pair<GoFishLogic.Player, Account>,
+                    item: Pair<GoFishLogic.Player, Account?>,
                     itemPosition: Int
                 ) {
                     PopupPickCard(applicationContext).apply {
@@ -68,7 +67,7 @@ class GoFishActivity : AppCompatActivity() {
                                 it.uid == goFishViewModel.uid
                             }?.deck?.let {
                                 if (isYourTurn) {
-                                    showPopup(binding.root, item.second, it)
+                                    item.second?.let { it1 -> showPopup(binding.root, it1, it) }
                                 }
                             }
                             adapter.itemClickListener = object : ItemClickListener<Rank> {
@@ -88,15 +87,16 @@ class GoFishActivity : AppCompatActivity() {
             cardView.adapter = cardViewAdapter
             playerView.adapter = playerViewAdapter
         }
+        goFishViewModel.goFishLogic.play.observe(this) { plays ->
+
+        }
 
         goFishViewModel.goFishLogic.gamePlayers.observe(this) { players ->
             players.partition { it.uid == goFishViewModel.uid }.let { player ->
-                GlobalScope.launch(Dispatchers.Main) {
-                    playerViewAdapter.updateItems(
-                        player.second.map {
-                            Pair(it, PlayerCache.instance.get(it.uid)!!)
-                        })
-                }
+                playerViewAdapter.updateItems(
+                    player.second.map { map ->
+                        Pair(map, goFishViewModel.players?.find { it.uid == map.uid })
+                    })
                 cardViewAdapter.updateItems(player.first.first().deck)
             }
             binding.deckSize.text =
@@ -125,10 +125,6 @@ class GoFishActivity : AppCompatActivity() {
             }
         }
         playerViewAdapter.isYourTurn = data.isYourTurn
-        Log.d(
-            "updateContent",
-            "isyourTurn: ${data.isYourTurn}, PlayerToTakeTurn: ${data.playerToTakeTurn}"
-        )
         if (data.showScores) {
             goFishViewModel.goFishLogic.gamePlayers.value?.let {
                 PopupEnd(this, it).showPopup(binding.root)

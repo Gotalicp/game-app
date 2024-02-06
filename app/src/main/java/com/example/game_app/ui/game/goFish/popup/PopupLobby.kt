@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish.popup
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.Gravity
@@ -27,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@SuppressLint("InflateParams")
 class PopupLobby(
     private val context: Context,
     private val canChangeSettings: Boolean,
@@ -49,33 +51,8 @@ class PopupLobby(
                 adapter = PopupLobbyRecycleView()
                 playersView.layoutManager = LinearLayoutManager(context)
                 playersView.adapter = adapter
-
-                val lobbyEdit = findViewById<TextInputEditText>(R.id.lobbyNameText)
-                val lobbyLayout = findViewById<TextInputLayout>(R.id.lobbyNameLayout)
-                val lobbyName = findViewById<TextView>(R.id.lobbyName).apply {
-                    setOnClickListener {
-                        lobbyLayout.visibility = View.VISIBLE
-                        lobbyEdit.requestFocus()
-                    }
-                }
-                lobbyEdit.apply {
-                    setOnFocusChangeListener { _, focus ->
-                        if (!focus) {
-                            lobbyLayout.visibility = View.GONE
-                        }
-                    }
-                    setOnKeyListener { _, keyCode, event ->
-                        if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                            fireBaseUtility.updateLobby(lobbyName = text.toString())
-                            clearFocus()
-                            true
-                        } else {
-                            false
-                        }
-                    }
-
-                }
                 SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
+                    findViewById<TextView>(R.id.codeText).text = lobbyInfo.code
                     CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
                         lobbyInfo.players.mapNotNull {
                             cache.get(it)
@@ -83,7 +60,6 @@ class PopupLobby(
                             adapter.updateItems(it)
                         }
                     }
-                    lobbyName.text = lobbyInfo.lobbyName
                 }
                 findViewById<Spinner>(R.id.playerLimit).let {
                     it.adapter =
@@ -121,12 +97,6 @@ class PopupLobby(
                                 }
                             }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
-                setBackgroundColor(
-                    ContextCompat.getColor(
-                        context,
-                        androidx.appcompat.R.color.material_blue_grey_800
-                    )
-                )
             }
     }
 

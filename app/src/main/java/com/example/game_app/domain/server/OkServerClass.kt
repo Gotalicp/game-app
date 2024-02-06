@@ -33,7 +33,6 @@ class OkServerClass<T : Serializable>(
 
     init {
         OkSocketOptions.setIsDebug(true);
-        fireBaseUtility.hostLobby(getLocalInetAddress() ?: "")
     }
 
     private var serverManager = register.registerReceiver(object : IServerActionListener {
@@ -57,21 +56,21 @@ class OkServerClass<T : Serializable>(
                     Log.d("OkServer", "Client Wrote")
                     originalData?.bodyBytes?.let { body ->
                         DeserializeData().adapt(body).toString().let {
-                                try {
-                                    Gson().fromJson(it, expectedTClazz).let {play->
-                                        send(play)
-                                        Log.d("DATA", play.toString())
-                                        gameLogic.turnHandling(play)
-                                    }
-                                } catch (_: JsonSyntaxException) {
+                            try {
+                                Gson().fromJson(it, expectedTClazz).let { play ->
+                                    send(play)
+                                    Log.d("DATA", play.toString())
+                                    gameLogic.turnHandling(play)
                                 }
-
-                                try {
-                                    val data = Gson().fromJson(it, String::class.java)
-                                    Log.d("DATA", data.toString())
-                                } catch (_: JsonSyntaxException) {
-                                }
+                            } catch (_: JsonSyntaxException) {
                             }
+
+                            try {
+                                val data = Gson().fromJson(it, String::class.java)
+                                Log.d("DATA", data.toString())
+                            } catch (_: JsonSyntaxException) {
+                            }
+                        }
                     }
                 }
 
@@ -118,26 +117,5 @@ class OkServerClass<T : Serializable>(
 
     fun stopServer() {
         serverManager.shutdown()
-    }
-
-    private fun getLocalInetAddress(): String? {
-        try {
-            NetworkInterface.getNetworkInterfaces().let { network ->
-                while (network.hasMoreElements()) {
-                    network.nextElement().inetAddresses.let { addresses ->
-                        while (addresses.hasMoreElements()) {
-                            addresses.nextElement().let { address ->
-                                if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
-                                    return address.toString()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
     }
 }

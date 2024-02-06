@@ -2,7 +2,7 @@ package com.example.game_app.data
 
 import android.graphics.Bitmap
 data class LibraryGame(
-    val installed:Boolean = false,
-    val image: Bitmap?,
-
+    val imageId: Int,
+    val clazz: Class<*>,
+    val description: String
 )
