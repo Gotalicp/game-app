@@ -17,7 +17,7 @@ import com.example.game_app.data.Account
 import com.example.game_app.domain.bitmap.BitmapReverser
 import com.example.game_app.domain.Card
 
-@SuppressLint("ClickableViewAccessibility")
+@SuppressLint("ClickableViewAccessibility", "InflateParams")
 class PopupPickCard(
     context: Context
 ) {
@@ -48,7 +48,7 @@ class PopupPickCard(
         }
     }
 
-    fun showPopup(anchorView: View,player:Account, yourDeck: List<Card>) {
+    fun showPopup(anchorView: View, player: Account, yourDeck: List<Card>) {
         this.player = player
         adapter.updateItems(yourDeck.distinctBy { it.rank }.map { it.rank })
         popupWindow = PopupWindow(

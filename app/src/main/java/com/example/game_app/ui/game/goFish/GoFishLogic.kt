@@ -40,6 +40,9 @@ class GoFishLogic : GameLogic<Play> {
     private val _seed = MutableStateFlow<Long?>(null)
     val seed: StateFlow<Long?> get() = _seed
 
+    private val _play = MutableLiveData<MutableList<Play>>()
+    val play: LiveData<MutableList<Play>> get() = _play
+
     //Initiate deck
     private var deck = Deck()
     private fun resetDeck() = Deck()
@@ -58,6 +61,7 @@ class GoFishLogic : GameLogic<Play> {
         }
         _hasEnded.value = false
         deck = resetDeck()
+        _play.postValue(mutableListOf())
         deck.shuffle(seed)
         deck.showDeck()
         if (!_gamePlayers.value.isNullOrEmpty()) {
@@ -71,26 +75,32 @@ class GoFishLogic : GameLogic<Play> {
     }
 
     override fun turnHandling(t: Play) {
+        _play.value?.let {
+            it.add(t)
+            _play.postValue(it)
+        }
         // Check if the asked player has any cards of the requested rank
         _gamePlayers.value?.let { player ->
             val cardsReceived = player[indexOf(t.askedPlayer)].deck.filter { it.rank == t.rank }
             if (cardsReceived.isNotEmpty()) {
                 player.find { it.uid == t.askingPlayer }?.deck?.addAll(cardsReceived)
                 player.find { it.uid == t.askedPlayer }?.deck?.removeAll(cardsReceived)
-                player.find { it.uid == t.askedPlayer }?.let { checkForEmptyHand(it) }
-                player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }
-                _playerToTakeTurn.postValue(player[indexOf(t.askingPlayer)])
+                player.find { it.uid == t.askedPlayer }?.let {
+                    if (isHandEmpty(it)) {
+                        drawCard(it)
+                    }
+                }
+                player.find { it.uid == t.askingPlayer }
+                    ?.let { checkForBooks(it, indexOf(t.askingPlayer)) }
             } else {
                 // If no cards received, draw a card from the deck
                 deck.drawCard()?.let { card ->
                     player.find { it.uid == t.askingPlayer }?.deck?.add(card)
-                    if (player.find { it.uid == t.askingPlayer }?.let { checkForBooks(it) }!!) {
-                        // Sets next player
-                        _playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer) +1) % player.size])
-                    }else{
-                        _playerToTakeTurn.postValue(player[indexOf(t.askingPlayer)])
+                    if (player.find { it.uid == t.askingPlayer }
+                            ?.let { checkForBooks(it, indexOf(t.askingPlayer)) }!!) {
+                        nextPlayer(indexOf(t.askingPlayer))
                     }
-                }?:_playerToTakeTurn.postValue(player[(indexOf(t.askingPlayer) +1) % player.size])
+                } ?: nextPlayer(indexOf(t.askingPlayer))
             }
             // Check for books in the current player's hand
             _gamePlayers.postValue(player)
@@ -99,7 +109,7 @@ class GoFishLogic : GameLogic<Play> {
     }
 
 
-    private fun checkForBooks(hand: Player): Boolean {
+    private fun checkForBooks(hand: Player, index: Int): Boolean {
         hand.deck.groupBy { it.rank }.let { card ->
             for (rank in card.keys) {
                 //Checks if all of current rank suit are in a players hand
@@ -107,7 +117,9 @@ class GoFishLogic : GameLogic<Play> {
                     Log.d("CheckBook", "Player ${_playerToTakeTurn.value} books $rank")
                     hand.deck.removeAll { it.rank == rank }
                     hand.score += 1
-                    checkForEmptyHand(hand)
+                    if (isHandEmpty(hand)) {
+                        drawCard(hand) ?: nextPlayer(index)
+                    }
                     return false
                 }
             }
@@ -115,11 +127,8 @@ class GoFishLogic : GameLogic<Play> {
         return true
     }
 
-    private fun checkForEmptyHand(hand: Player) {
-        if (hand.deck.isEmpty()) {
-            deck.drawCard()?.let { hand.deck.add(it) }
-        }
-    }
+    private fun isHandEmpty(hand: Player) = hand.deck.isEmpty()
+    private fun drawCard(hand: Player) = deck.drawCard()?.let { hand.deck.add(it) }
 
     //Checks if game has ended
     override fun checkEndGame() =
@@ -127,4 +136,17 @@ class GoFishLogic : GameLogic<Play> {
 
     //Gets index of player with this uid
     private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.uid == uid } ?: 0
+
+    //Sets the next player
+    private fun nextPlayer(index: Int) {
+        if (!_hasEnded.value) {
+            gamePlayers.value?.let {
+                if (it[(index + 1) % it.size].deck.isNotEmpty()) {
+                    _playerToTakeTurn.postValue(it[(index + 1) % it.size])
+                } else {
+                    nextPlayer(index + 1)
+                }
+            }
+        }
+    }
 }

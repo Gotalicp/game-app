@@ -46,7 +46,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     && email.text.toString() != ""
                     && password.text.toString() != "" ) {
                     viewModel.createAcc(
-                        usenname.text.toString(),
+                        username.text.toString(),
                         email.text.toString(),
                         password.text.toString(),
                         requireContext())

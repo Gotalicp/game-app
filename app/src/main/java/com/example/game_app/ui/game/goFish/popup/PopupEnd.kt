@@ -33,13 +33,6 @@ class PopupEnd(
 
         scoreboard.layoutManager = LinearLayoutManager(context)
         scoreboard.adapter = adapter
-
-        popupView.setBackgroundColor(
-            ContextCompat.getColor(
-                context,
-                androidx.appcompat.R.color.material_blue_grey_800
-            )
-        )
     }
 
     fun showPopup(anchorView: View) {

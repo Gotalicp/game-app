@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.game_app.data.Account
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.data.SharedInformation
 import com.example.game_app.domain.server.OkClientClass
@@ -26,6 +27,8 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         data class StartingIn(val startingIn: Int) : State
     }
 
+    var players: List<Account>? = null
+
     private val _state = MutableLiveData<State>()
     val state: LiveData<State> = _state
 
@@ -43,8 +46,8 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             player?.let {
                 viewModelScope.launch {
                     Log.d("GoFishViewModel", "Player To Take Turn: $it")
-                    _state.postValue(cache.get(it.uid)?.username?.let {name->
-                        State.MyTurn(( it.uid == uid), name)
+                    _state.postValue(cache.get(it.uid)?.username?.let { name ->
+                        State.MyTurn((it.uid == uid), name)
                     })
                 }
             }
@@ -53,7 +56,12 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             goFishLogic.seed.collect { seed ->
                 if (seed != null) {
                     if (!::endCollector.isInitialized) {
-                        endCollector = startGame()
+                        viewModelScope.launch {
+                            players = lobby.value?.players?.map {
+                                PlayerCache.instance.get(it)!!
+                            }?.toMutableList()
+                            endCollector = startGame()
+                        }
                     }
                     Log.d("GoFishViewModel", "Seed: $seed")
                     _state.postValue(State.StartingIn(5))
@@ -101,9 +109,9 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     fun createSeed() {
         if (::server.isInitialized) {
-            Random.nextLong().let {
-                server.send(it)
-                goFishLogic.updateSeed(it)
+            Random.nextLong().let { seed ->
+                goFishLogic.updateSeed(seed)
+                server.send(seed)
             }
         }
     }

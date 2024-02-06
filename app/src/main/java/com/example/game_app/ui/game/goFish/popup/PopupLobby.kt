@@ -121,12 +121,6 @@ class PopupLobby(
                                 }
                             }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
-                setBackgroundColor(
-                    ContextCompat.getColor(
-                        context,
-                        androidx.appcompat.R.color.material_blue_grey_800
-                    )
-                )
             }
     }
 
