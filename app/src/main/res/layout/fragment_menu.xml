@@ -7,22 +7,16 @@
     android:layout_marginTop="8dp"
     android:layout_marginRight="8dp">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/codeLayout"
-        android:layout_width="0dp"
+    <EditText
+        android:id="@+id/codeEdit"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:visibility="gone"
-        app:boxStrokeWidthFocused="0dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/codeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:maxLength="6"/>
-    </com.google.android.material.textfield.TextInputLayout>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:maxLength="6"
+        android:inputType="text"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewLibrary"

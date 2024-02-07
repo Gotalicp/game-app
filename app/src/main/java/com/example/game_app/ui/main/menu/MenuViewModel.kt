@@ -10,15 +10,18 @@ import kotlinx.coroutines.launch
 class MenuViewModel(private val application: Application) : AndroidViewModel(application) {
 
     private val fireBaseUtility = FireBaseUtility()
-    fun join(code: String, clazz: Class<*>) =
-        Intent(application.applicationContext, clazz).apply {
-            viewModelScope.launch {
-                fireBaseUtility.useCode(code) {
-                    putExtra("lobbyUid", it?.first)
-                    putExtra("lobbyIp", it?.second)
+    fun join(code: String, clazz: Class<*>): Intent? {
+        var intent: Intent? = null
+        fireBaseUtility.useCode(code) {
+            it?.let {
+                intent = Intent(application.applicationContext, clazz).apply {
+                    putExtra("lobbyUid", it.first)
+                    putExtra("lobbyIp", it.second)
                 }
             }
         }
+        return intent
+    }
 
-    fun <T> host(clazz: Class<T>) = Intent(application.applicationContext,clazz)
+    fun <T> host(clazz: Class<T>) = Intent(application.applicationContext, clazz)
 }

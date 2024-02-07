@@ -2,6 +2,8 @@ package com.example.game_app.ui.main.menu
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.R
 import com.example.game_app.data.Account
 import com.example.game_app.data.LibraryGame
@@ -32,7 +35,9 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
         LibraryGame(
             R.drawable.image, GoFishActivity::class.java,
             "Five cards are dealt from a standard 52-card deck to each player. The remaining cards are shared between the players, usually spread out in a disorderly pile referred to as the \"ocean\" or \"pool\". The player whose turn it is to play asks any another player for their cards of a particular face value."
-        ))
+        )
+    )
+    private lateinit var clazz: Class<*>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,26 +51,12 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
             viewAdapter.apply {
+                updateItems(list)
                 joinListener = object : ItemClickListener<Class<*>> {
                     override fun onItemClicked(item: Class<*>, itemPosition: Int) {
-                        codeLayout.visibility = View.VISIBLE
-                        codeText.requestFocus()
-                        codeText.apply {
-                            setOnFocusChangeListener { _, focus ->
-                                if (!focus) {
-                                    codeLayout.visibility = View.GONE
-                                }
-                            }
-                            setOnKeyListener { _, keyCode, event ->
-                                if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                                    viewModel.join(text.toString(), item)
-                                    clearFocus()
-                                    true
-                                } else {
-                                    false
-                                }
-                            }
-                        }
+                        codeEdit.visibility = View.VISIBLE
+                        codeEdit.requestFocus()
+                        clazz = item
                     }
                 }
 
@@ -75,7 +66,20 @@ class MenuFragment : Fragment(R.layout.fragment_menu) {
                     }
                 }
             }
+            codeEdit.setOnKeyListener { _, keyCode, event ->
+                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (codeEdit.text.length == 6) {
+                        if (::clazz.isInitialized) {
+                            viewModel.join(codeEdit.text.toString(), clazz)
+                                ?.let { startActivity(it) }
+                        }
+                    }
+                    return@setOnKeyListener true
+                }
+                return@setOnKeyListener false
+            }
             recyclerViewLibrary.adapter = viewAdapter
+            recyclerViewLibrary.layoutManager = LinearLayoutManager(context)
         }
     }
 

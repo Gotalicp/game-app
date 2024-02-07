@@ -130,7 +130,7 @@ class GoFishActivity : AppCompatActivity() {
                 PopupEnd(this, it).showPopup(binding.root)
             }
         }
-        binding.cooldown.visibility = if (data.startingIn == 0) {
+        binding.coolDown.visibility = if (data.startingIn == 0) {
             View.GONE
         } else {
             View.VISIBLE

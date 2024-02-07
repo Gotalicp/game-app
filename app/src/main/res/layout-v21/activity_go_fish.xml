@@ -8,7 +8,7 @@
     tools:context=".ui.game.goFish.GoFishActivity">
 
     <LinearLayout
-        android:id="@+id/cooldown"
+        android:id="@+id/cool_down"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"

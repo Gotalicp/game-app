@@ -52,7 +52,7 @@ class PopupLobby(
                 playersView.layoutManager = LinearLayoutManager(context)
                 playersView.adapter = adapter
                 SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
-                    findViewById<TextView>(R.id.codeText).text = lobbyInfo.code
+                    findViewById<TextView>(R.id.lobbyCode).text = lobbyInfo.code
                     CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
                         lobbyInfo.players.mapNotNull {
                             cache.get(it)
