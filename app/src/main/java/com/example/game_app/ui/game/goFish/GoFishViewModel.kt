@@ -78,7 +78,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     fun createGame() {
         server = OkServerClass(goFishLogic, Play::class.java)
-        FireBaseUtility().hostLobby(GetLocalIp().getLocalInetAddress()?:"", GoFishActivity::class.java)
+        FireBaseUtility().hostLobby(GetLocalIp().getLocalInetAddress()?:"", "GoFish")
     }
 
     fun joinGame(uid: String, ip: String) {

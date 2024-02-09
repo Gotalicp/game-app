@@ -7,6 +7,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
@@ -65,7 +66,11 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private fun updateContent(data: AuthenticationUiModel) {
         data.apply {
             if (failed) {
-
+                Toast.makeText(
+                    context,
+                    "Failed To Register",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
         }

@@ -2,6 +2,7 @@ package com.example.game_app.ui.main.menu
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.game_app.domain.FireBaseUtility
@@ -11,12 +12,13 @@ class MenuViewModel(private val application: Application) : AndroidViewModel(app
 
     private val fireBaseUtility = FireBaseUtility()
     fun join(code: String, clazz: Class<*>): Intent? {
+        Log.d("code", code)
         var intent: Intent? = null
         fireBaseUtility.useCode(code) {
             it?.let {
                 intent = Intent(application.applicationContext, clazz).apply {
-                    putExtra("lobbyUid", it.first)
-                    putExtra("lobbyIp", it.second)
+                    putExtra("lobbyUid", it.lobbyUid)
+                    putExtra("lobbyIp", it.ownerIp)
                 }
             }
         }

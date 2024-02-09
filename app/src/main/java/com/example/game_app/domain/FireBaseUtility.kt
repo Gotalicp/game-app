@@ -41,24 +41,29 @@ class FireBaseUtility {
             }
     }
 
-    fun useCode(code: String, callback: (Pair<String, String>?) -> Unit) {
-        Firebase.database.getReference("lobby/$code").get()
-            .addOnSuccessListener {
-                CodeAdapter().adapt(it).let(callback)
-            }.addOnFailureListener {
-                callback(null)
-            }.addOnCanceledListener {
-                callback(null)
-            }
+    //Find a lobby using code
+    fun useCode(code: String, callback: (LobbyInfo?) -> Unit) {
+        try {
+            Firebase.database.getReference("lobby/$code").get()
+                .addOnSuccessListener {
+                    CodeAdapter().adapt(it).let(callback)
+                }.addOnFailureListener {
+                    callback(null)
+                }.addOnCanceledListener {
+                    callback(null)
+                }
+        } catch (e: Exception) {
+            callback(null)
+        }
     }
 
     //Create a instance of hosted lobby in the database
-    fun hostLobby(ip: String, clazz: Class<*>) {
+    fun hostLobby(ip: String, clazz: String) {
         acc.value?.uid?.let {
             val lobby = LobbyInfo(
                 ownerIp = ip,
                 lobbyUid = it,
-                code = GenerateCode(clazz.toString(), it).generateCode()
+                code = GenerateCode(clazz, it).generateCode()
             )
             lobby.players.add(it)
             SharedInformation.updateLobbyReference(
