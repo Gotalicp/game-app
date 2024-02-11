@@ -18,14 +18,13 @@ import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
-    private val accAdapter = AccAdapter()
     private var lobbyReference = SharedInformation.getLobbyReference().value
-    private val auth = Firebase.auth
+    private var database = Firebase.database
 
     private val acc: LiveData<Account> = SharedInformation.getAcc()
 
     fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
-        Firebase.database.getReference("lobby/$uid").get()
+        database.getReference("lobby/$uid").get()
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null) {
                     val result = lobbyInfoAdapter.adapt(documentSnapshot)
@@ -42,7 +41,7 @@ class FireBaseUtility {
     //Find a lobby using code
     fun useCode(code: String, callback: (LobbyInfo?) -> Unit) {
         try {
-            Firebase.database.getReference("lobby/$code").get()
+            database.getReference("lobby/$code").get()
                 .addOnSuccessListener {
                     CodeAdapter().adapt(it).let(callback)
                 }.addOnFailureListener {
@@ -67,7 +66,7 @@ class FireBaseUtility {
             }
             lobby?.players?.add(it)
             SharedInformation.updateLobbyReference(
-                Firebase.database.getReference("lobby/${lobby?.code}").apply {
+                database.getReference("lobby/${lobby?.code}").apply {
                     setValue(lobby)
                     SharedInformation.updateLobby(lobby)
                     addValueEventListener(object : ValueEventListener {
@@ -87,7 +86,7 @@ class FireBaseUtility {
     fun joinLobby(uid: String) {
         acc.value?.let { acc ->
             SharedInformation.updateLobbyReference(
-                Firebase.database.getReference("lobby/$uid").apply {
+                database.getReference("lobby/$uid").apply {
                     addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
@@ -147,17 +146,17 @@ class FireBaseUtility {
     }
 
     fun logout() {
-        auth.signOut()
+        Firebase.auth.signOut()
         SharedInformation.updateLogged(false)
     }
 
     suspend fun getUserInfo(uid: String): Account? {
         var tempUser: Account? = null
         try {
-            Firebase.database.getReference("user/${uid}").get()
+            database.getReference("user/${uid}").get()
                 .addOnSuccessListener {
                     Log.d("Firebase", "Get Account")
-                    accAdapter.adapt(it)?.let { acc ->
+                    AccAdapter().adapt(it)?.let { acc ->
                         tempUser = acc
                     }
                 }.await()

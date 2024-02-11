@@ -78,8 +78,6 @@ class GoFishActivity : AppCompatActivity() {
             playerTurn.text = data.playerToTakeTurn
             playerViewAdapter.isYourTurn = data.isYourTurn
             goFishViewModel.showEndScreen(root,data.showScores)
-            coolDown.visibility = data.startingInVisibility
-            counter.text = "Game Starts in ${data.startingIn}sec"
         }
     }
 
