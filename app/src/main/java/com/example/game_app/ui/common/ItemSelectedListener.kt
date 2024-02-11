@@ -1,4 +1,4 @@
-package com.example.game_app.data.common
+package com.example.game_app.ui.common
 
 interface ItemSelectedListener<T> {
     fun onItemSelected(item: T)

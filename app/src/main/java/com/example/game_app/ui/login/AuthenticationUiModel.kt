@@ -1,7 +1,9 @@
 package com.example.game_app.ui.login
 
+import android.view.View
+
 data class AuthenticationUiModel(
-    val isLoading: Boolean = false,
+    val isLoading: Int = View.GONE,
     val default: Boolean = false,
     val failed: Boolean = false,
     val success: Boolean = false,

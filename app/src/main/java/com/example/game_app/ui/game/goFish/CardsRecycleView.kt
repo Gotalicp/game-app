@@ -6,9 +6,9 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.example.game_app.R
-import com.example.game_app.data.common.RecycleViewAdapter
-import com.example.game_app.data.common.ItemClickListener
-import com.example.game_app.domain.Card
+import com.example.game_app.ui.common.RecycleViewAdapter
+import com.example.game_app.ui.common.ItemClickListener
+import com.example.game_app.domain.game.Card
 
 class CardsRecycleView : RecycleViewAdapter<Card>(
     { oldItem, newItem -> oldItem == newItem },

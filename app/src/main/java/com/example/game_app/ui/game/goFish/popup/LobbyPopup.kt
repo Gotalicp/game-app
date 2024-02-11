@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.Gravity
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,32 +11,29 @@ import android.widget.Button
 import android.widget.PopupWindow
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.data.PlayerCache
-import com.example.game_app.data.SharedInformation
-import com.example.game_app.data.common.CustomSpinnerAdapter
-import com.example.game_app.data.common.ItemSelectedListener
-import com.example.game_app.domain.FireBaseUtility
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.game_app.domain.SharedInformation
+import com.example.game_app.ui.common.CustomSpinnerAdapter
+import com.example.game_app.ui.common.ItemSelectedListener
+import com.example.game_app.data.FireBaseUtility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @SuppressLint("InflateParams")
-class PopupLobby(
+class LobbyPopup(
     private val context: Context,
     private val canChangeSettings: Boolean,
-    private val startGame: (() -> Unit)? = null
+    private val startGame: (() -> Unit)
 ) {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
     private val playersView: RecyclerView
-    private val adapter: PopupLobbyRecycleView
+    private val adapter: LobbyAdapter
     private val fireBaseUtility = FireBaseUtility()
     private val cache = PlayerCache.instance
 
@@ -48,7 +44,7 @@ class PopupLobby(
                 null
             ).apply {
                 playersView = findViewById(R.id.playerRecycleView)
-                adapter = PopupLobbyRecycleView()
+                adapter = LobbyAdapter()
                 playersView.layoutManager = LinearLayoutManager(context)
                 playersView.adapter = adapter
                 SharedInformation.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
@@ -113,10 +109,10 @@ class PopupLobby(
                 0
             )
             popupView.findViewById<Button>(R.id.btn_start).apply {
-                visibility = if (startGame != null) View.VISIBLE else View.GONE
+                visibility = if (canChangeSettings) View.VISIBLE else View.GONE
                 setOnClickListener {
                     dismiss()
-                    startGame?.invoke()
+                    startGame.invoke()
                 }
             }
             popupView.findViewById<Button>(R.id.btn_exit).setOnClickListener {

@@ -1,4 +1,6 @@
-package com.example.game_app.data
+package com.example.game_app.data.common
+
+import com.example.game_app.data.fishy.Account
 
 interface Cache {
     val size: Int

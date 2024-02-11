@@ -1,25 +1,21 @@
-package com.example.game_app.ui.game.goFish
+package com.example.game_app.domain.game
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.game_app.data.GameLogic
-import com.example.game_app.data.SharedInformation
-import com.example.game_app.domain.Card
-import com.example.game_app.domain.Deck
-import com.example.game_app.domain.Rank
+import com.example.game_app.domain.SharedInformation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.Serializable
 import java.util.Random
 
-data class Play(
-    val askingPlayer: String,
-    val askedPlayer: String,
-    val rank: Rank
-) : Serializable
+class GoFishLogic : GameLogic<GoFishLogic.Play> {
+    data class Play(
+        val askingPlayer: String,
+        val askedPlayer: String,
+        val rank: Rank
+    ) : Serializable
 
-class GoFishLogic : GameLogic<Play> {
     data class Player(
         val deck: MutableList<Card>,
         val uid: String,
@@ -31,8 +27,8 @@ class GoFishLogic : GameLogic<Play> {
     val gamePlayers: LiveData<MutableList<Player>> get() = _gamePlayers
 
     //Checking who's turn is it
-    private val _playerToTakeTurn = MutableLiveData<Player>()
-    val playerToTakeTurn: LiveData<Player> get() = _playerToTakeTurn
+    private val _playerToTakeTurn = MutableStateFlow<String?>(null)
+    val playerToTakeTurn: StateFlow<String?> get() = _playerToTakeTurn
 
     private val _hasEnded = MutableStateFlow(false)
     val hasEnded: StateFlow<Boolean> get() = _hasEnded
@@ -65,11 +61,17 @@ class GoFishLogic : GameLogic<Play> {
         deck.shuffle(seed)
         deck.showDeck()
         if (!_gamePlayers.value.isNullOrEmpty()) {
-            _gamePlayers.value?.let {
-                it.shuffle(Random(seed))
-                _gamePlayers.postValue(it)
-                _gamePlayers.postValue(deck.deal(it, 5, deck))
-                _playerToTakeTurn.postValue(it[0])
+            _gamePlayers.value?.let { players ->
+                players.shuffle(Random(seed))
+                deck.deal(players.map { it.uid }, 5, deck).let {
+                    players.forEach { player ->
+                        it[player.uid]?.let {
+                            player.deck.addAll(it)
+                        }
+                    }
+                    _gamePlayers.postValue(players)
+                    _playerToTakeTurn.value = players[0].uid
+                }
             }
         }
     }
@@ -142,7 +144,7 @@ class GoFishLogic : GameLogic<Play> {
         if (!_hasEnded.value) {
             gamePlayers.value?.let {
                 if (it[(index + 1) % it.size].deck.isNotEmpty()) {
-                    _playerToTakeTurn.postValue(it[(index + 1) % it.size])
+                    _playerToTakeTurn.value = it[(index + 1) % it.size].uid
                 } else {
                     nextPlayer(index + 1)
                 }

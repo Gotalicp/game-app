@@ -5,13 +5,12 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.example.game_app.R
-import com.example.game_app.data.Account
-import com.example.game_app.data.SharedInformation
-import com.example.game_app.data.common.RecycleViewAdapter
-import com.example.game_app.data.common.ItemClickListener
+import com.example.game_app.data.fishy.Account
+import com.example.game_app.ui.common.RecycleViewAdapter
+import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.domain.bitmap.BitmapReverser
 
-class PopupLobbyRecycleView : RecycleViewAdapter<Account>(
+class LobbyAdapter : RecycleViewAdapter<Account>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_popup_profile

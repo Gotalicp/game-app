@@ -1,14 +1,13 @@
-package com.example.game_app.domain
+package com.example.game_app.data
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.example.game_app.data.SharedInformation
-import com.example.game_app.data.Account
-import com.example.game_app.data.LobbyInfo
+import com.example.game_app.data.fishy.Account
+import com.example.game_app.domain.SharedInformation
 import com.example.game_app.domain.firebase.AccAdapter
 import com.example.game_app.domain.firebase.CodeAdapter
 import com.example.game_app.domain.firebase.GenerateCode
-import com.example.game_app.domain.firebase.LobbyAdapter
+import com.example.game_app.domain.firebase.LobbyInfoAdapter
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
@@ -18,8 +17,7 @@ import com.google.firebase.database.database
 import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
-    //    private val lobbyAdapter = LobbyAdapter()
-    private val lobbyAdapter = LobbyAdapter()
+    private val lobbyInfoAdapter = LobbyInfoAdapter()
     private val accAdapter = AccAdapter()
     private var lobbyReference = SharedInformation.getLobbyReference().value
     private val auth = Firebase.auth
@@ -30,7 +28,7 @@ class FireBaseUtility {
         Firebase.database.getReference("lobby/$uid").get()
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot != null) {
-                    val result = lobbyAdapter.adapt(documentSnapshot)
+                    val result = lobbyInfoAdapter.adapt(documentSnapshot)
                     callback(result)
                 } else {
                     callback(null)
@@ -58,21 +56,23 @@ class FireBaseUtility {
     }
 
     //Create a instance of hosted lobby in the database
-    fun hostLobby(ip: String, clazz: String) {
+    fun hostLobby(clazz: String) {
         acc.value?.uid?.let {
-            val lobby = LobbyInfo(
-                ownerIp = ip,
-                lobbyUid = it,
-                code = GenerateCode(clazz, it).generateCode()
-            )
-            lobby.players.add(it)
+            val lobby = GetLocalIp().getLocalInetAddress()?.let { it1 ->
+                LobbyInfo(
+                    ownerIp = it1,
+                    lobbyUid = it,
+                    code = GenerateCode(clazz, it).generateCode()
+                )
+            }
+            lobby?.players?.add(it)
             SharedInformation.updateLobbyReference(
-                Firebase.database.getReference("lobby/${it}").apply {
+                Firebase.database.getReference("lobby/${lobby?.code}").apply {
                     setValue(lobby)
                     SharedInformation.updateLobby(lobby)
                     addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            SharedInformation.updateLobby(lobbyAdapter.adapt(snapshot))
+                            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -90,7 +90,7 @@ class FireBaseUtility {
                 Firebase.database.getReference("lobby/$uid").apply {
                     addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            SharedInformation.updateLobby(lobbyAdapter.adapt(snapshot))
+                            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
                         }
 
                         override fun onCancelled(error: DatabaseError) {

@@ -33,9 +33,9 @@
     <string name="game_starts_in_5">Game Starts In 5</string>
     <string name="game_mode">Game Mode</string>
     <string name="lobby_code">Lobby Code</string>
-    <string name="max_players">Max Players:</string>
-    <string name="time_per_round">Time Per Round</string>
-    <string name="rounds">Rounds</string>
+    <string name="max_players">Max Players: </string>
+    <string name="time_per_round">Time Per Round: </string>
+    <string name="rounds">Rounds: </string>
     <string name="have_account">Have an account? Login here</string>
     <string name="no_account">Don\'t have an account? Register here</string>
     <string name="enter_code">Enter code to join</string>

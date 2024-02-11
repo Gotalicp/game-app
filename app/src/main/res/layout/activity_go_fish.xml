@@ -7,28 +7,6 @@
     android:padding="16dp"
     tools:context=".ui.game.goFish.GoFishActivity">
 
-
-    <LinearLayout
-        android:id="@+id/cool_down"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/black"
-        android:gravity="center_horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/counter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/game_starts_in_5"
-            android:textSize="50sp" />
-    </LinearLayout>
-
     <ImageView
         android:id="@+id/table"
         android:layout_width="0dp"

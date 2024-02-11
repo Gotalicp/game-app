@@ -1,16 +1,11 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
-import com.example.game_app.data.DeserializeData
-import com.example.game_app.data.GameLogic
-import com.example.game_app.data.ISendableData
-import com.example.game_app.data.SharedInformation
-import com.example.game_app.domain.FireBaseUtility
-import com.example.game_app.domain.Rank
-import com.example.game_app.ui.game.goFish.Play
+import com.example.game_app.domain.game.GameLogic
+import com.example.game_app.domain.SharedInformation
+import com.example.game_app.data.FireBaseUtility
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
 import com.xuhao.didi.core.iocore.interfaces.ISendable
 import com.xuhao.didi.core.pojo.OriginalData
 import com.xuhao.didi.socket.client.sdk.OkSocket
@@ -21,15 +16,13 @@ import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClient
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerActionListener
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerShutdown
 import java.io.Serializable
-import java.net.NetworkInterface
 
-class OkServerClass<T : Serializable>(
-    private val gameLogic: GameLogic<T>,
-    private val expectedTClazz: Class<T>
-
-) {
+class OkServer<T : Serializable>(
+    override val gameLogic: GameLogic<T>,
+    override val expectedTClazz: Class<T>, override val port: Int
+) : ServerInterface<T> {
     private val fireBaseUtility = FireBaseUtility()
-    private val register = OkSocket.server(8888)
+    private val register = OkSocket.server(port)
 
     init {
         OkSocketOptions.setIsDebug(true);
@@ -55,21 +48,17 @@ class OkServerClass<T : Serializable>(
                 ) {
                     Log.d("OkServer", "Client Wrote")
                     originalData?.bodyBytes?.let { body ->
-                        DeserializeData().adapt(body).toString().let {
+                        ByteArrayAdapter().adapt(body).toString().let {
                             try {
                                 Gson().fromJson(it, expectedTClazz).let { play ->
                                     send(play)
                                     Log.d("DATA", play.toString())
-                                    gameLogic.turnHandling(play)
                                 }
-                            } catch (_: JsonSyntaxException) {
-                            }
-
+                            } catch (_: JsonSyntaxException) {}
                             try {
                                 val data = Gson().fromJson(it, String::class.java)
                                 Log.d("DATA", data.toString())
-                            } catch (_: JsonSyntaxException) {
-                            }
+                            } catch (_: JsonSyntaxException) {}
                         }
                     }
                 }
@@ -105,17 +94,23 @@ class OkServerClass<T : Serializable>(
         override fun onServerAlreadyShutdown(serverPort: Int) {
             Log.d("OkServer", "onServerAlreadyShutdown")
         }
-    }).apply {
-        listen()
-    }
+    })
 
-    fun <J> send(data: J) {
+    override fun <J> send(data: J) {
         serverManager.clientPool.sendToAll(
             ISendableData(Gson().toJson(data))
         )
+        if(expectedTClazz.isInstance(data)){
+            gameLogic.turnHandling(data as T)
+        }
     }
 
-    fun stopServer() {
+    override fun join() {
+        serverManager.listen()
+    }
+
+    override fun disconnect() {
         serverManager.shutdown()
     }
+
 }

@@ -6,11 +6,11 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.example.game_app.R
-import com.example.game_app.data.common.RecycleViewAdapter
-import com.example.game_app.data.common.ItemClickListener
-import com.example.game_app.domain.Rank
+import com.example.game_app.ui.common.RecycleViewAdapter
+import com.example.game_app.ui.common.ItemClickListener
+import com.example.game_app.domain.game.Rank
 
-class PopupPickCardRecycleView : RecycleViewAdapter<Rank>(
+class CardPickerAdapter : RecycleViewAdapter<Rank>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_card

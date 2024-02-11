@@ -43,12 +43,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 findNavController().navigate(R.id.LoginToRegister)
             }
             btnLogin.setOnClickListener {
-                if (password.text.toString() != "" && email.text.toString() != "") {
-                    viewModel.logIn(
-                        email.text.toString(),
-                        password.text.toString()
-                    )
-                }
+                viewModel.logIn(
+                    email.text.toString(),
+                    password.text.toString()
+                )
             }
             checkBoxShowPassword.setOnCheckedChangeListener { _, isChecked ->
                 password.inputType = if (isChecked) {
@@ -65,7 +63,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (success) {
 
             }
-            binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
+            binding?.loading?.visibility = isLoading
         }
     }
 

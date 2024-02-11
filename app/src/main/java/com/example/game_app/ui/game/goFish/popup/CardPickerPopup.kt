@@ -13,18 +13,18 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.Account
+import com.example.game_app.data.fishy.Account
 import com.example.game_app.domain.bitmap.BitmapReverser
-import com.example.game_app.domain.Card
+import com.example.game_app.domain.game.Card
 
 @SuppressLint("ClickableViewAccessibility", "InflateParams")
-class PopupPickCard(
+class CardPickerPopup(
     context: Context
 ) {
 
     private val popupView: View
     private val recyclerView: RecyclerView
-    val adapter: PopupPickCardRecycleView
+    val adapter: CardPickerAdapter
     private lateinit var player: Account
     private var popupWindow: PopupWindow? = null
 
@@ -32,7 +32,7 @@ class PopupPickCard(
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         popupView = inflater.inflate(R.layout.window_pick_card, null)
         recyclerView = popupView.findViewById(R.id.cards)
-        adapter = PopupPickCardRecycleView()
+        adapter = CardPickerAdapter()
         recyclerView.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = adapter

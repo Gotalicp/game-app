@@ -1,4 +1,4 @@
-package com.example.game_app.data.common
+package com.example.game_app.ui.common
 
 import android.content.Context
 import android.database.DataSetObserver

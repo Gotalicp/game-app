@@ -1,4 +1,4 @@
-package com.example.game_app.data
+package com.example.game_app.domain.server
 
 import com.xuhao.didi.core.iocore.interfaces.ISendable
 import java.nio.ByteBuffer

@@ -1,10 +1,11 @@
-package com.example.game_app.data.common
+package com.example.game_app.ui.common
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.game_app.data.common.GenericDiffUtil
 
 abstract class RecycleViewAdapter<T>(
     private val areItemsTheSame: (oldItem: T, newItem: T) -> Boolean,

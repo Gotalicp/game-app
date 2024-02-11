@@ -1,13 +1,10 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
-import com.example.game_app.data.DeserializeData
-import com.example.game_app.data.GameLogic
-import com.example.game_app.data.ISendableData
-import com.example.game_app.domain.FireBaseUtility
+import com.example.game_app.domain.game.GameLogic
+import com.example.game_app.data.FireBaseUtility
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
 import com.xuhao.didi.core.pojo.OriginalData
 import com.xuhao.didi.socket.client.sdk.OkSocket
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
@@ -16,13 +13,13 @@ import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter
 import java.io.Serializable
 import java.lang.Exception
 
-class OkClientClass<T : Serializable>(
-    private val gameLogic: GameLogic<T>,
-    private val expectedTClazz: Class<T>,
-    info: ConnectionInfo,
-    private val lobbyUid: String,
-) {
-    private var manager = OkSocket.open(info)
+class OkClient<T : Serializable>(
+    override val gameLogic: GameLogic<T>,
+    override val expectedTClazz: Class<T>,
+    ip: String,
+    private val lobbyUid: String, override val port: Int,
+) : ServerInterface<T> {
+    private var manager = OkSocket.open(ConnectionInfo(ip,port))
     private val fireBaseUtility = FireBaseUtility()
 
     init {
@@ -44,7 +41,7 @@ class OkClientClass<T : Serializable>(
                 ) {
                     super.onSocketReadResponse(info, action, data)
                     data?.bodyBytes?.let { body ->
-                        DeserializeData().adapt(body)?.let { data ->
+                        ByteArrayAdapter().adapt(body)?.let { data ->
                             try {
                                 Gson().fromJson(data, String::class.java).let { string ->
                                     Log.d("DATAString", string.toString())
@@ -82,15 +79,15 @@ class OkClientClass<T : Serializable>(
         }
     }
 
-    fun join() {
+    override fun join() {
         manager.connect()
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         manager.disconnect()
     }
 
-    fun send(t: T) {
-        manager.send(ISendableData(Gson().toJson(t).toString()))
+    override fun <T> send(data: T) {
+        manager.send(ISendableData(Gson().toJson(data).toString()))
     }
 }

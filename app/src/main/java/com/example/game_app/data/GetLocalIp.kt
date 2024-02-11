@@ -1,4 +1,4 @@
-package com.example.game_app.domain
+package com.example.game_app.data
 
 import java.net.NetworkInterface
 

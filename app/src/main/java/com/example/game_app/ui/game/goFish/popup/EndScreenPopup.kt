@@ -8,26 +8,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupWindow
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.ui.game.goFish.GoFishLogic
+import com.example.game_app.domain.game.GoFishLogic
 
-class PopupEnd(
+class EndScreenPopup(
     private val context: Context,
     private val players: List<GoFishLogic.Player>
     ) {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
-    private val adapter: PopupEndRecycleView
+    private val adapter: EndScreenAdapter
     private val scoreboard: RecyclerView
 
     init {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         popupView = inflater.inflate(R.layout.window_game_ended, null)
         scoreboard = popupView.findViewById(R.id.scoreboard)
-        adapter = PopupEndRecycleView().apply {
+        adapter = EndScreenAdapter().apply {
             updateItems(players)
         }
 

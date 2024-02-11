@@ -6,11 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.example.game_app.R
-import com.example.game_app.databinding.FragmentMenuBinding
 import com.example.game_app.databinding.FragmentProfileBinding
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 
 class ProfileFragment : Fragment() {
 
@@ -32,7 +28,7 @@ class ProfileFragment : Fragment() {
             viewModel.acc.observe(viewLifecycleOwner) {
                 profilePhoto.setImageBitmap(viewModel.getImage())
                 username.text = it.username
-                email.text = Firebase.auth.currentUser?.email
+                email.text = viewModel.getEmail()
             }
         }
     }

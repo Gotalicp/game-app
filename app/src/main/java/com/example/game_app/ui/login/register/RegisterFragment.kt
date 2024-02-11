@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
@@ -18,7 +16,7 @@ import com.example.game_app.ui.login.AuthenticationUiModel
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
 
-    private var _binding: FragmentRegisterBinding?=null
+    private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding
 
     private val viewModel: RegisterViewModel by activityViewModels()
@@ -27,7 +25,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentRegisterBinding.inflate(inflater,container,false)
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         return binding?.root
     }
 
@@ -42,18 +40,15 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 findNavController().navigate(R.id.RegisterToLogin)
             }
             btnSignIn.setOnClickListener {
-                if (password.text.toString() != ""
-                    && repassword.text.toString() == password.text.toString()
-                    && email.text.toString() != ""
-                    && password.text.toString() != "" ) {
-                    viewModel.createAcc(
-                        username.text.toString(),
-                        email.text.toString(),
-                        password.text.toString(),
-                        requireContext())
-                }
+                viewModel.createAcc(
+                    username.text.toString(),
+                    email.text.toString(),
+                    password.text.toString(),
+                    repassword.text.toString(),
+                    requireContext()
+                )
             }
-            checkBoxShowPassword.setOnCheckedChangeListener{ _, isChecked ->
+            checkBoxShowPassword.setOnCheckedChangeListener { _, isChecked ->
                 password.inputType = if (isChecked) {
                     android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                 } else {
@@ -63,6 +58,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             }
         }
     }
+
     private fun updateContent(data: AuthenticationUiModel) {
         data.apply {
             if (failed) {
@@ -72,7 +68,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            binding?.loading?.visibility = if (isLoading) { VISIBLE } else { GONE }
+            binding?.loading?.visibility = isLoading
         }
     }
 

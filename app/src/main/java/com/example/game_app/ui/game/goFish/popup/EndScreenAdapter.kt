@@ -4,11 +4,10 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
 import com.example.game_app.R
-import com.example.game_app.data.PlayerCache
-import com.example.game_app.data.common.RecycleViewAdapter
-import com.example.game_app.ui.game.goFish.GoFishLogic
+import com.example.game_app.ui.common.RecycleViewAdapter
+import com.example.game_app.domain.game.GoFishLogic
 
-class PopupEndRecycleView: RecycleViewAdapter<GoFishLogic.Player>(
+class EndScreenAdapter: RecycleViewAdapter<GoFishLogic.Player>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_leaderboard

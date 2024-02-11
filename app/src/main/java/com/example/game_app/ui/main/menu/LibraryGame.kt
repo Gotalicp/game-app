@@ -1,6 +1,5 @@
-package com.example.game_app.data
+package com.example.game_app.ui.main.menu
 
-import android.graphics.Bitmap
 data class LibraryGame(
     val imageId: Int,
     val clazz: Class<*>,

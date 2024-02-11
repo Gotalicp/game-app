@@ -4,7 +4,7 @@ import com.example.game_app.data.common.Adapter
 import com.example.game_app.data.LobbyInfo
 import com.google.firebase.database.DataSnapshot
 
-class LobbyAdapter : Adapter<DataSnapshot, LobbyInfo> {
+class LobbyInfoAdapter : Adapter<DataSnapshot, LobbyInfo> {
     override fun adapt(t: DataSnapshot) = LobbyInfo(
         code = t.child("code").getValue(String::class.java) ?: "",
         clazz = t.child("clazz").getValue(String::class.java) ?: "",
