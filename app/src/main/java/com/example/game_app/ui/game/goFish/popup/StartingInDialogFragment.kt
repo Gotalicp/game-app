@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish.popup
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -24,6 +25,7 @@ class StartingInDialogFragment(private val time: Long) : DialogFragment() {
         _binding = DialogStartingInBinding.inflate(inflater, container, false)
         requireDialog().requestWindowFeature(Window.FEATURE_NO_TITLE)
         setStyle(STYLE_NO_FRAME, android.R.style.Theme)
+        isCancelable = false
         requireDialog().window?.apply {
             setLayout(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -37,8 +39,9 @@ class StartingInDialogFragment(private val time: Long) : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         object : CountDownTimer(time, 1000) {
+            @SuppressLint("SetTextI18n")
             override fun onTick(p0: Long) {
-                binding.counter.text = "Starts in ${p0/1000}"
+                binding.counter.text = "Starts in ${p0 / 1000}"
             }
             override fun onFinish() {
                 dismiss()

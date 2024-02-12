@@ -1,9 +1,9 @@
-package com.example.game_app.data.fishy
+package com.example.game_app.data
 
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable
-data class Account (
+data class FireBaseAcc (
     val username: String?,
     val uid: String?,
     val image: String?

@@ -5,11 +5,10 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.game_app.data.fishy.Account
+import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.data.FireBaseUtility
@@ -20,14 +19,10 @@ import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
 import com.example.game_app.ui.game.goFish.popup.LobbyPopup
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.math.log
 import kotlin.random.Random
 
 class GoFishViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -51,7 +46,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     //Server
     private lateinit var server: ServerInterface<GoFishLogic.Play>
 
-    var players: List<Account>? = null
+    var players: List<AppAcc>? = null
     private var rounds: Int? = null
 
     private var uid = SharedInformation.getAcc().value?.uid
@@ -65,7 +60,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     val id = SharedInformation.getAcc().value?.uid
 
     init {
-        viewModelScope.launch  {
+        viewModelScope.launch {
             goFishLogic.hasEnded.onEach {
                 collectHasEnded(it)
             }.launchIn(this)
@@ -90,7 +85,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private suspend fun collectSeed(seed: Long) {
-        if(players == null){
+        if (players == null) {
             setUp()
         }
         Log.d("GoFishViewModel", "Seed: $seed")
@@ -122,13 +117,13 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
 
-    fun findElse() = goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
+    fun findPlayers() = goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
         players?.mapNotNull { player ->
             gamePlayersMap[player.uid]?.let { gamePlayer ->
                 Pair(gamePlayer.deck, player)
             }
         }
-    }?.partition { it.second.uid == uid }?.second
+    }?.partition { it.second.uid == uid }
 
     fun findMyDeck() = goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck
 
@@ -194,7 +189,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             } else {
                 lobbyPopup.dismissPopup()
             }
-        } catch (_: ExceptionInInitializerError) {}
+        } catch (_: ExceptionInInitializerError) {
+        }
     }
 
     fun showEndScreen(view: View, check: Boolean) {

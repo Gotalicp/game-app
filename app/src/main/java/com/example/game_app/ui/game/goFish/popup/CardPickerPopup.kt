@@ -13,9 +13,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.fishy.Account
-import com.example.game_app.domain.bitmap.BitmapReverser
 import com.example.game_app.domain.game.Card
+import com.example.game_app.ui.common.AppAcc
 
 @SuppressLint("ClickableViewAccessibility", "InflateParams")
 class CardPickerPopup(
@@ -25,7 +24,7 @@ class CardPickerPopup(
     private val popupView: View
     private val recyclerView: RecyclerView
     val adapter: CardPickerAdapter
-    private lateinit var player: Account
+    private lateinit var player: AppAcc
     private var popupWindow: PopupWindow? = null
 
     init {
@@ -43,12 +42,12 @@ class CardPickerPopup(
             popupView.findViewById<TextView>(R.id.name).text = player.username
             player.image?.let {
                 popupView.findViewById<ImageView>(R.id.image)
-                    .setImageBitmap(BitmapReverser().adapt(it))
+                    .setImageBitmap(it)
             }
         }
     }
 
-    fun showPopup(anchorView: View, player: Account, yourDeck: List<Card>) {
+    fun showPopup(anchorView: View, player: AppAcc, yourDeck: List<Card>) {
         this.player = player
         adapter.updateItems(yourDeck.distinctBy { it.rank }.map { it.rank })
         popupWindow = PopupWindow(

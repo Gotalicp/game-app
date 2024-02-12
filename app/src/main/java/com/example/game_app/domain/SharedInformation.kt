@@ -3,7 +3,7 @@ package com.example.game_app.domain
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.data.LobbyInfo
-import com.example.game_app.data.fishy.Account
+import com.example.game_app.ui.common.AppAcc
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 object SharedInformation {
     //TODO(save me)
     //Current User
-    private val account = MutableLiveData<Account>()
+    private val account = MutableLiveData<AppAcc>()
     fun getAcc() = account
-    fun updateAcc(acc: Account) {
+    fun updateAcc(acc: AppAcc) {
         account.value = acc
     }
 

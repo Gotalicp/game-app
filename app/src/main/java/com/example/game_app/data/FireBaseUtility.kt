@@ -1,13 +1,16 @@
 package com.example.game_app.data
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.example.game_app.data.fishy.Account
 import com.example.game_app.domain.SharedInformation
+import com.example.game_app.domain.bitmap.BitmapConverter
 import com.example.game_app.domain.firebase.AccAdapter
 import com.example.game_app.domain.firebase.CodeAdapter
 import com.example.game_app.domain.firebase.GenerateCode
 import com.example.game_app.domain.firebase.LobbyInfoAdapter
+import com.example.game_app.ui.common.AppAcc
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
@@ -21,7 +24,7 @@ class FireBaseUtility {
     private var lobbyReference = SharedInformation.getLobbyReference().value
     private var database = Firebase.database
 
-    private val acc: LiveData<Account> = SharedInformation.getAcc()
+    private val acc: LiveData<AppAcc> = SharedInformation.getAcc()
 
     fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
         database.getReference("lobby/$uid").get()
@@ -154,8 +157,8 @@ class FireBaseUtility {
         SharedInformation.updateLogged(false)
     }
 
-    suspend fun getUserInfo(uid: String): Account? {
-        var tempUser: Account? = null
+    suspend fun getUserInfo(uid: String): AppAcc? {
+        var tempUser: AppAcc? = null
         try {
             database.getReference("user/${uid}").get()
                 .addOnSuccessListener {
@@ -169,6 +172,17 @@ class FireBaseUtility {
             logout()
         }
         return tempUser
+    }
+
+    fun createUser(uid: String, username: String, image: Bitmap ){
+        Firebase.database.getReference("user/$uid")
+            .setValue(FireBaseAcc(username,uid, BitmapConverter().adapt(image)))
+            .addOnCompleteListener {
+                SharedInformation.updateAcc(AppAcc(username, uid, image))
+                SharedInformation.updateLogged(true)
+            }.addOnFailureListener {
+                logout()
+            }
     }
 
     private fun generateUniqueCode(clazz: String, uid: String, callback: (String) -> Unit) {

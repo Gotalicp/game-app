@@ -26,7 +26,7 @@ class ProfileFragment : Fragment() {
 
         binding?.apply {
             viewModel.acc.observe(viewLifecycleOwner) {
-                profilePhoto.setImageBitmap(viewModel.getImage())
+                profilePhoto.setImageBitmap(it.image)
                 username.text = it.username
                 email.text = viewModel.getEmail()
             }

@@ -7,17 +7,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.R
-import com.example.game_app.data.fishy.Account
-import com.example.game_app.domain.SharedInformation
 import com.example.game_app.data.FireBaseUtility
-import com.example.game_app.domain.bitmap.BitmapConverter
 import com.example.game_app.ui.login.AuthenticationState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.database.database
 
 class RegisterViewModel(application: Application) : AndroidViewModel(application) {
-    private val bitmapConverter = BitmapConverter()
     private val auth = Firebase.auth
 
     private val _state = MutableLiveData<AuthenticationState>()
@@ -35,17 +30,12 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             Firebase.auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val image =
-                            BitmapFactory.decodeResource(context.resources, R.drawable.image)
-                        Account(username, auth.uid, bitmapConverter.adapt(image)).let { acc ->
-                            Firebase.database.getReference("user/${auth.uid}")
-                                .setValue(acc)
-                                .addOnCompleteListener {
-                                    SharedInformation.updateAcc(acc)
-                                    SharedInformation.updateLogged(true)
-                                }.addOnFailureListener {
-                                    FireBaseUtility().logout()
-                                }
+                        auth.uid?.let {
+                            FireBaseUtility().createUser(
+                                it,
+                                username,
+                                BitmapFactory.decodeResource(context.resources, R.drawable.image)
+                            )
                         }
                     }
                 }.addOnCanceledListener {

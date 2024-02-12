@@ -2,21 +2,21 @@ package com.example.game_app.data
 
 import android.util.Log
 import com.example.game_app.data.common.Cache
-import com.example.game_app.data.fishy.Account
+import com.example.game_app.ui.common.AppAcc
 
-class PlayerCache : Cache {
+class PlayerCache : Cache<AppAcc> {
     val firebase = FireBaseUtility()
 
     companion object {
         val instance: PlayerCache by lazy { PlayerCache() }
     }
 
-    private val cache = HashMap<String, Account>()
+    private val cache = HashMap<String, AppAcc>()
 
     override val size: Int
         get() = cache.size
 
-    override fun set(key: String, value: Account) {
+    override fun set(key: String, value: AppAcc) {
         this.cache[key] = value
     }
 

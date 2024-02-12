@@ -1,11 +1,9 @@
 package com.example.game_app.data.common
 
-import com.example.game_app.data.fishy.Account
-
-interface Cache {
+interface Cache<T> {
     val size: Int
-    fun set(key: String, value: Account)
-    suspend fun get(key: String): Account?
-    fun remove(key: String): Account?
+    fun set(key: String, value: T)
+    suspend fun get(key: String): T?
+    fun remove(key: String): T?
     fun clear()
 }
