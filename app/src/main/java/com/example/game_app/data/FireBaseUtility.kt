@@ -56,37 +56,41 @@ class FireBaseUtility {
 
     //Create a instance of hosted lobby in the database
     fun hostLobby(clazz: String) {
-        acc.value?.uid?.let {
-            val lobby = GetLocalIp().getLocalInetAddress()?.let { it1 ->
-                LobbyInfo(
-                    ownerIp = it1,
-                    lobbyUid = it,
-                    code = GenerateCode(clazz, it).generateCode()
-                )
+        acc.value?.uid?.let { acc ->
+            GetLocalIp().getLocalInetAddress()?.let { ip ->
+                generateUniqueCode(clazz, acc) {
+                    LobbyInfo(
+                        ownerIp = ip,
+                        lobbyUid = acc,
+                        code = it,
+                        players = mutableListOf(acc)
+                    ).let { lobby ->
+                        SharedInformation.updateLobbyReference(
+                            database.getReference("lobby/${lobby.code}").apply {
+                                setValue(lobby)
+                                SharedInformation.updateLobby(lobby)
+                                addValueEventListener(object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        SharedInformation.updateLobby(
+                                            lobbyInfoAdapter.adapt(snapshot)
+                                        )
+                                    }
+                                    override fun onCancelled(error: DatabaseError) {
+                                        Log.e("Firebase", "Cancelled HostLobby")
+                                    }
+                                })
+                            })
+                    }
+                }
             }
-            lobby?.players?.add(it)
-            SharedInformation.updateLobbyReference(
-                database.getReference("lobby/${lobby?.code}").apply {
-                    setValue(lobby)
-                    SharedInformation.updateLobby(lobby)
-                    addValueEventListener(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Log.e("Firebase", "Cancelled HostLobby")
-                        }
-                    })
-                })
         }
     }
 
     //Add a player to selected lobby in database
-    fun joinLobby(uid: String) {
+    fun joinLobby(code: String) {
         acc.value?.let { acc ->
             SharedInformation.updateLobbyReference(
-                database.getReference("lobby/$uid").apply {
+                database.getReference("lobby/$code").apply {
                     addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
@@ -165,5 +169,21 @@ class FireBaseUtility {
             logout()
         }
         return tempUser
+    }
+
+    private fun generateUniqueCode(clazz: String, uid: String, callback: (String) -> Unit) {
+        GenerateCode(clazz, uid).generateCode().let { code ->
+            database.getReference("lobby/$code")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            generateUniqueCode(clazz, uid, callback)
+                        } else { callback(code) }
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("Firebase", "Cancelled Query Lobby Code")
+                    }
+                })
+        }
     }
 }

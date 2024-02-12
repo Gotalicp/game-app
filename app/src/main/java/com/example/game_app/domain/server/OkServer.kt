@@ -87,12 +87,12 @@ class OkServer<T : Serializable>(
             clientPool: IClientPool<*, *>?,
             throwable: Throwable?
         ) {
-            fireBaseUtility.destroyLobby()
             shutdown?.shutdown()
         }
 
         override fun onServerAlreadyShutdown(serverPort: Int) {
             Log.d("OkServer", "onServerAlreadyShutdown")
+            fireBaseUtility.destroyLobby()
         }
     })
 

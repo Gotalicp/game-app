@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.domain.SharedInformation
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.Serializable
@@ -28,13 +29,13 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     //Checking who's turn is it
     private val _playerToTakeTurn = MutableStateFlow<String?>(null)
-    val playerToTakeTurn: StateFlow<String?> get() = _playerToTakeTurn
+    val playerToTakeTurn: Flow<String?> get() = _playerToTakeTurn
 
     private val _hasEnded = MutableStateFlow(false)
-    val hasEnded: StateFlow<Boolean> get() = _hasEnded
+    val hasEnded: Flow<Boolean> get() = _hasEnded
 
     private val _seed = MutableStateFlow<Long?>(null)
-    val seed: StateFlow<Long?> get() = _seed
+    val seed: Flow<Long?> get() = _seed
 
     private val _play = MutableLiveData<MutableList<Play>>()
     val play: LiveData<MutableList<Play>> get() = _play

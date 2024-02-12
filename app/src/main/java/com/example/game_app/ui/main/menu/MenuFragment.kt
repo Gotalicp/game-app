@@ -17,8 +17,8 @@ class MenuFragment : Fragment(R.layout.fragment_menu), MenuAdapter.AdapterListen
     private val binding get() = _binding
 
     private val viewModel: MenuViewModel by viewModels()
-    //TODO(hard code it)
 
+    //TODO(hard code it)
     private val list = listOf(
         LibraryGame(
             R.drawable.go_fish, GoFishActivity::class.java,

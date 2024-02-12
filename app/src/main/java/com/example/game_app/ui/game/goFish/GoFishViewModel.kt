@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -19,8 +20,14 @@ import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
 import com.example.game_app.ui.game.goFish.popup.LobbyPopup
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlin.math.log
 import kotlin.random.Random
 
 class GoFishViewModel(private val application: Application) : AndroidViewModel(application) {
@@ -33,8 +40,9 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             val playerToTakeTurn: String,
             val visibility: Int
         ) : State
+
         data object EndGame : State
-        data class StartingIn(val startingIn: Int) : State
+        data class StartingIn(val startingIn: Long) : State
     }
 
     private val _state = MutableLiveData<State>()
@@ -44,8 +52,9 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     private lateinit var server: ServerInterface<GoFishLogic.Play>
 
     var players: List<Account>? = null
+    private var rounds: Int? = null
 
-    private lateinit var endCollector: Unit
+    private var uid = SharedInformation.getAcc().value?.uid
     private var lobby = SharedInformation.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
@@ -53,69 +62,65 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     //PopUps
     private lateinit var lobbyPopup: LobbyPopup
 
-    val uid = SharedInformation.getAcc().value?.uid
+    val id = SharedInformation.getAcc().value?.uid
 
     init {
-        viewModelScope.launch {
-            collectSeed()
-            collectPlayer()
+        viewModelScope.launch  {
+            goFishLogic.hasEnded.onEach {
+                collectHasEnded(it)
+            }.launchIn(this)
+            goFishLogic.seed.onEach {
+                it?.let { collectSeed(it) }
+            }.launchIn(this)
+            goFishLogic.playerToTakeTurn.onEach {
+                it?.let { collectPlayer(it) }
+            }.launchIn(this)
         }
     }
 
-    private suspend fun collectPlayer() {
-        goFishLogic.playerToTakeTurn.collect { player ->
-            player?.let {
-                viewModelScope.launch {
-                    Log.d("GoFishViewModel", "Player To Take Turn: $it")
-                    _state.postValue(cache.get(it)?.username?.let { name ->
-                        State.MyTurn((it == uid), name, View.VISIBLE)
-                    })
-                    delay(3000L)
-                    _state.postValue(cache.get(it)?.username?.let { name ->
-                        State.MyTurn((it == uid), name, View.GONE)
-                    })
+    private suspend fun collectPlayer(player: String) {
+        Log.d("GoFishViewModel", "Player To Take Turn: $player")
+        _state.postValue(cache.get(player)?.username?.let { name ->
+            State.MyTurn((player == uid), name, View.VISIBLE)
+        })
+        delay(3000L)
+        _state.postValue(cache.get(player)?.username?.let { name ->
+            State.MyTurn((player == uid), name, View.GONE)
+        })
+    }
+
+    private suspend fun collectSeed(seed: Long) {
+        if(players == null){
+            setUp()
+        }
+        Log.d("GoFishViewModel", "Seed: $seed")
+        _state.postValue(State.StartingIn(5000L))
+        delay(5000L)
+        goFishLogic.startGame(seed)
+    }
+
+    private suspend fun collectHasEnded(hasEnded: Boolean) {
+        if (hasEnded) {
+            _state.value =
+                State.EndGame
+            rounds?.let {
+                if (rounds != 0) {
+                    rounds = rounds!! - 1
+                    _state.postValue(State.StartingIn(5000L))
+                    delay(5000L)
+                    createSeed()
                 }
             }
         }
     }
 
-    private suspend fun collectSeed() {
-        goFishLogic.seed.collect { seed ->
-            seed?.let {
-                if (!::endCollector.isInitialized) {
-                    players = lobby.value?.players?.map {
-                        PlayerCache.instance.get(it)!!
-                    }?.toMutableList()
-                    endCollector = startGame()
-                }
-                Log.d("GoFishViewModel", "Seed: $seed")
-                _state.postValue(State.StartingIn(5))
-                delay(5000L)
-                goFishLogic.startGame(seed)
-            }
-        }
+    private suspend fun setUp() {
+        players = lobby.value?.players?.map {
+            PlayerCache.instance.get(it)!!
+        }?.toList()
+        rounds = lobby.value?.rounds
     }
 
-    private fun startGame() {
-        Log.d("started", "started")
-        var rounds = lobby.value?.rounds
-        rounds?.let {
-            viewModelScope.launch {
-                goFishLogic.hasEnded.collect { hasEnded ->
-                    if (hasEnded) {
-                        _state.value =
-                            State.EndGame
-                        if (rounds != 0) {
-                            rounds--
-                            _state.postValue(State.StartingIn(5))
-                            delay(5000L)
-                            createSeed()
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     fun findElse() = goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
         players?.mapNotNull { player ->
@@ -123,7 +128,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 Pair(gamePlayer.deck, player)
             }
         }
-    }
+    }?.partition { it.second.uid == uid }?.second
 
     fun findMyDeck() = goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck
 
@@ -139,6 +144,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             ).apply {
                 join()
                 lobbyPopup = LobbyPopup(context, false) { createSeed() }
+                FireBaseUtility().joinLobby(uid)
+
             }
         } else {
             OkServer(
@@ -146,7 +153,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 expectedTClazz = GoFishLogic.Play::class.java,
                 port = 8888
             ).apply {
-                //TODO(thing about the middle)
+                //TODO(think about the middle)
                 FireBaseUtility().hostLobby("GoFish")
                 join()
                 lobbyPopup = LobbyPopup(context, true) { createSeed() }
@@ -158,7 +165,6 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     private fun createSeed() {
         if (::server.isInitialized) {
             Random.nextLong().let { seed ->
-
                 goFishLogic.updateSeed(seed)
                 server.send(seed)
             }
@@ -177,6 +183,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         if (::server.isInitialized) {
             server.disconnect()
         }
+        lobby.value
     }
 
     //Ui Part
@@ -187,11 +194,11 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             } else {
                 lobbyPopup.dismissPopup()
             }
-        } catch (ex: ExceptionInInitializerError) { }
+        } catch (_: ExceptionInInitializerError) {}
     }
 
-    fun showEndScreen(view: View, check:Boolean) {
-        if(check) {
+    fun showEndScreen(view: View, check: Boolean) {
+        if (check) {
             goFishLogic.gamePlayers.value?.let {
                 EndScreenPopup(
                     application.applicationContext,

@@ -46,9 +46,11 @@ class CodeDialogFragment(private val clazz: Class<*>) : DialogFragment() {
                 dismiss()
             }
             btnJoin.setOnClickListener {
-                viewModel.join(text.toString(), clazz)?.let {
-                    startActivity(it)
-                    dialog?.dismiss()
+                viewModel.join(codeEdit.text.toString(), clazz) {
+                    it?.let {
+                        startActivity(it)
+                        dialog?.dismiss()
+                    }
                 }
             }
             codeEdit.apply {
@@ -56,9 +58,11 @@ class CodeDialogFragment(private val clazz: Class<*>) : DialogFragment() {
                     if (actionId == EditorInfo.IME_ACTION_DONE ||
                         (event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)
                     ) {
-                        viewModel.join(text.toString(), clazz)?.let {
-                            startActivity(it)
-                            dialog?.dismiss()
+                        viewModel.join(text.toString(), clazz) {
+                            it?.let {
+                                startActivity(it)
+                                dialog?.dismiss()
+                            }
                         }
                         return@setOnEditorActionListener true
                     }
