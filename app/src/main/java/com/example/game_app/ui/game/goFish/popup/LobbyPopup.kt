@@ -3,6 +3,7 @@ package com.example.game_app.ui.game.goFish.popup
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -62,9 +63,7 @@ class LobbyPopup(
                         CustomSpinnerAdapter(context, listOf(2, 3, 4, 5, 6), object :
                             ItemSelectedListener<Int> {
                             override fun onItemSelected(item: Int) {
-                                if (canChangeSettings) {
-                                    fireBaseUtility.updateLobby(playerLimit = item)
-                                }
+                                fireBaseUtility.updateLobby(playerLimit = item)
                             }
                         }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
@@ -73,9 +72,7 @@ class LobbyPopup(
                         CustomSpinnerAdapter(context, listOf(1, 2, 3, 4, 5, 6), object :
                             ItemSelectedListener<Int> {
                             override fun onItemSelected(item: Int) {
-                                if (canChangeSettings) {
-                                    fireBaseUtility.updateLobby(rounds = item)
-                                }
+                                fireBaseUtility.updateLobby(rounds = item)
                             }
                         }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }
@@ -87,9 +84,7 @@ class LobbyPopup(
                             object :
                                 ItemSelectedListener<String> {
                                 override fun onItemSelected(item: String) {
-                                    if (canChangeSettings) {
-                                        fireBaseUtility.updateLobby(secPerTurn = item)
-                                    }
+                                    fireBaseUtility.updateLobby(secPerTurn = item)
                                 }
                             }).apply { setItemSelectedListener(it, 1, canChangeSettings) }
                 }

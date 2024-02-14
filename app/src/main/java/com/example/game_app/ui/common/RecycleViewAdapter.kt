@@ -25,6 +25,9 @@ abstract class RecycleViewAdapter<T>(
         )
     }
 
+    override fun getItemId(position: Int): Long {
+        return super.getItemId(position)
+    }
     abstract fun createViewHolder(view: View): BaseViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {

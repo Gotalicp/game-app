@@ -12,6 +12,7 @@ import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.domain.game.Card
 import com.example.game_app.domain.game.GoFishLogic
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.domain.server.OkClient
@@ -127,7 +128,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             }
         }?.partition { it.second.uid == uid }
 
-    fun findMyDeck() = goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck
+    fun findMyDeck() = goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck?.sortedBy { it.rank }
 
     //Server Part
     fun joinGame(code: String? = null, uid: String? = null, ip: String? = null, context: Context) {

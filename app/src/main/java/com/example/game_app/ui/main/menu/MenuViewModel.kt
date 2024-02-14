@@ -17,17 +17,20 @@ class MenuViewModel(private val application: Application) : AndroidViewModel(app
             if (code.length == 6) {
                 fireBaseUtility.useCode(code) {
                     it?.let {
-                        callback(
-                            Intent(application.applicationContext, clazz).apply {
-                                putExtra("lobbyUid", it.lobbyUid)
-                                putExtra("lobbyIp", it.ownerIp)
-                                putExtra("code", code)
-                            })
+                        if (it.players.size < it.maxPlayerCount) {
+                            callback(
+                                Intent(application.applicationContext, clazz).apply {
+                                    putExtra("lobbyUid", it.lobbyUid)
+                                    putExtra("lobbyIp", it.ownerIp)
+                                    putExtra("code", code)
+                                })
+                        }
                     }
 
                 }
             }
-        }catch (_:Exception){}
+        } catch (_: Exception) {
+        }
     }
 
     fun <T> host(clazz: Class<T>) = Intent(application.applicationContext, clazz)

@@ -45,6 +45,7 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         playerViewAdapter.apply {
+            setHasStableIds(true)
             itemClickListener = object : ItemClickListener<Pair<MutableList<Card>, AppAcc>> {
                 override fun onItemClicked(
                     item: Pair<MutableList<Card>, AppAcc>,
@@ -80,10 +81,10 @@ class GoFishActivity : AppCompatActivity() {
             binding.profile.visibility = View.VISIBLE
             goFishViewModel.findPlayers()?.let { players ->
                 playerViewAdapter.updateItems(players.second)
-                players.first.first().let {
-                    cardViewAdapter.updateItems(it.first)
-                    binding.yourImage.setImageBitmap(it.second.image)
-                    binding.yourName.text = "${it.second.username}"
+                players.first.first().let { me ->
+                    goFishViewModel.findMyDeck()?.let { deck -> cardViewAdapter.updateItems(deck) }
+                    binding.yourImage.setImageBitmap(me.second.image)
+                    binding.yourName.text = "${me.second.username}"
                 }
             }
             binding.deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"

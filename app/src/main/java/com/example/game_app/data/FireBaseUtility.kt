@@ -21,8 +21,10 @@ import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
-    private var lobbyReference: DatabaseReference? = null
     private var database = Firebase.database
+    companion object {
+        private var lobbyReference: DatabaseReference? = null
+    }
 
     private val listener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
