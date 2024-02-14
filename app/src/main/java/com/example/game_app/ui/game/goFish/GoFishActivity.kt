@@ -2,10 +2,13 @@ package com.example.game_app.ui.game.goFish
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.map
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.game.Card
@@ -25,11 +28,18 @@ class GoFishActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                Log.d("called","back")
+            }
+        })
         goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
         binding.root.post {
             goFishViewModel.joinGame(
-                intent.getStringExtra("lobbyIp"),
-                intent.getStringExtra("lobbyUid"),
+                code = intent.getStringExtra("code"),
+                uid = intent.getStringExtra("lobbyUid"),
+                ip = intent.getStringExtra("lobbyIp"),
                 this
             )
         }
@@ -57,6 +67,9 @@ class GoFishActivity : AppCompatActivity() {
         binding.apply {
             cardView.adapter = cardViewAdapter
             playerView.adapter = playerViewAdapter
+            if (playerView.itemAnimator is SimpleItemAnimator) {
+                (playerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            }
         }
 
         goFishViewModel.goFishLogic.play.observe(this) { plays ->
@@ -65,7 +78,7 @@ class GoFishActivity : AppCompatActivity() {
 
         goFishViewModel.goFishLogic.gamePlayers.observe(this) {
             binding.profile.visibility = View.VISIBLE
-            goFishViewModel.findPlayers()?.let {players->
+            goFishViewModel.findPlayers()?.let { players ->
                 playerViewAdapter.updateItems(players.second)
                 players.first.first().let {
                     cardViewAdapter.updateItems(it.first)

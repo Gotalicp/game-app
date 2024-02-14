@@ -1,7 +1,6 @@
 package com.example.game_app.data
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.game_app.domain.SharedInformation
@@ -15,15 +14,25 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import kotlinx.coroutines.tasks.await
 
 class FireBaseUtility {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
-    private var lobbyReference = SharedInformation.getLobbyReference().value
+    private var lobbyReference: DatabaseReference? = null
     private var database = Firebase.database
 
+    private val listener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e("Firebase", "Cancelled")
+        }
+    }
     private val acc: LiveData<AppAcc> = SharedInformation.getAcc()
 
     fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
@@ -68,43 +77,31 @@ class FireBaseUtility {
                         code = it,
                         players = mutableListOf(acc)
                     ).let { lobby ->
-                        SharedInformation.updateLobbyReference(
-                            database.getReference("lobby/${lobby.code}").apply {
+                        lobbyReference = database.getReference("lobby/${lobby.code}")
+                            .apply {
                                 setValue(lobby)
-                                SharedInformation.updateLobby(lobby)
-                                addValueEventListener(object : ValueEventListener {
-                                    override fun onDataChange(snapshot: DataSnapshot) {
-                                        SharedInformation.updateLobby(
-                                            lobbyInfoAdapter.adapt(snapshot)
-                                        )
-                                    }
-                                    override fun onCancelled(error: DatabaseError) {
-                                        Log.e("Firebase", "Cancelled HostLobby")
-                                    }
-                                })
-                            })
+                                addValueEventListener(listener)
+                            }
                     }
                 }
             }
+
         }
     }
 
     //Add a player to selected lobby in database
     fun joinLobby(code: String) {
-        acc.value?.let { acc ->
-            SharedInformation.updateLobbyReference(
-                database.getReference("lobby/$code").apply {
-                    addValueEventListener(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
-                        }
+        try {
+            Log.d("pog", code)
+            acc.value?.let { acc ->
+                lobbyReference = database.getReference("lobby/${code}")
+                    .apply {
+                        addValueEventListener(listener)
+                        child("players").child("${acc.uid}").setValue(acc.uid ?: "")
+                    }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            Log.e("Firebase", "Cancelled JoinLobby")
-                        }
-                    })
-                    child("players").child("${acc.uid}").setValue(acc.uid ?: "")
-                })
+            }
+        } catch (e: Exception) {
         }
     }
 
@@ -112,7 +109,6 @@ class FireBaseUtility {
     fun leaveLobby() {
         acc.value?.uid?.let { uid ->
             lobbyReference?.child(uid)?.removeValue()
-            SharedInformation.updateLobby(null)
             stopObservingLobby()
         }
     }
@@ -124,10 +120,9 @@ class FireBaseUtility {
     }
 
     private fun stopObservingLobby() {
-        lobbyReference?.removeEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {}
-            override fun onCancelled(error: DatabaseError) {}
-        })
+        SharedInformation.updateLobby(null)
+        lobbyReference?.removeEventListener(listener)
+        lobbyReference = null
     }
 
     fun updateLobby(
@@ -174,9 +169,9 @@ class FireBaseUtility {
         return tempUser
     }
 
-    fun createUser(uid: String, username: String, image: Bitmap ){
+    fun createUser(uid: String, username: String, image: Bitmap) {
         Firebase.database.getReference("user/$uid")
-            .setValue(FireBaseAcc(username,uid, BitmapConverter().adapt(image)))
+            .setValue(FireBaseAcc(username, uid, BitmapConverter().adapt(image)))
             .addOnCompleteListener {
                 SharedInformation.updateAcc(AppAcc(username, uid, image))
                 SharedInformation.updateLogged(true)
@@ -188,16 +183,14 @@ class FireBaseUtility {
     private fun generateUniqueCode(clazz: String, uid: String, callback: (String) -> Unit) {
         GenerateCode(clazz, uid).generateCode().let { code ->
             database.getReference("lobby/$code")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            generateUniqueCode(clazz, uid, callback)
-                        } else { callback(code) }
+                .get()
+                .addOnCompleteListener { task ->
+                    if (!task.result.exists()) {
+                        callback(code)
+                    } else {
+                        generateUniqueCode(clazz, uid, callback)
                     }
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e("Firebase", "Cancelled Query Lobby Code")
-                    }
-                })
+                }
         }
     }
 }

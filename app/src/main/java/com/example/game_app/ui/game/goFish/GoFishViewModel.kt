@@ -19,6 +19,7 @@ import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
 import com.example.game_app.ui.game.goFish.popup.LobbyPopup
+import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -44,7 +45,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     val state: LiveData<State> = _state
 
     //Server
-    private lateinit var server: ServerInterface<GoFishLogic.Play>
+    private var server: ServerInterface<GoFishLogic.Play>? = null
 
     var players: List<AppAcc>? = null
     private var rounds: Int? = null
@@ -117,29 +118,29 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
 
-    fun findPlayers() = goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
-        players?.mapNotNull { player ->
-            gamePlayersMap[player.uid]?.let { gamePlayer ->
-                Pair(gamePlayer.deck, player)
+    fun findPlayers() =
+        goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
+            players?.mapNotNull { player ->
+                gamePlayersMap[player.uid]?.let { gamePlayer ->
+                    Pair(gamePlayer.deck, player)
+                }
             }
-        }
-    }?.partition { it.second.uid == uid }
+        }?.partition { it.second.uid == uid }
 
     fun findMyDeck() = goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck
 
     //Server Part
-    fun joinGame(uid: String? = null, ip: String? = null, context: Context) {
-        server = if (uid != null && ip != null) {
+    fun joinGame(code: String? = null, uid: String? = null, ip: String? = null, context: Context) {
+        server = if (code != null && uid != null && ip != null) {
             OkClient(
                 gameLogic = goFishLogic,
                 expectedTClazz = GoFishLogic.Play::class.java,
                 ip = ip,
-                lobbyUid = uid,
+                code = code,
                 port = 8888
             ).apply {
                 join()
                 lobbyPopup = LobbyPopup(context, false) { createSeed() }
-                FireBaseUtility().joinLobby(uid)
 
             }
         } else {
@@ -148,8 +149,6 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 expectedTClazz = GoFishLogic.Play::class.java,
                 port = 8888
             ).apply {
-                //TODO(think about the middle)
-                FireBaseUtility().hostLobby("GoFish")
                 join()
                 lobbyPopup = LobbyPopup(context, true) { createSeed() }
             }
@@ -158,27 +157,21 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private fun createSeed() {
-        if (::server.isInitialized) {
-            Random.nextLong().let { seed ->
-                goFishLogic.updateSeed(seed)
-                server.send(seed)
-            }
+        Random.nextLong().let { seed ->
+            goFishLogic.updateSeed(seed)
+            server?.send(seed)
         }
     }
 
     fun write(player: String, card: Rank) {
         viewModelScope.launch {
-            if (::server.isInitialized) {
-                server.send(uid?.let { GoFishLogic.Play(it, player, card) })
-            }
+            server?.send(uid?.let { GoFishLogic.Play(it, player, card) })
         }
     }
 
     fun disconnect() {
-        if (::server.isInitialized) {
-            server.disconnect()
-        }
-        lobby.value
+        server?.disconnect()
+        server = null
     }
 
     //Ui Part

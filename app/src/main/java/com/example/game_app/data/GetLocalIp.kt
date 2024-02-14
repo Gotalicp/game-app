@@ -1,5 +1,6 @@
 package com.example.game_app.data
 
+import android.util.Log
 import java.net.NetworkInterface
 
 class GetLocalIp {
@@ -11,7 +12,8 @@ class GetLocalIp {
                         while (addresses.hasMoreElements()) {
                             addresses.nextElement().let { address ->
                                 if (!address.isLoopbackAddress && address.isSiteLocalAddress) {
-                                    return address.toString()
+                                    Log.d("pog", address.toString().replace("/", ""))
+                                    return address.toString().replace("/", "")
                                 }
                             }
                         }

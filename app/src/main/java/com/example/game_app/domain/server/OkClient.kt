@@ -17,9 +17,9 @@ class OkClient<T : Serializable>(
     override val gameLogic: GameLogic<T>,
     override val expectedTClazz: Class<T>,
     ip: String,
-    private val lobbyUid: String, override val port: Int,
+    private val code: String, override val port: Int,
 ) : ServerInterface<T> {
-    private var manager = OkSocket.open(ConnectionInfo(ip,port))
+    private var manager = OkSocket.open(ConnectionInfo(ip, port))
     private val fireBaseUtility = FireBaseUtility()
 
     init {
@@ -31,7 +31,7 @@ class OkClient<T : Serializable>(
                 override fun onSocketConnectionSuccess(info: ConnectionInfo?, action: String?) {
                     super.onSocketConnectionSuccess(info, action)
                     Log.d("OkClient", "Connected ${info?.ip}")
-                    fireBaseUtility.joinLobby(lobbyUid)
+                    fireBaseUtility.joinLobby(code)
                 }
 
                 override fun onSocketReadResponse(
@@ -72,8 +72,8 @@ class OkClient<T : Serializable>(
                     e: Exception?
                 ) {
                     super.onSocketDisconnection(info, action, e)
-                    manager.unRegisterReceiver(this)
                     fireBaseUtility.leaveLobby()
+                    manager.unRegisterReceiver(this)
                 }
             })
         }
@@ -85,6 +85,7 @@ class OkClient<T : Serializable>(
 
     override fun disconnect() {
         manager.disconnect()
+        fireBaseUtility.leaveLobby()
     }
 
     override fun <T> send(data: T) {

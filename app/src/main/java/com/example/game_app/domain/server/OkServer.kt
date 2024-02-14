@@ -31,6 +31,7 @@ class OkServer<T : Serializable>(
     private var serverManager = register.registerReceiver(object : IServerActionListener {
         override fun onServerListening(serverPort: Int) {
             Log.d("OkServer", "Listening")
+            fireBaseUtility.hostLobby("GoFish")
         }
 
         override fun onClientConnected(
@@ -54,11 +55,13 @@ class OkServer<T : Serializable>(
                                     send(play)
                                     Log.d("DATA", play.toString())
                                 }
-                            } catch (_: JsonSyntaxException) {}
+                            } catch (_: JsonSyntaxException) {
+                            }
                             try {
                                 val data = Gson().fromJson(it, String::class.java)
                                 Log.d("DATA", data.toString())
-                            } catch (_: JsonSyntaxException) {}
+                            } catch (_: JsonSyntaxException) {
+                            }
                         }
                     }
                 }
@@ -93,14 +96,16 @@ class OkServer<T : Serializable>(
         override fun onServerAlreadyShutdown(serverPort: Int) {
             Log.d("OkServer", "onServerAlreadyShutdown")
             fireBaseUtility.destroyLobby()
+            register.unRegisterReceiver(this)
         }
-    })
+    }
+    )
 
     override fun <J> send(data: J) {
         serverManager.clientPool.sendToAll(
             ISendableData(Gson().toJson(data))
         )
-        if(expectedTClazz.isInstance(data)){
+        if (expectedTClazz.isInstance(data)) {
             gameLogic.turnHandling(data as T)
         }
     }

@@ -21,6 +21,7 @@ class MenuViewModel(private val application: Application) : AndroidViewModel(app
                             Intent(application.applicationContext, clazz).apply {
                                 putExtra("lobbyUid", it.lobbyUid)
                                 putExtra("lobbyIp", it.ownerIp)
+                                putExtra("code", code)
                             })
                     }
 

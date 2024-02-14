@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.data.LobbyInfo
 import com.example.game_app.ui.common.AppAcc
-import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.flow.MutableStateFlow
 
 //An object of information to share between all fragments and viewModels
@@ -27,11 +26,5 @@ object SharedInformation {
     fun getLogged() = logged
     fun updateLogged(log: Boolean) {
         logged.value = log
-    }
-
-    private var lobbyReference = MutableLiveData<DatabaseReference>()
-    fun getLobbyReference() = lobbyReference
-    fun updateLobbyReference(reference: DatabaseReference) {
-        lobbyReference.postValue(reference)
     }
 }
