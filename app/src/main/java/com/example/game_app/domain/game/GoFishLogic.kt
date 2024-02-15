@@ -36,8 +36,8 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     private val _seed = MutableStateFlow<Long?>(null)
     val seed: Flow<Long?> get() = _seed
 
-    private val _play = MutableLiveData<MutableList<String>>()
-    val play: LiveData<MutableList<String>> get() = _play
+    private val _play = MutableLiveData<MutableList<Pair<Play, Int>>>()
+    val play: LiveData<MutableList<Pair<Play, Int>>> get() = _play
 
     //Initiate deck
     private var deck = Deck()
@@ -46,11 +46,9 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     override fun setPlayer(players: MutableList<String>) {
         _gamePlayers.value = players.map { Player(mutableListOf(), it, 0) }.toMutableList()
     }
-
     override fun updateSeed(seed: Long) {
         _seed.value = seed
     }
-
     override fun startGame(seed: Long) {
         if (_gamePlayers.value == null) {
             SharedInformation.getLobby().value?.players?.let { setPlayer(it) }
@@ -83,10 +81,9 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
             if (cardsReceived.isNotEmpty()) {
                 player.find { it.uid == t.askingPlayer }?.deck?.addAll(cardsReceived)
                 _play.value?.let { play ->
-                    play.add("${t.askedPlayer},")
+                    play.add(Pair(t, cardsReceived.size))
                     _play.postValue(play)
                 }
-                //TODO(add play)
                 player.find { it.uid == t.askedPlayer }?.deck?.removeAll(cardsReceived)
                 player.find { it.uid == t.askedPlayer }?.let {
                     if (isHandEmpty(it)) {
@@ -98,7 +95,10 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
             } else {
                 // If no cards received, draw a card from the deck
                 deck.drawCard()?.let { card ->
-                    //TODO(add play)
+                    _play.value?.let { play ->
+                        play.add(Pair(t, cardsReceived.size))
+                        _play.postValue(play)
+                    }
                     player.find { it.uid == t.askingPlayer }?.deck?.add(card)
                     if (player.find { it.uid == t.askingPlayer }
                             ?.let { checkForBooks(it, indexOf(t.askingPlayer)) }!!) {

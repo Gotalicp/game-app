@@ -24,14 +24,15 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
+    @SuppressLint("DiscouragedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Log.d("called","back")
+                Log.d("called", "back")
             }
         })
         goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
@@ -71,23 +72,24 @@ class GoFishActivity : AppCompatActivity() {
             if (playerView.itemAnimator is SimpleItemAnimator) {
                 (playerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
-        }
 
-        goFishViewModel.goFishLogic.play.observe(this) { plays ->
-
-        }
-
-        goFishViewModel.goFishLogic.gamePlayers.observe(this) {
-            binding.profile.visibility = View.VISIBLE
-            goFishViewModel.findPlayers()?.let { players ->
-                playerViewAdapter.updateItems(players.second)
-                players.first.first().let { me ->
-                    goFishViewModel.findMyDeck()?.let { deck -> cardViewAdapter.updateItems(deck) }
-                    binding.yourImage.setImageBitmap(me.second.image)
-                    binding.yourName.text = "${me.second.username}"
-                }
+            goFishViewModel.goFishLogic.play.observe(this@GoFishActivity) { plays ->
+                goFishViewModel.showAnimation(plays, this)
             }
-            binding.deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
+
+            goFishViewModel.goFishLogic.gamePlayers.observe(this@GoFishActivity) {
+                profile.visibility = View.VISIBLE
+                goFishViewModel.findPlayers()?.let { players ->
+                    playerViewAdapter.updateItems(players.second)
+                    players.first.first().let { me ->
+                        goFishViewModel.findMyDeck()
+                            ?.let { deck -> cardViewAdapter.updateItems(deck) }
+                        yourImage.setImageBitmap(me.second.image)
+                        yourName.text = "${me.second.username}"
+                    }
+                }
+                deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
+            }
         }
     }
 

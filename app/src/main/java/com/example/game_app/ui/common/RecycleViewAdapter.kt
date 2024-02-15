@@ -15,7 +15,6 @@ abstract class RecycleViewAdapter<T>(
 
     private val items = ArrayList<T>()
     private var diffUtil: GenericDiffUtil<T>? = null
-
     init {
         diffUtil = GenericDiffUtil(
             oldList = listOf(),

@@ -18,12 +18,14 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
     var isYourTurn: Boolean = false
     override fun createViewHolder(view: View) = PlayersViewHolder(view)
     inner class PlayersViewHolder(private val view: View) : BaseViewHolder(view) {
+        var id: String = ""
         private val profile = view.findViewById<ImageView>(R.id.profile)
         private val name = view.findViewById<TextView>(R.id.name)
         private val cards = view.findViewById<TextView>(R.id.cards)
 
         override fun bind(item: Pair<MutableList<Card>, AppAcc>) {
             super.bind(item)
+            id = item.second.uid.toString()
             profile.setImageBitmap(item.second.image)
             name.text = item.second.username
             cards.text = item.first.size.toString()

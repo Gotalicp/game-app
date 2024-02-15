@@ -57,10 +57,12 @@ class FireBaseUtility {
         try {
             database.getReference("lobby/$code").get()
                 .addOnSuccessListener {
-                    CodeAdapter().adapt(it).let(callback)
+                    callback(CodeAdapter().adapt(it))
                 }.addOnFailureListener {
+                    Log.d("called","fail")
                     callback(null)
                 }.addOnCanceledListener {
+                    Log.d("called","cancel")
                     callback(null)
                 }
         } catch (e: Exception) {

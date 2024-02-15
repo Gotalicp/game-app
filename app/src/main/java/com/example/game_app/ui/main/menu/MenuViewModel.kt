@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 class MenuViewModel(private val application: Application) : AndroidViewModel(application) {
     private val fireBaseUtility = FireBaseUtility()
     fun join(code: String, clazz: Class<*>, callback: (Intent?) -> Unit) {
-        Log.d("code", code)
         try {
             if (code.length == 6) {
                 fireBaseUtility.useCode(code) {
@@ -29,7 +28,8 @@ class MenuViewModel(private val application: Application) : AndroidViewModel(app
 
                 }
             }
-        } catch (_: Exception) {
+        } catch (ex: Exception) {
+            Log.d("error", "${ex}")
         }
     }
 
