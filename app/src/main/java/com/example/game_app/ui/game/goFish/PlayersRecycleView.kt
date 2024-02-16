@@ -14,7 +14,7 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_go_fish_player_card
 ) {
-    var itemClickListener: ItemClickListener<Pair<MutableList<Card>, AppAcc>>? = null
+    var itemClickListener: ItemClickListener<AppAcc>? = null
     var isYourTurn: Boolean = false
     override fun createViewHolder(view: View) = PlayersViewHolder(view)
     inner class PlayersViewHolder(private val view: View) : BaseViewHolder(view) {
@@ -31,7 +31,7 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
             cards.text = item.first.size.toString()
             view.setOnClickListener {
                 if (isYourTurn) {
-                    itemClickListener?.onItemClicked(item, absoluteAdapterPosition)
+                    itemClickListener?.onItemClicked(item.second, absoluteAdapterPosition)
                 }
             }
         }

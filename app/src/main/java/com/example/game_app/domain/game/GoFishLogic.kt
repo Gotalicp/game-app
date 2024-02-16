@@ -142,7 +142,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.uid == uid } ?: 0
 
     //Sets the next player
-    fun nextPlayer(index: Int) {
+    private fun nextPlayer(index: Int) {
         if (!_hasEnded.value) {
             gamePlayers.value?.let {
                 if (it[(index + 1) % it.size].deck.isNotEmpty()) {
@@ -152,5 +152,8 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
                 }
             }
         }
+    }
+    fun skipPlayer(){
+        _playerToTakeTurn.value?.let { indexOf(it) }?.let { nextPlayer(it) }
     }
 }

@@ -3,8 +3,10 @@ package com.example.game_app.ui.game.goFish
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -54,6 +56,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     var players: List<AppAcc>? = null
     private var rounds: Int? = null
+    private var timer: Long? = null
 
     var uid = SharedInformation.getAcc().value?.uid
     private var lobby = SharedInformation.getLobby()
@@ -86,9 +89,6 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             State.MyTurn((player == uid), name, View.VISIBLE)
         })
         delay(3000L)
-        _state.postValue(cache.get(player)?.username?.let { name ->
-            State.MyTurn((player == uid), name, View.GONE)
-        })
     }
 
     private suspend fun collectSeed(seed: Long) {
@@ -117,10 +117,16 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private suspend fun setUp() {
-        players = lobby.value?.players?.map {
-            PlayerCache.instance.get(it)!!
-        }?.toList()
-        rounds = lobby.value?.rounds
+        lobby.value?.let { lobby ->
+            players = lobby.players.map {
+                PlayerCache.instance.get(it)!!
+            }.toList()
+            rounds = lobby.rounds
+            try {
+                timer = lobby.secPerTurn.toLong() * 1000
+            } catch (_: Exception) {
+            }
+        }
     }
 
     fun findPlayers() =
@@ -214,12 +220,16 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 plays.last().let {
                     val view1 = if (it.first.askingPlayer != uid) {
                         getPositionById(playerView, it.first.askingPlayer)
-                    } else { profile }
+                    } else {
+                        profile
+                    }
                     if (it.second != 0) {
                         val view2 =
                             if (it.first.askedPlayer != uid) {
                                 getPositionById(playerView, it.first.askedPlayer)
-                            } else { profile }
+                            } else {
+                                profile
+                            }
                         try {
                             numberCards.text = "${it.second}x"
                             imageCard.setImageDrawable(
@@ -232,8 +242,9 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                                 )
                             )
                             if (view1 != null && view2 != null)
-                                gaivingCardAnimation(view2, view1, binding)
-                        } catch (_: Exception) { }
+                                givingCardAnimation(view2, view1, binding)
+                        } catch (_: Exception) {
+                        }
                     } else {
                         numberCards.text = ""
                         imageCard.setImageResource(R.drawable.back)
@@ -257,7 +268,31 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         return null
     }
 
-    private fun gaivingCardAnimation(
+    fun setTimer(binding: ActivityGoFishBinding, uid: String) {
+        timer?.let {
+            callTimer(getPositionById(binding.playerView, uid)?.findViewById(R.id.timeTurn) ?:binding.timeTurn)
+        }
+    }
+
+    private var countDown: CountDownTimer? = null
+    private fun callTimer(progress: ProgressBar) {
+        countDown?.cancel()
+        progress.visibility = View.VISIBLE
+        countDown = object : CountDownTimer(timer!!, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                progress.progress = (millisUntilFinished / 1000).toInt()
+            }
+            override fun onFinish() {
+                Log.d("tick", "pog2")
+                progress.progress = 0
+                progress.visibility = View.GONE
+                goFishLogic.skipPlayer()
+            }
+        }
+        countDown?.start()
+    }
+
+    private fun givingCardAnimation(
         view1: View,
         view2: View,
         binding: ActivityGoFishBinding

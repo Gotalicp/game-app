@@ -7,15 +7,20 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
-import com.example.game_app.domain.game.Card
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
 import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GoFishActivity : AppCompatActivity() {
     private val goFishViewModel: GoFishViewModel by viewModels()
@@ -47,19 +52,19 @@ class GoFishActivity : AppCompatActivity() {
 
         playerViewAdapter.apply {
             setHasStableIds(true)
-            itemClickListener = object : ItemClickListener<Pair<MutableList<Card>, AppAcc>> {
+            itemClickListener = object : ItemClickListener<AppAcc> {
                 override fun onItemClicked(
-                    item: Pair<MutableList<Card>, AppAcc>,
+                    item: AppAcc,
                     itemPosition: Int
                 ) {
                     CardPickerPopup(application).apply {
                         goFishViewModel.findMyDeck()?.let {
-                            showPopup(binding.root, item.second, it)
+                            showPopup(binding.root, item, it)
                         }
                         adapter.itemClickListener = object : ItemClickListener<Rank> {
                             override fun onItemClicked(card: Rank, itemPosition: Int) {
                                 dismiss()
-                                item.second.uid?.let { goFishViewModel.write(it, card) }
+                                item.uid?.let { goFishViewModel.write(it, card) }
                             }
                         }
                     }
@@ -103,10 +108,17 @@ class GoFishActivity : AppCompatActivity() {
                 supportFragmentManager,
                 StartingInDialogFragment.TAG
             )
-            playerTurn.visibility = data.playerToTakeTurnVisibility
-            playerTurn.text = data.playerToTakeTurn
             playerViewAdapter.isYourTurn = data.isYourTurn
             goFishViewModel.showEndScreen(root, data.showScores)
+            data.playerToTakeTurn?.let {
+                playerTurn.visibility = View.VISIBLE
+                playerTurn.text = it
+                goFishViewModel.setTimer(binding,it)
+                lifecycleScope.launch {
+                    delay(1000)
+                    playerTurn.visibility = View.GONE
+                }
+            }
         }
     }
 
