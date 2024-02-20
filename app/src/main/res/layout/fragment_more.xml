@@ -12,5 +12,4 @@
         android:backgroundTint="@color/black"
         android:text="@string/logout"
         android:layout_gravity="center"/>
-
 </FrameLayout>

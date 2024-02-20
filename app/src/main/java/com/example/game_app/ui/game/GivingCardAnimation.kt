@@ -13,6 +13,7 @@ class GivingCardAnimation(
     private val from = IntArray(2)
     private val to = IntArray(2)
     init {
+        view.visibility = View.VISIBLE
         viewFrom.getLocationOnScreen(from)
         viewTo.getLocationOnScreen(to)
     }

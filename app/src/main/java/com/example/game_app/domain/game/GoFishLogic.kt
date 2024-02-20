@@ -46,9 +46,11 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     override fun setPlayer(players: MutableList<String>) {
         _gamePlayers.value = players.map { Player(mutableListOf(), it, 0) }.toMutableList()
     }
+
     override fun updateSeed(seed: Long) {
         _seed.value = seed
     }
+
     override fun startGame(seed: Long) {
         if (_gamePlayers.value == null) {
             SharedInformation.getLobby().value?.players?.let { setPlayer(it) }
@@ -76,35 +78,37 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     override fun turnHandling(t: Play) {
         // Check if the asked player has any cards of the requested rank
+        val askingIndex = indexOf(t.askingPlayer)
         _gamePlayers.value?.let { player ->
             val cardsReceived = player[indexOf(t.askedPlayer)].deck.filter { it.rank == t.rank }
+            //Add whats happening to the game
+            _play.value?.let { play ->
+                play.add(Pair(t, cardsReceived.size))
+                _play.postValue(play)
+            }
+            //If there are card give them
             if (cardsReceived.isNotEmpty()) {
-                player.find { it.uid == t.askingPlayer }?.deck?.addAll(cardsReceived)
-                _play.value?.let { play ->
-                    play.add(Pair(t, cardsReceived.size))
-                    _play.postValue(play)
+                player.find { it.uid == t.askingPlayer }?.let {
+                    it.deck.addAll(cardsReceived)
+                    hasBook(it, askingIndex)
                 }
-                player.find { it.uid == t.askedPlayer }?.deck?.removeAll(cardsReceived)
                 player.find { it.uid == t.askedPlayer }?.let {
+                    it.deck.removeAll(cardsReceived)
                     if (isHandEmpty(it)) {
                         drawCard(it)
                     }
                 }
-                player.find { it.uid == t.askingPlayer }
-                    ?.let { checkForBooks(it, indexOf(t.askingPlayer)) }
+                setSamePlayer(indexOf(t.askingPlayer))
             } else {
                 // If no cards received, draw a card from the deck
-                deck.drawCard()?.let { card ->
-                    _play.value?.let { play ->
-                        play.add(Pair(t, cardsReceived.size))
-                        _play.postValue(play)
+                player.find { it.uid == t.askingPlayer }?.let {
+                    drawCard(it)
+                    if (hasBook(it, askingIndex)) {
+                        setSamePlayer(askingIndex)
+                    } else {
+                        nextPlayer(askingIndex)
                     }
-                    player.find { it.uid == t.askingPlayer }?.deck?.add(card)
-                    if (player.find { it.uid == t.askingPlayer }
-                            ?.let { checkForBooks(it, indexOf(t.askingPlayer)) }!!) {
-                        nextPlayer(indexOf(t.askingPlayer))
-                    }
-                } ?: nextPlayer(indexOf(t.askingPlayer))
+                } ?: nextPlayer(askingIndex)
             }
             // Check for books in the current player's hand
             _gamePlayers.postValue(player)
@@ -113,7 +117,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     }
 
 
-    private fun checkForBooks(hand: Player, index: Int): Boolean {
+    private fun hasBook(hand: Player, index: Int): Boolean {
         hand.deck.groupBy { it.rank }.let { card ->
             for (rank in card.keys) {
                 //Checks if all of current rank suit are in a players hand
@@ -124,11 +128,11 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
                     if (isHandEmpty(hand)) {
                         drawCard(hand) ?: nextPlayer(index)
                     }
-                    return false
+                    return true
                 }
             }
         }
-        return true
+        return false
     }
 
     private fun isHandEmpty(hand: Player) = hand.deck.isEmpty()
@@ -153,7 +157,20 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
             }
         }
     }
-    fun skipPlayer(){
+
+    private fun setSamePlayer(index: Int) {
+        if (!_hasEnded.value) {
+            gamePlayers.value?.get(index)?.let {
+                if (it.deck.isNotEmpty()) {
+                    _playerToTakeTurn.value = it.uid
+                } else {
+                    nextPlayer(index)
+                }
+            }
+        }
+    }
+
+    fun skipPlayer() {
         _playerToTakeTurn.value?.let { nextPlayer(indexOf(it)) }
     }
 }

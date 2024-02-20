@@ -41,7 +41,6 @@ class GoFishActivity : AppCompatActivity() {
             }
         })
 
-        goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
         binding.root.post {
             goFishViewModel.joinGame(
                 code = intent.getStringExtra("code"),
@@ -93,6 +92,7 @@ class GoFishActivity : AppCompatActivity() {
                 deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
             }
         }
+        goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
     }
 
     @SuppressLint("SetTextI18n")
@@ -107,15 +107,8 @@ class GoFishActivity : AppCompatActivity() {
             )
             playerViewAdapter.isYourTurn = data.isYourTurn
             goFishViewModel.showEndScreen(root, data.showScores)
-            data.playerToTakeTurn?.let {
-                playerTurn.visibility = View.VISIBLE
-                playerTurn.text = it
-                goFishViewModel.setTimer(binding,it)
-                lifecycleScope.launch {
-                    delay(1000)
-                    playerTurn.visibility = View.GONE
-                }
-            }
+            data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }
+            data.playerName?.let {goFishViewModel.showPlayerToTakeTurn(binding.playerTurn,it)}
         }
     }
 

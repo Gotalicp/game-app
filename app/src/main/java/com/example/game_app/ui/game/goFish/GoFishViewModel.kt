@@ -7,6 +7,8 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -41,8 +43,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         data object PreGame : State
         data class MyTurn(
             val isYourTurn: Boolean,
-            val playerToTakeTurn: String,
-            val visibility: Int
+            val playerUid: String,
+            val playerName: String,
         ) : State
 
         data object EndGame : State
@@ -86,7 +88,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     private suspend fun collectPlayer(player: String) {
         countDown?.cancelCountdown()
         _state.postValue(cache.get(player)?.username?.let { name ->
-            State.MyTurn((player == uid), name, View.VISIBLE)
+            State.MyTurn((player == uid), player, name)
         })
     }
 
@@ -123,7 +125,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             rounds = lobby.rounds
             try {
                 timer = lobby.secPerTurn.toLong() * 1000
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -213,13 +216,17 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             if (plays.isNotEmpty()) {
                 plays.last().let {
                     val view1 = if (it.first.askingPlayer != uid) {
-                        getPositionById(playerView, it.first.askingPlayer)
-                    } else { profile }
+                        getPositionById(playerView, it.first.askingPlayer)?.itemView
+                    } else {
+                        profile
+                    }
                     if (it.second != 0) {
                         val view2 =
                             if (it.first.askedPlayer != uid) {
-                                getPositionById(playerView, it.first.askedPlayer)
-                            } else { profile }
+                                getPositionById(playerView, it.first.askedPlayer)?.itemView
+                            } else {
+                                profile
+                            }
                         try {
                             numberCards.text = "${it.second}x"
                             imageCard.setImageDrawable(
@@ -232,53 +239,69 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                                 )
                             )
                             if (view1 != null && view2 != null)
-                                givingCardAnimation(view2, view1, binding)
-                        } catch (_: Exception) { }
+                                givingCardAnimation(view2, view1, binding.movableCard)
+                        } catch (_: Exception) {
+                        }
                     } else {
                         numberCards.text = ""
                         imageCard.setImageResource(R.drawable.back)
                         if (view1 != null)
-                            drawingCardAnimation(view1, binding)
+                            drawingCardAnimation(view1, binding.movableCard)
                     }
                 }
             }
         }
     }
 
-    private fun getPositionById(recyclerView: RecyclerView, id: String): View? {
-        for (i in 0 until (recyclerView.adapter?.itemCount?: 0)) {
+    private fun getPositionById(
+        recyclerView: RecyclerView,
+        id: String
+    ): PlayersRecycleView.PlayersViewHolder? {
+        for (i in 0 until (recyclerView.adapter?.itemCount ?: 0)) {
             (recyclerView.findViewHolderForAdapterPosition(i) as? PlayersRecycleView.PlayersViewHolder)?.let {
                 if (it.id == id) {
-                    return it.itemView
+                    return it
                 }
             }
         }
         return null
     }
 
-    fun setTimer(binding: ActivityGoFishBinding,uid: String) {
-        timer?.let {
+    fun setTimer(binding: ActivityGoFishBinding, uid: String) {
+        if (!players.isNullOrEmpty() && timer != null) {
             countDown = CountDown(
-                (getPositionById(binding.playerView, uid)?.findViewById(R.id.timeTurn)
-                    ?: binding.timeTurn), { goFishLogic.skipPlayer() }, timer!!, 1000
+                (getPositionById(binding.playerView, uid)?.timer ?: binding.timeTurn),
+                { goFishLogic.skipPlayer() },
+                timer!!,
+                1000
             )
         }
     }
 
-    private fun givingCardAnimation(view1: View, view2: View, binding: ActivityGoFishBinding) {
-        binding.movableCard.apply {
+    private fun givingCardAnimation(view1: View, view2: View, layout: ConstraintLayout) {
+        layout.apply {
             visibility = View.VISIBLE
             startAnimation(
                 GivingCardAnimation(this, view1, view2)
                     .apply { duration = 1000 })
         }
     }
-    private fun drawingCardAnimation(view: View, binding: ActivityGoFishBinding) {
-        binding.movableCard.apply {
+
+    private fun drawingCardAnimation(view: View, layout: ConstraintLayout) {
+        layout.apply {
             visibility = View.VISIBLE
             startAnimation(
                 DrawingCardAnimation(this, view)
                     .apply { duration = 1000 })
+        }
+    }
+
+    fun showPlayerToTakeTurn(view: TextView, data: String) {
+        view.text = data
+        viewModelScope.launch {
+            view.visibility = View.VISIBLE
+            delay(1000)
+            view.visibility = View.GONE
         }
     }
 }
