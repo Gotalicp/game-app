@@ -9,34 +9,14 @@ class DrawingCardAnimation(
     viewTo: View
 ) : Animation() {
     private val to = IntArray(2)
-    init {
-        viewTo.getLocationOnScreen(to)
-    }
-    private val fromX: Float = 0.0f
-    private val fromY: Float = 0.0f
+    private var fromX: Float = 0.0f
+    private var fromY: Float = 0.0f
 
     private var deltaX1: Float = 0f
     private var deltaY1: Float = 0f
-    override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-        //TODO(Fix)
-        view.translationX = to[0] + deltaX1 * interpolatedTime
-        view.translationY = to[1] + deltaY1 * interpolatedTime
-    }
-
-    override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
-        super.initialize(width, height, parentWidth, parentHeight)
-
-        (parentWidth / 2f - view.width / 2).let { x ->
-            (parentHeight / 2f - view.height / 2f).let { y ->
-                deltaX1 = x - fromX
-                deltaY1 = y - fromY
-            }
-        }
-    }
-
-    override fun willChangeBounds() = true
 
     init {
+        viewTo.getLocationOnScreen(to)
         setAnimationListener(object : AnimationListener {
             override fun onAnimationStart(animation: Animation) {
                 view.visibility = View.VISIBLE
@@ -49,4 +29,19 @@ class DrawingCardAnimation(
             override fun onAnimationRepeat(animation: Animation) {}
         })
     }
+    override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+        view.translationX = fromX + deltaX1 * interpolatedTime
+        view.translationY = fromY + deltaY1 * interpolatedTime
+    }
+
+    override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
+        super.initialize(width, height, parentWidth, parentHeight)
+        fromX = parentWidth / 2f
+        fromY = parentHeight / 2f
+
+        deltaX1 = to[0] - fromX
+        deltaY1 = to[1] - fromY
+    }
+
+    override fun willChangeBounds() = true
 }

@@ -15,6 +15,17 @@ class GivingCardAnimation(
     init {
         viewFrom.getLocationOnScreen(from)
         viewTo.getLocationOnScreen(to)
+        setAnimationListener(object : AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
+                view.visibility = View.VISIBLE
+            }
+
+            override fun onAnimationEnd(animation: Animation) {
+                view.visibility = View.GONE
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
     }
 
     private var deltaX1: Float = 0f
@@ -38,7 +49,7 @@ class GivingCardAnimation(
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)
-
+        duration = 1000
         (parentWidth / 2f - view.width / 2).let { x ->
             (parentHeight / 2f - view.height / 2f).let { y ->
                 deltaX1 = x - from[0]
@@ -51,18 +62,4 @@ class GivingCardAnimation(
     }
 
     override fun willChangeBounds() = true
-
-    init {
-        setAnimationListener(object : AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-                view.visibility = View.VISIBLE
-            }
-
-            override fun onAnimationEnd(animation: Animation) {
-                view.visibility = View.GONE
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {}
-        })
-    }
 }
