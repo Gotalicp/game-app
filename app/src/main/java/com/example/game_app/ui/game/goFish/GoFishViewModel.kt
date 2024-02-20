@@ -3,12 +3,9 @@ package com.example.game_app.ui.game.goFish
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -203,7 +200,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     fun showEndScreen(view: View, check: Boolean) {
         if (check) {
             goFishLogic.gamePlayers.value?.let {
-                EndScreenPopup(application, it).showPopup(view)
+                players?.let { it1 -> EndScreenPopup(application, it, it1).showPopup(view) }
             }
         }
     }
@@ -216,21 +213,14 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         binding.apply {
             if (plays.isNotEmpty()) {
                 plays.last().let {
-                    val view1 = getPositionById(playerView, it.first.askingPlayer) ?: profile
+                    val view1 = getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
                     if (it.second != 0) {
-                        val view2 =
-                            if (it.first.askedPlayer != uid) {
-                                getPositionById(playerView, it.first.askedPlayer)?.itemView
-                            } else {
-                                profile
-                            }
-                            
                         try {
                             numberCards.text = "${it.second}x"
                             imageCard.setImageDrawable(
                                 ContextCompat.getDrawable(
                                     root.context, root.context.resources.getIdentifier(
-                                        it.first.rank.name,
+                                        it.first.rank.name.lowercase(),
                                         "drawable",
                                         root.context.packageName
                                     )
@@ -241,15 +231,14 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                                     GivingCardAnimation(
                                         this,
                                         view1,
-                                        getPositionById(playerView, it.first.askedPlayer) ?: profile
+                                        getPositionById(playerView, it.first.askedPlayer)?.itemView?: profile
                                     )
                                 )
-                            }   
-                        } catch (_: Exception) {
-                        }
+                            }
+                        } catch (_: Exception) { }
                     } else {
                         numberCards.text = ""
-                        imageCard.setImageResource(R.drawable.ace)
+                        imageCard.setImageResource(R.drawable.back)
                         movableCard.apply {
                             startAnimation(DrawingCardAnimation(this, view1))
                         }

@@ -18,22 +18,20 @@ class CardsRecycleView : RecycleViewAdapter<Card>(
     var itemClickListener: ItemClickListener<Card>? = null
 
     override fun createViewHolder(view: View) = CardViewHolder(view)
-    inner class CardViewHolder(private val view: View) : BaseViewHolder(view) {
+    inner class CardViewHolder(view: View) : BaseViewHolder(view) {
         private val cardView = view.findViewById<ImageView>(R.id.card)
 
         @SuppressLint("SetTextI18n", "DiscouragedApi")
         override fun bind(item: Card) {
             try {
-                val drawableResId = itemView.context.resources.getIdentifier(
-                    "${item.suit.name.lowercase()}_${item.rank.name.lowercase()}",
-                    "drawable",
-                    itemView.context.packageName
-                )
-
                 cardView.setImageDrawable(
                     ContextCompat.getDrawable(
                         itemView.context,
-                        drawableResId
+                        itemView.context.resources.getIdentifier(
+                            "${item.suit.name.lowercase()}_${item.rank.name.lowercase()}",
+                            "drawable",
+                            itemView.context.packageName
+                        )
                     )
                 )
             } catch (e: Exception) {

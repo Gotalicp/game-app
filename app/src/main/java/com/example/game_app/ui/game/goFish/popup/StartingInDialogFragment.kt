@@ -41,7 +41,7 @@ class StartingInDialogFragment(private val time: Long) : DialogFragment() {
         object : CountDownTimer(time, 1000) {
             @SuppressLint("SetTextI18n")
             override fun onTick(p0: Long) {
-                binding.counter.text = "Starts in ${p0 / 1000}"
+                binding.counter.text = "Starts in ${1+(p0 / 1000)}"
             }
             override fun onFinish() {
                 dismiss()

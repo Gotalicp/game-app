@@ -8,23 +8,21 @@ class GivingCardAnimation(
     private val view: View,
     viewTo: View,
     viewFrom: View
-
 ) : Animation() {
     private val from = IntArray(2)
     private val to = IntArray(2)
+
     init {
-        view.visibility = View.VISIBLE
+        duration = 2000
         viewFrom.getLocationOnScreen(from)
         viewTo.getLocationOnScreen(to)
         setAnimationListener(object : AnimationListener {
             override fun onAnimationStart(animation: Animation) {
                 view.visibility = View.VISIBLE
             }
-
             override fun onAnimationEnd(animation: Animation) {
                 view.visibility = View.GONE
             }
-
             override fun onAnimationRepeat(animation: Animation) {}
         })
     }
@@ -37,28 +35,26 @@ class GivingCardAnimation(
 
     override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
         view.translationX = if (interpolatedTime < 0.5f) {
-            from[0] + deltaX1 * (interpolatedTime / 0.5f)
+            from[0] + deltaX1 * (interpolatedTime / 0.5f) - view.height / 2
         } else {
-            from[0]+ deltaX1 + deltaX2 * (interpolatedTime - 0.5f) / 0.5f
+            from[0] + deltaX1 + deltaX2 * (interpolatedTime - 0.5f) / 0.5f - view.height / 2
         }
         view.translationY = if (interpolatedTime < 0.5f) {
-            from[1] + deltaY1 * (interpolatedTime / 0.5f)
+            from[1] + deltaY1 * (interpolatedTime / 0.5f) - view.height / 2
         } else {
-            from[1] + deltaY1 + deltaY2 * (interpolatedTime - 0.5f) / 0.5f
+            from[1] + deltaY1 + deltaY2 * (interpolatedTime - 0.5f) / 0.5f - view.height / 2
         }
     }
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)
-        duration = 1000
-        (parentWidth / 2f - view.width / 2).let { x ->
-            (parentHeight / 2f - view.height / 2f).let { y ->
-                deltaX1 = x - from[0]
-                deltaY1 = y - from[1]
-
-                deltaX2 = to[0] - x
-                deltaY2 = to[1] - y
-            }
+        (parentWidth / 2f).let{
+            deltaX1 = it - from[0]
+            deltaX2 = to[0] - it
+        }
+        (parentHeight / 2f).let {
+            deltaY1 = it - from[1]
+            deltaY2 = to[1] - it
         }
     }
 

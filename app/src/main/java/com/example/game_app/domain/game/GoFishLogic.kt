@@ -147,13 +147,17 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     //Sets the next player
     private fun nextPlayer(index: Int) {
-        if (!_hasEnded.value) {
-            gamePlayers.value?.let {
-                if (it[(index + 1) % it.size].deck.isNotEmpty()) {
-                    _playerToTakeTurn.value = it[(index + 1) % it.size].uid
-                } else {
-                    nextPlayer(index + 1)
+        checkEndGame().let { ended ->
+            if (!ended) {
+                gamePlayers.value?.let {
+                    if (it[(index + 1) % it.size].deck.isNotEmpty()) {
+                        _playerToTakeTurn.value = it[(index + 1) % it.size].uid
+                    } else {
+                        nextPlayer(index + 1)
+                    }
                 }
+            } else {
+                _hasEnded.value = checkEndGame()
             }
         }
     }

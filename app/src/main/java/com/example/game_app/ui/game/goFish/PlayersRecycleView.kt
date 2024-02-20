@@ -11,7 +11,7 @@ import com.example.game_app.domain.game.Card
 import com.example.game_app.ui.common.AppAcc
 
 class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
-    { oldItem, newItem -> oldItem.first == newItem.first },
+    { oldItem, newItem -> oldItem.first != newItem.first },
     { oldItem, newItem -> oldItem.first == newItem.first },
     R.layout.item_go_fish_player_card
 ) {
@@ -20,7 +20,7 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
     override fun createViewHolder(view: View) = PlayersViewHolder(view)
     inner class PlayersViewHolder(private val view: View) : BaseViewHolder(view) {
         var id: String = ""
-        val timer = view.findViewById<ProgressBar>(R.id.timeTurn)
+        val timer: ProgressBar = view.findViewById(R.id.timeTurn)
         private val profile = view.findViewById<ImageView>(R.id.profile)
         private val name = view.findViewById<TextView>(R.id.name)
         private val cards = view.findViewById<TextView>(R.id.cards)

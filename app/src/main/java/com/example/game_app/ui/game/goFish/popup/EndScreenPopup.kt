@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish.popup
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.Gravity
@@ -12,11 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.domain.game.GoFishLogic
+import com.example.game_app.ui.common.AppAcc
+import java.security.PrivateKey
 
+@SuppressLint("InflateParams")
 class EndScreenPopup(
     private val context: Context,
-    private val players: List<GoFishLogic.Player>
-    ) {
+    private val players: List<GoFishLogic.Player>,
+    private val users: List<AppAcc>
+) {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
     private val adapter: EndScreenAdapter
@@ -27,7 +32,10 @@ class EndScreenPopup(
         popupView = inflater.inflate(R.layout.window_game_ended, null)
         scoreboard = popupView.findViewById(R.id.scoreboard)
         adapter = EndScreenAdapter().apply {
-            updateItems(players)
+            updateItems(users.mapNotNull { name ->
+                players.find { it.uid == name.uid }?.let { Pair(name.username, it.score) }
+            }
+            )
         }
 
         scoreboard.layoutManager = LinearLayoutManager(context)

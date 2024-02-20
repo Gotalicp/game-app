@@ -8,11 +8,13 @@ import com.google.firebase.database.DataSnapshot
 class AccAdapter : Adapter<DataSnapshot?, AppAcc?> {
     override fun adapt(t: DataSnapshot?): AppAcc? {
         return t?.let {
-            return AppAcc(
-                t.child("username").getValue(String::class.java),
-                t.child("uid").getValue(String::class.java),
-                t.child("image").getValue(String::class.java)
-                    ?.let { it1 -> BitmapReverser().adapt(it1) })
+            return t.child("username").getValue(String::class.java)?.let { it1 ->
+                AppAcc(
+                    it1,
+                    t.child("uid").getValue(String::class.java),
+                    t.child("image").getValue(String::class.java)
+                        ?.let { it1 -> BitmapReverser().adapt(it1) })
+            }
         }
     }
 }

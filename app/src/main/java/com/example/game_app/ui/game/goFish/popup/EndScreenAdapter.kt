@@ -7,7 +7,7 @@ import com.example.game_app.R
 import com.example.game_app.ui.common.RecycleViewAdapter
 import com.example.game_app.domain.game.GoFishLogic
 
-class EndScreenAdapter: RecycleViewAdapter<GoFishLogic.Player>(
+class EndScreenAdapter: RecycleViewAdapter<Pair<String,Int>>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_leaderboard
@@ -18,9 +18,9 @@ class EndScreenAdapter: RecycleViewAdapter<GoFishLogic.Player>(
         private val name = view.findViewById<TextView>(R.id.name)
 
         @SuppressLint("SetTextI18n")
-        override fun bind(item: GoFishLogic.Player) {
-            score.text = item.score.toString()
-            name.text = item.uid
+        override fun bind(item: Pair<String,Int>) {
+            name.text = item.first
+            score.text = item.second.toString()
         }
     }
 }

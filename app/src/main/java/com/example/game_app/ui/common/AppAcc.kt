@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import java.io.Serializable
 
 data class AppAcc (
-    val username: String?,
+    val username: String,
     val uid: String?,
     val image: Bitmap?
 ): Serializable

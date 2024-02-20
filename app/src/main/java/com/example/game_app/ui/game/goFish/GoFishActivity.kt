@@ -7,7 +7,6 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.example.game_app.ui.common.ItemClickListener
@@ -16,11 +15,6 @@ import com.example.game_app.domain.game.Rank
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
 import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class GoFishActivity : AppCompatActivity() {
     private val goFishViewModel: GoFishViewModel by viewModels()
@@ -86,7 +80,7 @@ class GoFishActivity : AppCompatActivity() {
                         goFishViewModel.findMyDeck()
                             ?.let { deck -> cardViewAdapter.updateItems(deck) }
                         yourImage.setImageBitmap(me.second.image)
-                        yourName.text = "${me.second.username}"
+                        yourName.text = me.second.username
                     }
                 }
                 deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
@@ -101,10 +95,12 @@ class GoFishActivity : AppCompatActivity() {
             root.post {
                 goFishViewModel.showLobby(data.showLobby, root)
             }
-            StartingInDialogFragment(data.startingIn).show(
-                supportFragmentManager,
-                StartingInDialogFragment.TAG
-            )
+            data.startingIn?.let {
+                StartingInDialogFragment(it).show(
+                    supportFragmentManager,
+                    StartingInDialogFragment.TAG
+                )
+            }
             playerViewAdapter.isYourTurn = data.isYourTurn
             goFishViewModel.showEndScreen(root, data.showScores)
             data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }

@@ -16,22 +16,21 @@ class DrawingCardAnimation(
     private var deltaY1: Float = 0f
 
     init {
+        duration = 1000
         viewTo.getLocationOnScreen(to)
         setAnimationListener(object : AnimationListener {
             override fun onAnimationStart(animation: Animation) {
                 view.visibility = View.VISIBLE
             }
-
             override fun onAnimationEnd(animation: Animation) {
                 view.visibility = View.GONE
             }
-
             override fun onAnimationRepeat(animation: Animation) {}
         })
     }
     override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-        view.translationX = fromX + deltaX1 * interpolatedTime
-        view.translationY = fromY + deltaY1 * interpolatedTime
+        view.translationX = fromX + deltaX1 * interpolatedTime - view.width / 2
+        view.translationY = fromY + deltaY1 * interpolatedTime - view.height / 2
     }
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
