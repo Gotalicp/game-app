@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.domain.game.GoFishLogic
 import com.example.game_app.ui.common.AppAcc
+import com.example.game_app.ui.common.Popup
 import java.security.PrivateKey
 
 @SuppressLint("InflateParams")
@@ -21,7 +22,7 @@ class EndScreenPopup(
     private val context: Context,
     private val players: List<GoFishLogic.Player>,
     private val users: List<AppAcc>
-) {
+):Popup {
     private val popupView: View
     private var popupWindow: PopupWindow? = null
     private val adapter: EndScreenAdapter
@@ -42,7 +43,7 @@ class EndScreenPopup(
         scoreboard.adapter = adapter
     }
 
-    fun showPopup(anchorView: View) {
+    override fun showPopup(anchorView: View) {
         popupWindow = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -58,5 +59,8 @@ class EndScreenPopup(
                 (context as? Activity)?.finish()
             }
         }
+    }
+    override fun dismissPopup() {
+        popupWindow?.dismiss()
     }
 }

@@ -20,6 +20,7 @@ import com.example.game_app.domain.SharedInformation
 import com.example.game_app.ui.common.CustomSpinnerAdapter
 import com.example.game_app.ui.common.ItemSelectedListener
 import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.ui.common.Popup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +30,7 @@ class LobbyPopup(
     private val context: Context,
     private val canChangeSettings: Boolean,
     private val startGame: (() -> Unit)
-) {
+): Popup{
     private val popupView: View
     private var popupWindow: PopupWindow? = null
     private val playersView: RecyclerView
@@ -96,14 +97,14 @@ class LobbyPopup(
             }
     }
 
-    fun showPopup(anchorView: View) {
+    override fun showPopup(view: View) {
         popupWindow = PopupWindow(
             popupView,
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         ).apply {
             showAtLocation(
-                anchorView,
+                view,
                 Gravity.CENTER,
                 0,
                 0
@@ -122,7 +123,7 @@ class LobbyPopup(
         }
     }
 
-    fun dismissPopup() {
+    override fun dismissPopup() {
         popupWindow?.dismiss()
     }
 }

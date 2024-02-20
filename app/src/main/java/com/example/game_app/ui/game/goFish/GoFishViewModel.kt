@@ -23,6 +23,7 @@ import com.example.game_app.domain.server.OkClient
 import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
 import com.example.game_app.ui.CountDown
+import com.example.game_app.ui.common.Popup
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GivingCardAnimation
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
@@ -64,7 +65,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     var goFishLogic = GoFishLogic()
 
     //PopUps
-    private lateinit var lobbyPopup: LobbyPopup
+    private lateinit var popup: Popup
     private var countDown: CountDown? = null
 
     //Game
@@ -101,8 +102,10 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     private suspend fun collectHasEnded(hasEnded: Boolean) {
         if (hasEnded) {
-            _state.value =
-                State.EndGame
+            goFishLogic.gamePlayers.value?.let {
+                players?.let { it1 -> popup = EndScreenPopup(application, it, it1) }
+            }
+            _state.value = State.EndGame
             rounds?.let {
                 if (rounds != 0) {
                     rounds = rounds!! - 1
@@ -151,7 +154,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 port = 8888
             ).apply {
                 join()
-                lobbyPopup = LobbyPopup(context, false) {}
+                popup = LobbyPopup(context, false) {}
 
             }
         } else {
@@ -161,7 +164,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 port = 8888
             ).apply {
                 join()
-                lobbyPopup = LobbyPopup(context, true) { createSeed() }
+                popup = LobbyPopup(context, true) { createSeed() }
             }
         }
         _state.value = State.PreGame
@@ -186,22 +189,14 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     //Ui Part
-    fun showLobby(data: Boolean, view: View) {
+    fun showPopup(data: Boolean, view: View) {
         try {
             if (data) {
-                lobbyPopup.showPopup(view)
+                popup.showPopup(view)
             } else {
-                lobbyPopup.dismissPopup()
+                popup.dismissPopup()
             }
         } catch (_: ExceptionInInitializerError) {
-        }
-    }
-
-    fun showEndScreen(view: View, check: Boolean) {
-        if (check) {
-            goFishLogic.gamePlayers.value?.let {
-                players?.let { it1 -> EndScreenPopup(application, it, it1).showPopup(view) }
-            }
         }
     }
 
@@ -213,7 +208,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         binding.apply {
             if (plays.isNotEmpty()) {
                 plays.last().let {
-                    val view1 = getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
+                    val view1 =
+                        getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
                     if (it.second != 0) {
                         try {
                             numberCards.text = "${it.second}x"
@@ -231,11 +227,13 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                                     GivingCardAnimation(
                                         this,
                                         view1,
-                                        getPositionById(playerView, it.first.askedPlayer)?.itemView?: profile
+                                        getPositionById(playerView, it.first.askedPlayer)?.itemView
+                                            ?: profile
                                     )
                                 )
                             }
-                        } catch (_: Exception) { }
+                        } catch (_: Exception) {
+                        }
                     } else {
                         numberCards.text = ""
                         imageCard.setImageResource(R.drawable.back)

@@ -93,7 +93,7 @@ class GoFishActivity : AppCompatActivity() {
     private fun updateContent(data: GoFishUiModel) {
         binding.apply {
             root.post {
-                goFishViewModel.showLobby(data.showLobby, root)
+                goFishViewModel.showPopup(data.showPopup, root)
             }
             data.startingIn?.let {
                 StartingInDialogFragment(it).show(
@@ -102,7 +102,6 @@ class GoFishActivity : AppCompatActivity() {
                 )
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
-            goFishViewModel.showEndScreen(root, data.showScores)
             data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }
             data.playerName?.let {goFishViewModel.showPlayerToTakeTurn(binding.playerTurn,it)}
         }
