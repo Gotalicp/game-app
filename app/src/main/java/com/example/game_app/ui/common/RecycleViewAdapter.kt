@@ -32,22 +32,20 @@ abstract class RecycleViewAdapter<T>(
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(items[position])
     }
-
     override fun getItemCount(): Int = items.size
-
-    fun updateItems(newItems: List<T>) {
-        DiffUtil.calculateDiff(
+    open fun updateItems(newItems: List<T>) {
+        val result = DiffUtil.calculateDiff(
             GenericDiffUtil(
                 oldList = items,
                 newList = newItems,
                 areItemsTheSame = areItemsTheSame,
                 areContentsTheSame = areContentsTheSame
-            ).apply {
-                items.clear()
-                items.addAll(newItems)
-                diffUtil = this
-            }
-        ).dispatchUpdatesTo(this)
+            )
+        )
+        items.clear()
+        items.addAll(newItems)
+        result.dispatchUpdatesTo(this)
+
     }
 
     open inner class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {

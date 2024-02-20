@@ -8,8 +8,8 @@ object GoFishUiMapper {
         is GoFishViewModel.State.Loading -> GoFishUiModel()
         is GoFishViewModel.State.MyTurn -> GoFishUiModel(
             isYourTurn = state.isYourTurn,
-            playerToTakeTurn = state.playerToTakeTurn,
-            playerToTakeTurnVisibility = state.visibility
+            playerUid = state.playerUid,
+            playerName = state.playerName,
         )
 
         is GoFishViewModel.State.EndGame -> GoFishUiModel(showScores = true)
