@@ -154,6 +154,6 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
         }
     }
     fun skipPlayer(){
-        _playerToTakeTurn.value?.let { indexOf(it) }?.let { nextPlayer(it) }
+        _playerToTakeTurn.value?.let { nextPlayer(indexOf(it)) }
     }
 }

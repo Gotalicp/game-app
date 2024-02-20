@@ -14,19 +14,13 @@ abstract class RecycleViewAdapter<T>(
 ) : RecyclerView.Adapter<RecycleViewAdapter<T>.BaseViewHolder>() {
 
     private val items = ArrayList<T>()
-    private var diffUtil: GenericDiffUtil<T>? = null
-    init {
-        diffUtil = GenericDiffUtil(
-            oldList = listOf(),
-            newList = listOf(),
-            areItemsTheSame = areItemsTheSame,
-            areContentsTheSame = areContentsTheSame
-        )
-    }
+    private var diffUtil: GenericDiffUtil<T> = GenericDiffUtil(
+        oldList = listOf(),
+        newList = listOf(),
+        areItemsTheSame = areItemsTheSame,
+        areContentsTheSame = areContentsTheSame
+    )
 
-    override fun getItemId(position: Int): Long {
-        return super.getItemId(position)
-    }
     abstract fun createViewHolder(view: View): BaseViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -42,27 +36,18 @@ abstract class RecycleViewAdapter<T>(
     override fun getItemCount(): Int = items.size
 
     fun updateItems(newItems: List<T>) {
-        diffUtil?.let {
-            val result = DiffUtil.calculateDiff(
-                GenericDiffUtil(
-                    oldList = items,
-                    newList = newItems,
-                    areItemsTheSame = areItemsTheSame,
-                    areContentsTheSame = areContentsTheSame
-                )
-            )
-
-            items.clear()
-            items.addAll(newItems)
-            diffUtil = GenericDiffUtil(
-                oldList = items.toList(),
-                newList = newItems.toList(),
+        DiffUtil.calculateDiff(
+            GenericDiffUtil(
+                oldList = items,
+                newList = newItems,
                 areItemsTheSame = areItemsTheSame,
                 areContentsTheSame = areContentsTheSame
-            )
-
-            result.dispatchUpdatesTo(this)
-        }
+            ).apply {
+                items.clear()
+                items.addAll(newItems)
+                diffUtil = this
+            }
+        ).dispatchUpdatesTo(this)
     }
 
     open inner class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {

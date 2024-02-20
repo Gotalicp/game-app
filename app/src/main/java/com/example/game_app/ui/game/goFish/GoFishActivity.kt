@@ -37,26 +37,23 @@ class GoFishActivity : AppCompatActivity() {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Log.d("called", "back")
+                Log.d("handleOnBackPressed", "Clicked")
             }
         })
+
         goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
         binding.root.post {
             goFishViewModel.joinGame(
                 code = intent.getStringExtra("code"),
                 uid = intent.getStringExtra("lobbyUid"),
                 ip = intent.getStringExtra("lobbyIp"),
-                this
-            )
+                this)
         }
 
         playerViewAdapter.apply {
             setHasStableIds(true)
             itemClickListener = object : ItemClickListener<AppAcc> {
-                override fun onItemClicked(
-                    item: AppAcc,
-                    itemPosition: Int
-                ) {
+                override fun onItemClicked(item: AppAcc, itemPosition: Int) {
                     CardPickerPopup(application).apply {
                         goFishViewModel.findMyDeck()?.let {
                             showPopup(binding.root, item, it)

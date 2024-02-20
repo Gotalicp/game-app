@@ -22,6 +22,7 @@ import kotlinx.coroutines.tasks.await
 class FireBaseUtility {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
     private var database = Firebase.database
+
     companion object {
         private var lobbyReference: DatabaseReference? = null
     }
@@ -59,10 +60,10 @@ class FireBaseUtility {
                 .addOnSuccessListener {
                     callback(CodeAdapter().adapt(it))
                 }.addOnFailureListener {
-                    Log.d("called","fail")
+                    Log.d("called", "fail")
                     callback(null)
                 }.addOnCanceledListener {
-                    Log.d("called","cancel")
+                    Log.d("called", "cancel")
                     callback(null)
                 }
         } catch (e: Exception) {
@@ -95,17 +96,14 @@ class FireBaseUtility {
 
     //Add a player to selected lobby in database
     fun joinLobby(code: String) {
-        try {
-            Log.d("pog", code)
-            acc.value?.let { acc ->
-                lobbyReference = database.getReference("lobby/${code}")
-                    .apply {
-                        addValueEventListener(listener)
-                        child("players").child("${acc.uid}").setValue(acc.uid ?: "")
-                    }
+        Log.d("pog", code)
+        acc.value?.let { acc ->
+            lobbyReference = database.getReference("lobby/${code}")
+                .apply {
+                    addValueEventListener(listener)
+                    child("players").child("${acc.uid}").setValue(acc.uid ?: "")
+                }
 
-            }
-        } catch (e: Exception) {
         }
     }
 

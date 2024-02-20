@@ -6,9 +6,12 @@ import android.view.animation.Transformation
 
 class DrawingCardAnimation(
     private val view: View,
-    private val toX: Float,
-    private val toY: Float
+    viewTo: View
 ) : Animation() {
+    private val to = IntArray(2)
+    init {
+        viewTo.getLocationOnScreen(to)
+    }
     private val fromX: Float = 0.0f
     private val fromY: Float = 0.0f
 
@@ -16,8 +19,8 @@ class DrawingCardAnimation(
     private var deltaY1: Float = 0f
     override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
         //TODO(Fix)
-        view.translationX = toX + deltaX1 * interpolatedTime
-        view.translationY = toY + deltaY1 * interpolatedTime
+        view.translationX = to[0] + deltaX1 * interpolatedTime
+        view.translationY = to[1] + deltaY1 * interpolatedTime
     }
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {

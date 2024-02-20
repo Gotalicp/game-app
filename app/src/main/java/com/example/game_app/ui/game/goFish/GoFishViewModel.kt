@@ -23,6 +23,7 @@ import com.example.game_app.domain.game.Rank
 import com.example.game_app.domain.server.OkClient
 import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
+import com.example.game_app.ui.CountDown
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GivingCardAnimation
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
@@ -58,15 +59,14 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     private var rounds: Int? = null
     private var timer: Long? = null
 
-    var uid = SharedInformation.getAcc().value?.uid
+    private var uid = SharedInformation.getAcc().value?.uid
     private var lobby = SharedInformation.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
 
     //PopUps
     private lateinit var lobbyPopup: LobbyPopup
-
-    val id = SharedInformation.getAcc().value?.uid
+    private var countDown: CountDown? = null
 
     //Game
     init {
@@ -84,11 +84,10 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private suspend fun collectPlayer(player: String) {
-        Log.d("GoFishViewModel", "Player To Take Turn: $player")
+        countDown?.cancelCountdown()
         _state.postValue(cache.get(player)?.username?.let { name ->
             State.MyTurn((player == uid), name, View.VISIBLE)
         })
-        delay(3000L)
     }
 
     private suspend fun collectSeed(seed: Long) {
@@ -124,8 +123,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             rounds = lobby.rounds
             try {
                 timer = lobby.secPerTurn.toLong() * 1000
-            } catch (_: Exception) {
-            }
+            } catch (_: Exception) { }
         }
     }
 
@@ -201,10 +199,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     fun showEndScreen(view: View, check: Boolean) {
         if (check) {
             goFishLogic.gamePlayers.value?.let {
-                EndScreenPopup(
-                    application.applicationContext,
-                    it
-                ).showPopup(view)
+                EndScreenPopup(application, it).showPopup(view)
             }
         }
     }
@@ -214,28 +209,23 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         plays: MutableList<Pair<GoFishLogic.Play, Int>>,
         binding: ActivityGoFishBinding
     ) {
-        val idImage = ""
         binding.apply {
             if (plays.isNotEmpty()) {
                 plays.last().let {
                     val view1 = if (it.first.askingPlayer != uid) {
                         getPositionById(playerView, it.first.askingPlayer)
-                    } else {
-                        profile
-                    }
+                    } else { profile }
                     if (it.second != 0) {
                         val view2 =
                             if (it.first.askedPlayer != uid) {
                                 getPositionById(playerView, it.first.askedPlayer)
-                            } else {
-                                profile
-                            }
+                            } else { profile }
                         try {
                             numberCards.text = "${it.second}x"
                             imageCard.setImageDrawable(
                                 ContextCompat.getDrawable(
                                     root.context, root.context.resources.getIdentifier(
-                                        idImage,
+                                        it.first.rank.toString(),
                                         "drawable",
                                         root.context.packageName
                                     )
@@ -243,8 +233,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                             )
                             if (view1 != null && view2 != null)
                                 givingCardAnimation(view2, view1, binding)
-                        } catch (_: Exception) {
-                        }
+                        } catch (_: Exception) { }
                     } else {
                         numberCards.text = ""
                         imageCard.setImageResource(R.drawable.back)
@@ -257,8 +246,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private fun getPositionById(recyclerView: RecyclerView, id: String): View? {
-        val itemCount = recyclerView.adapter?.itemCount ?: 0
-        for (i in 0 until itemCount) {
+        for (i in 0 until (recyclerView.adapter?.itemCount?: 0)) {
             (recyclerView.findViewHolderForAdapterPosition(i) as? PlayersRecycleView.PlayersViewHolder)?.let {
                 if (it.id == id) {
                     return it.itemView
@@ -268,70 +256,29 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         return null
     }
 
-    fun setTimer(binding: ActivityGoFishBinding, uid: String) {
+    fun setTimer(binding: ActivityGoFishBinding,uid: String) {
         timer?.let {
-            callTimer(getPositionById(binding.playerView, uid)?.findViewById(R.id.timeTurn) ?:binding.timeTurn)
+            countDown = CountDown(
+                (getPositionById(binding.playerView, uid)?.findViewById(R.id.timeTurn)
+                    ?: binding.timeTurn), { goFishLogic.skipPlayer() }, timer!!, 1000
+            )
         }
     }
 
-    private var countDown: CountDownTimer? = null
-    private fun callTimer(progress: ProgressBar) {
-        countDown?.cancel()
-        progress.visibility = View.VISIBLE
-        countDown = object : CountDownTimer(timer!!, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                progress.progress = (millisUntilFinished / 1000).toInt()
-            }
-            override fun onFinish() {
-                Log.d("tick", "pog2")
-                progress.progress = 0
-                progress.visibility = View.GONE
-                goFishLogic.skipPlayer()
-            }
-        }
-        countDown?.start()
-    }
-
-    private fun givingCardAnimation(
-        view1: View,
-        view2: View,
-        binding: ActivityGoFishBinding
-    ) {
+    private fun givingCardAnimation(view1: View, view2: View, binding: ActivityGoFishBinding) {
         binding.movableCard.apply {
             visibility = View.VISIBLE
-            val coordinates1 = IntArray(2)
-            view1.getLocationOnScreen(coordinates1)
-            val coordinates2 = IntArray(2)
-            view2.getLocationOnScreen(coordinates2)
             startAnimation(
-                GivingCardAnimation(
-                    this,
-                    coordinates1[0].toFloat(),
-                    coordinates1[1].toFloat(),
-                    coordinates2[0].toFloat(),
-                    coordinates2[1].toFloat()
-                ).apply {
-                    duration = 1000
-                })
+                GivingCardAnimation(this, view1, view2)
+                    .apply { duration = 1000 })
         }
     }
-
-    private fun drawingCardAnimation(
-        view: View,
-        binding: ActivityGoFishBinding
-    ) {
+    private fun drawingCardAnimation(view: View, binding: ActivityGoFishBinding) {
         binding.movableCard.apply {
             visibility = View.VISIBLE
-            val coordinates1 = IntArray(2)
-            view.getLocationOnScreen(coordinates1)
             startAnimation(
-                DrawingCardAnimation(
-                    this,
-                    coordinates1[0].toFloat(),
-                    coordinates1[1].toFloat(),
-                ).apply {
-                    duration = 1000
-                })
+                DrawingCardAnimation(this, view)
+                    .apply { duration = 1000 })
         }
     }
 }
