@@ -11,9 +11,9 @@ class AccAdapter : Adapter<DataSnapshot?, AppAcc?> {
             return t.child("username").getValue(String::class.java)?.let { it1 ->
                 AppAcc(
                     it1,
-                    t.child("uid").getValue(String::class.java),
+                    t.child("uid").getValue(String::class.java)?:"",
                     t.child("image").getValue(String::class.java)
-                        ?.let { it1 -> BitmapReverser().adapt(it1) })
+                        ?.let { it2 -> BitmapReverser().adapt(it2) })
             }
         }
     }

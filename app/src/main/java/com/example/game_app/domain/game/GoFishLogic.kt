@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.domain.SharedInformation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.Serializable
 import java.util.Random
@@ -18,7 +19,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     data class Player(
         val deck: MutableList<Card>,
-        val uid: String,
+        var uid: String,
         var score: Int
     ) : Serializable
 
@@ -27,7 +28,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     val gamePlayers: LiveData<MutableList<Player>> get() = _gamePlayers
 
     //Checking who's turn is it
-    private val _playerToTakeTurn = MutableStateFlow<String?>(null)
+    private val _playerToTakeTurn = MutableSharedFlow<String>()
     val playerToTakeTurn: Flow<String?> get() = _playerToTakeTurn
 
     private val _hasEnded = MutableStateFlow(false)
@@ -36,8 +37,8 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     private val _seed = MutableStateFlow<Long?>(null)
     val seed: Flow<Long?> get() = _seed
 
-    private val _play = MutableLiveData<MutableList<Pair<Play, Int>>>()
-    val play: LiveData<MutableList<Pair<Play, Int>>> get() = _play
+    private val _play = MutableLiveData<Pair<Play, Int>>()
+    val play: LiveData <Pair<Play, Int>> get() = _play
 
     //Initiate deck
     private var deck = Deck()
@@ -51,13 +52,12 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
         _seed.value = seed
     }
 
-    override fun startGame(seed: Long) {
+    override suspend fun startGame(seed: Long) {
         if (_gamePlayers.value == null) {
             SharedInformation.getLobby().value?.players?.let { setPlayer(it) }
         }
         _hasEnded.value = false
         deck = resetDeck()
-        _play.postValue(mutableListOf())
         deck.shuffle(seed)
         deck.showDeck()
         if (!_gamePlayers.value.isNullOrEmpty()) {
@@ -70,22 +70,19 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
                         }
                     }
                     _gamePlayers.postValue(players)
-                    _playerToTakeTurn.value = players[0].uid
+                    _playerToTakeTurn.emit(players[0].uid)
                 }
             }
         }
     }
 
-    override fun turnHandling(t: Play) {
+    override suspend fun turnHandling(t: Play) {
         // Check if the asked player has any cards of the requested rank
         val askingIndex = indexOf(t.askingPlayer)
         _gamePlayers.value?.let { player ->
             val cardsReceived = player[indexOf(t.askedPlayer)].deck.filter { it.rank == t.rank }
             //Add whats happening to the game
-            _play.value?.let { play ->
-                play.add(Pair(t, cardsReceived.size))
-                _play.postValue(play)
-            }
+                _play.postValue(Pair(t, cardsReceived.size))
             //If there are card give them
             if (cardsReceived.isNotEmpty()) {
                 player.find { it.uid == t.askingPlayer }?.let {
@@ -112,17 +109,16 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
             }
             // Check for books in the current player's hand
             _gamePlayers.postValue(player)
-            _hasEnded.value = checkEndGame()
         }
     }
 
 
-    private fun hasBook(hand: Player, index: Int): Boolean {
+    private suspend fun hasBook(hand: Player, index: Int): Boolean {
         hand.deck.groupBy { it.rank }.let { card ->
             for (rank in card.keys) {
                 //Checks if all of current rank suit are in a players hand
                 if (card[rank]?.size == 4) {
-                    Log.d("CheckBook", "Player ${_playerToTakeTurn.value} books $rank")
+                    Log.d("CheckBook", "Player $_playerToTakeTurn books $rank")
                     hand.deck.removeAll { it.rank == rank }
                     hand.score += 1
                     if (isHandEmpty(hand)) {
@@ -146,27 +142,27 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.uid == uid } ?: 0
 
     //Sets the next player
-    private fun nextPlayer(index: Int) {
+    private suspend fun nextPlayer(index: Int) {
         checkEndGame().let { ended ->
             if (!ended) {
                 gamePlayers.value?.let {
                     if (it[(index + 1) % it.size].deck.isNotEmpty()) {
-                        _playerToTakeTurn.value = it[(index + 1) % it.size].uid
+                        _playerToTakeTurn.emit(it[(index + 1) % it.size].uid)
                     } else {
                         nextPlayer(index + 1)
                     }
                 }
             } else {
-                _hasEnded.value = checkEndGame()
+                _hasEnded.value = true
             }
         }
     }
 
-    private fun setSamePlayer(index: Int) {
+    private suspend fun setSamePlayer(index: Int) {
         if (!_hasEnded.value) {
             gamePlayers.value?.get(index)?.let {
                 if (it.deck.isNotEmpty()) {
-                    _playerToTakeTurn.value = it.uid
+                    _playerToTakeTurn.emit(it.uid)
                 } else {
                     nextPlayer(index)
                 }
@@ -174,7 +170,9 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
         }
     }
 
-    fun skipPlayer() {
-        _playerToTakeTurn.value?.let { nextPlayer(indexOf(it)) }
+    suspend fun skipPlayer(uid: String) {
+        nextPlayer(indexOf(uid))
     }
+
+    fun getPlayer(uid: String) = _gamePlayers.value?.find { it.uid == uid }
 }

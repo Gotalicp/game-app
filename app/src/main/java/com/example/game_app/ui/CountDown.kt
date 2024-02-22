@@ -26,7 +26,7 @@ class CountDown(
     }
 
     override fun onFinish() {
-        onFinishCallback.invoke()
+        onFinishCallback
         progressBar.progress = 0
         progressBar.visibility = View.INVISIBLE
     }

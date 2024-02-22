@@ -12,6 +12,6 @@ object GoFishUiMapper {
             playerName = state.playerName,
         )
         is GoFishViewModel.State.EndGame -> GoFishUiModel(showPopup = true)
-        is GoFishViewModel.State.StartingIn -> GoFishUiModel(startingIn = state.startingIn, startingInVisibility = View.VISIBLE)
+        is GoFishViewModel.State.StartingIn -> GoFishUiModel(startingIn = state.startingIn, showPopup = state.showPopup, startingInVisibility = View.VISIBLE)
     }
 }

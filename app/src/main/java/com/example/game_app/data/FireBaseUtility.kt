@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 
 class FireBaseUtility {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
@@ -96,12 +97,11 @@ class FireBaseUtility {
 
     //Add a player to selected lobby in database
     fun joinLobby(code: String) {
-        Log.d("pog", code)
         acc.value?.let { acc ->
             lobbyReference = database.getReference("lobby/${code}")
                 .apply {
                     addValueEventListener(listener)
-                    child("players").child("${acc.uid}").setValue(acc.uid ?: "")
+                    child("players").child(acc.uid).setValue(acc.uid)
                 }
 
         }
@@ -152,6 +152,14 @@ class FireBaseUtility {
     fun logout() {
         Firebase.auth.signOut()
         SharedInformation.updateLogged(false)
+    }
+
+    fun updateHistory(history: GameHistory) {
+        database.getReference("user/${acc.value?.uid}/history").setValue(
+            history.apply {
+                date = Date().time.toString()
+            })
+        Log.d("called", "made")
     }
 
     suspend fun getUserInfo(uid: String): AppAcc? {

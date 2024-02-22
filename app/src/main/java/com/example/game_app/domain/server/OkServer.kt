@@ -1,6 +1,7 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
+import androidx.coordinatorlayout.widget.CoordinatorLayout.DispatchChangeEvent
 import com.example.game_app.domain.game.GameLogic
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.data.FireBaseUtility
@@ -15,6 +16,10 @@ import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClient
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClientPool
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerActionListener
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerShutdown
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.Serializable
 
 class OkServer<T : Serializable>(
@@ -106,7 +111,9 @@ class OkServer<T : Serializable>(
             ISendableData(Gson().toJson(data))
         )
         if (expectedTClazz.isInstance(data)) {
-            gameLogic.turnHandling(data as T)
+            CoroutineScope(Dispatchers.Default).launch {
+                gameLogic.turnHandling(data as T)
+            }
         }
     }
 

@@ -10,6 +10,9 @@ import com.xuhao.didi.socket.client.sdk.OkSocket
 import com.xuhao.didi.socket.client.sdk.client.ConnectionInfo
 import com.xuhao.didi.socket.client.sdk.client.OkSocketOptions
 import com.xuhao.didi.socket.client.sdk.client.action.SocketActionAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.Serializable
 import java.lang.Exception
 
@@ -57,7 +60,9 @@ class OkClient<T : Serializable>(
                                 try {
                                     Gson().fromJson(data, expectedTClazz).let {
                                         Log.d("DATAPlay", it.toString())
-                                        gameLogic.turnHandling(it)
+                                        CoroutineScope(Dispatchers.Default).launch {
+                                            gameLogic.turnHandling(it)
+                                        }
                                     }
                                 } catch (_: JsonSyntaxException) {
                                 }

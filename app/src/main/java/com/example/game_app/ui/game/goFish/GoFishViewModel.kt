@@ -13,6 +13,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
+import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.data.GameHistory
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.SharedInformation
@@ -46,7 +48,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         ) : State
 
         data object EndGame : State
-        data class StartingIn(val startingIn: Long) : State
+        data class StartingIn(val startingIn: Long, val showPopup: Boolean) : State
     }
 
     private val _state = MutableLiveData<State>()
@@ -58,6 +60,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     var players: List<AppAcc>? = null
     private var rounds: Int? = null
     private var timer: Long? = null
+
+    private var createSeed: (() -> Unit)? = null
 
     private var uid = SharedInformation.getAcc().value?.uid
     private var lobby = SharedInformation.getLobby()
@@ -95,7 +99,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             setUp()
         }
         Log.d("GoFishViewModel", "Seed: $seed")
-        _state.postValue(State.StartingIn(5000L))
+        _state.postValue(State.StartingIn(5000L, false))
         delay(5000L)
         goFishLogic.startGame(seed)
     }
@@ -107,11 +111,20 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             }
             _state.value = State.EndGame
             rounds?.let {
-                if (rounds != 0) {
-                    rounds = rounds!! - 1
-                    _state.postValue(State.StartingIn(5000L))
-                    delay(5000L)
-                    createSeed()
+                rounds = rounds!! - 1
+                if (rounds!! > 0) {
+                    createSeed?.invoke()
+                } else {
+                    Log.d("called", "called")
+                    players?.let { players ->
+                        Log.d("called", "called1")
+                        players.associate {
+                            Pair(it.uid, goFishLogic.getPlayer(it.uid)?.score ?: 0)
+                        }.let { map ->
+                            Log.d("called", "called2")
+                            FireBaseUtility().updateHistory(GameHistory(map, null, "GoFish"))
+                        }
+                    }
                 }
             }
         }
@@ -121,7 +134,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         lobby.value?.let { lobby ->
             players = lobby.players.map {
                 PlayerCache.instance.get(it)!!
-            }.toList()
+            }
             rounds = lobby.rounds
             try {
                 timer = lobby.secPerTurn.toLong() * 1000
@@ -132,10 +145,10 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     //Methods to get Information from GameLogic
     fun findPlayers() =
-        goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayersMap ->
+        goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayers ->
             players?.mapNotNull { player ->
-                gamePlayersMap[player.uid]?.let { gamePlayer ->
-                    Pair(gamePlayer.deck, player)
+                gamePlayers[player.uid]?.let {
+                    Pair(it.deck, player)
                 }
             }
         }?.partition { it.second.uid == uid }
@@ -155,7 +168,6 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
             ).apply {
                 join()
                 popup = LobbyPopup(context, false) {}
-
             }
         } else {
             OkServer(
@@ -164,17 +176,16 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 port = 8888
             ).apply {
                 join()
-                popup = LobbyPopup(context, true) { createSeed() }
+                createSeed = {
+                    Random.nextLong().let { seed ->
+                        goFishLogic.updateSeed(seed)
+                        server?.send(seed)
+                    }
+                }
+                popup = LobbyPopup(context, true) { createSeed?.invoke() }
             }
         }
         _state.value = State.PreGame
-    }
-
-    private fun createSeed() {
-        Random.nextLong().let { seed ->
-            goFishLogic.updateSeed(seed)
-            server?.send(seed)
-        }
     }
 
     fun write(player: String, card: Rank) {
@@ -202,44 +213,42 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     @SuppressLint("DiscouragedApi", "SetTextI18n")
     fun showAnimation(
-        plays: MutableList<Pair<GoFishLogic.Play, Int>>,
+        plays: Pair<GoFishLogic.Play, Int>,
         binding: ActivityGoFishBinding
     ) {
         binding.apply {
-            if (plays.isNotEmpty()) {
-                plays.last().let {
-                    val view1 =
-                        getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
-                    if (it.second != 0) {
-                        try {
-                            numberCards.text = "${it.second}x"
-                            imageCard.setImageDrawable(
-                                ContextCompat.getDrawable(
-                                    root.context, root.context.resources.getIdentifier(
-                                        it.first.rank.name.lowercase(),
-                                        "drawable",
-                                        root.context.packageName
-                                    )
+            plays.let {
+                val view1 =
+                    getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
+                if (it.second != 0) {
+                    try {
+                        numberCards.text = "${it.second}x"
+                        imageCard.setImageDrawable(
+                            ContextCompat.getDrawable(
+                                root.context, root.context.resources.getIdentifier(
+                                    it.first.rank.name.lowercase(),
+                                    "drawable",
+                                    root.context.packageName
                                 )
                             )
-                            movableCard.apply {
-                                startAnimation(
-                                    GivingCardAnimation(
-                                        this,
-                                        view1,
-                                        getPositionById(playerView, it.first.askedPlayer)?.itemView
-                                            ?: profile
-                                    )
-                                )
-                            }
-                        } catch (_: Exception) {
-                        }
-                    } else {
-                        numberCards.text = ""
-                        imageCard.setImageResource(R.drawable.back)
+                        )
                         movableCard.apply {
-                            startAnimation(DrawingCardAnimation(this, view1))
+                            startAnimation(
+                                GivingCardAnimation(
+                                    this,
+                                    view1,
+                                    getPositionById(playerView, it.first.askedPlayer)?.itemView
+                                        ?: profile
+                                )
+                            )
                         }
+                    } catch (_: Exception) {
+                    }
+                } else {
+                    numberCards.text = ""
+                    imageCard.setImageResource(R.drawable.back)
+                    movableCard.apply {
+                        startAnimation(DrawingCardAnimation(this, view1))
                     }
                 }
             }
@@ -264,7 +273,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         if (!players.isNullOrEmpty() && timer != null) {
             countDown = CountDown(
                 (getPositionById(binding.playerView, uid)?.timer ?: binding.timeTurn),
-                { goFishLogic.skipPlayer() },
+                { viewModelScope.launch { goFishLogic.skipPlayer(uid) } },
                 timer!!,
                 1000
             )

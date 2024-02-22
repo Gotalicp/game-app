@@ -112,12 +112,12 @@ class LobbyPopup(
             popupView.findViewById<Button>(R.id.btn_start).apply {
                 visibility = if (canChangeSettings) View.VISIBLE else View.GONE
                 setOnClickListener {
-                    dismiss()
+                    dismissPopup()
                     startGame.invoke()
                 }
             }
             popupView.findViewById<Button>(R.id.btn_exit).setOnClickListener {
-                dismiss()
+                dismissPopup()
                 (context as? Activity)?.finish()
             }
         }
