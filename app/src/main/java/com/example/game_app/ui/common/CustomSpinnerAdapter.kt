@@ -11,36 +11,27 @@ import android.widget.TextView
 
 class CustomSpinnerAdapter<T>(
     private val context: Context,
-    private val data: List<T>,
-    private val listener: ItemSelectedListener<T>
-) : SpinnerAdapter {
-
-    private var selectedPosition: Int = 0
-    private var isEnabled: Boolean = false
-
+    private val data: List<T>) : SpinnerAdapter {
     override fun getCount(): Int = data.size
 
     override fun getItem(position: Int): T = data[position]
 
     override fun getItemId(position: Int): Long = position.toLong()
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val textView = TextView(context)
-        textView.text = data[position].toString()
-        return textView
-    }
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?) =
+        TextView(context).apply {
+            text = data[position].toString()
+        }
 
-    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        TextView(context).let {
-            it.text = data[position].toString()
-            it.layoutParams = ViewGroup.LayoutParams(
+    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?) =
+        TextView(context).apply {
+            text = data[position].toString()
+            layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            it.setPadding(16, 16, 16, 16)
-            return it
+            setPadding(16, 16, 16, 16)
         }
-    }
 
     override fun getItemViewType(position: Int): Int = 0
 
@@ -54,28 +45,5 @@ class CustomSpinnerAdapter<T>(
     }
 
     override fun unregisterDataSetObserver(observer: DataSetObserver?) {
-    }
-
-    fun setItemSelectedListener(spinner: Spinner, position: Int, enabled: Boolean) {
-        selectedPosition = position
-        isEnabled = enabled
-
-        spinner.adapter = this
-
-        spinner.setSelection(selectedPosition)
-        spinner.isEnabled = isEnabled
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                selectedPosition = position
-                listener.onItemSelected(data[position])
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
     }
 }

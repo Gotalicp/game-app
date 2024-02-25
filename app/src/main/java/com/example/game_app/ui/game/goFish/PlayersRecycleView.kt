@@ -11,7 +11,7 @@ import com.example.game_app.domain.game.Card
 import com.example.game_app.ui.common.AppAcc
 
 class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
-    { oldItem, newItem -> oldItem.first != newItem.first },
+    { oldItem, newItem -> oldItem.first.size == newItem.first.size },
     { oldItem, newItem -> oldItem.first == newItem.first },
     R.layout.item_go_fish_player_card
 ) {
@@ -27,7 +27,7 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<MutableList<Card>, AppAcc>>(
 
         override fun bind(item: Pair<MutableList<Card>, AppAcc>) {
             super.bind(item)
-            id = item.second.uid.toString()
+            id = item.second.uid
             profile.setImageBitmap(item.second.image)
             name.text = item.second.username
             cards.text = item.first.size.toString()

@@ -3,6 +3,8 @@ package com.example.game_app.data
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.example.game_app.domain.AccountProvider
+import com.example.game_app.domain.LobbyProvider
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.domain.bitmap.BitmapConverter
 import com.example.game_app.domain.firebase.AccAdapter
@@ -30,14 +32,14 @@ class FireBaseUtility {
 
     private val listener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
-            SharedInformation.updateLobby(lobbyInfoAdapter.adapt(snapshot))
+            LobbyProvider.updateLobby(lobbyInfoAdapter.adapt(snapshot))
         }
 
         override fun onCancelled(error: DatabaseError) {
             Log.e("Firebase", "Cancelled")
         }
     }
-    private val acc: LiveData<AppAcc> = SharedInformation.getAcc()
+    private val acc: LiveData<AppAcc> = AccountProvider.getAcc()
 
     fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
         database.getReference("lobby/$uid").get()
@@ -122,23 +124,19 @@ class FireBaseUtility {
     }
 
     private fun stopObservingLobby() {
-        SharedInformation.updateLobby(null)
+        LobbyProvider.updateLobby(null)
         lobbyReference?.removeEventListener(listener)
         lobbyReference = null
     }
 
     fun updateLobby(
         playerLimit: Int? = null,
-        lobbyName: String? = null,
         rounds: Int? = null,
         secPerTurn: String? = null
     ) {
         lobbyReference?.apply {
             playerLimit?.let {
                 child("maxPlayerCount").setValue(it)
-            }
-            lobbyName?.let {
-                child("LobbyName").setValue(it)
             }
             rounds?.let {
                 child("rounds").setValue(it)
@@ -183,7 +181,7 @@ class FireBaseUtility {
         Firebase.database.getReference("user/$uid")
             .setValue(FireBaseAcc(username, uid, BitmapConverter().adapt(image)))
             .addOnCompleteListener {
-                SharedInformation.updateAcc(AppAcc(username, uid, image))
+                AccountProvider.updateAcc(AppAcc(username, uid, image))
                 SharedInformation.updateLogged(true)
             }.addOnFailureListener {
                 logout()

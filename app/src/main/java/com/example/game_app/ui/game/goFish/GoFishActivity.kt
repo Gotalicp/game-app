@@ -14,6 +14,7 @@ import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
+import com.example.game_app.ui.game.goFish.popup.LobbyDialogFragment
 import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
 
 class GoFishActivity : AppCompatActivity() {
@@ -40,7 +41,8 @@ class GoFishActivity : AppCompatActivity() {
                 code = intent.getStringExtra("code"),
                 uid = intent.getStringExtra("lobbyUid"),
                 ip = intent.getStringExtra("lobbyIp"),
-                this)
+                this
+            )
         }
 
         playerViewAdapter.apply {
@@ -54,7 +56,7 @@ class GoFishActivity : AppCompatActivity() {
                         adapter.itemClickListener = object : ItemClickListener<Rank> {
                             override fun onItemClicked(card: Rank, itemPosition: Int) {
                                 dismiss()
-                                item.uid?.let { goFishViewModel.write(it, card) }
+                                item.uid.let { goFishViewModel.write(it, card) }
                             }
                         }
                     }
@@ -92,18 +94,21 @@ class GoFishActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateContent(data: GoFishUiModel) {
         binding.apply {
-            root.post {
-                goFishViewModel.showPopup(data.showPopup, root)
-            }
             data.startingIn?.let {
                 StartingInDialogFragment(it).show(
                     supportFragmentManager,
                     StartingInDialogFragment.TAG
                 )
             }
+            data.showLobby?.let {
+                LobbyDialogFragment(it, goFishViewModel.createSeed).show(
+                        supportFragmentManager,
+                        LobbyDialogFragment.TAG
+                    )
+            }
             playerViewAdapter.isYourTurn = data.isYourTurn
             data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }
-            data.playerName?.let {goFishViewModel.showPlayerToTakeTurn(binding.playerTurn,it)}
+            data.playerName?.let { goFishViewModel.showPlayerToTakeTurn(binding.playerTurn, it) }
         }
     }
 

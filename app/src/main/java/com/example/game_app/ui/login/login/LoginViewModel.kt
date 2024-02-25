@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.game_app.data.PlayerCache
+import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.ui.login.AuthenticationState
 import com.google.firebase.Firebase
@@ -26,7 +27,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         viewModelScope.launch {
                             PlayerCache.instance.get(uid)
                                 ?.let {
-                                    SharedInformation.updateAcc(it)
+                                    AccountProvider.updateAcc(it)
                                     _state.value = AuthenticationState.Success(true)
                                     SharedInformation.updateLogged(true)
                                 }

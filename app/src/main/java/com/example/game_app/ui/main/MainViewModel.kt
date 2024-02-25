@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.game_app.data.FireBaseUtility
 import com.example.game_app.data.PlayerCache
+import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.ui.login.AuthenticationActivity
 import com.google.firebase.Firebase
@@ -22,7 +23,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         viewModelScope.launch {
             Firebase.auth.currentUser?.let {
                 PlayerCache.instance.get(it.uid)?.let { acc ->
-                    SharedInformation.updateAcc(acc)
+                    AccountProvider.updateAcc(acc)
                 }
             } ?: run { FireBaseUtility().logout() }
 

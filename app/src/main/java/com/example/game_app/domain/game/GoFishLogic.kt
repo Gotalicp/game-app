@@ -3,6 +3,7 @@ package com.example.game_app.domain.game
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.game_app.domain.LobbyProvider
 import com.example.game_app.domain.SharedInformation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,7 +55,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     override suspend fun startGame(seed: Long) {
         if (_gamePlayers.value == null) {
-            SharedInformation.getLobby().value?.players?.let { setPlayer(it) }
+            LobbyProvider.getLobby().value?.players?.let { setPlayer(it) }
         }
         _hasEnded.value = false
         deck = resetDeck()

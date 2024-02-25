@@ -6,6 +6,7 @@ data class GoFishUiModel(
     val inGame: Boolean = false,
     val isYourTurn: Boolean = false,
     val showPopup: Boolean = false,
+    val showLobby: Boolean? = null,
     val startingIn: Long? = null,
     val startingInVisibility: Int = View.GONE,
     val playerName: String? = null,

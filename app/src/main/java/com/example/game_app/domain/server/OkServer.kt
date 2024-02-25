@@ -5,6 +5,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout.DispatchChangeEvent
 import com.example.game_app.domain.game.GameLogic
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.domain.AccountProvider
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.xuhao.didi.core.iocore.interfaces.ISendable
@@ -44,7 +45,7 @@ class OkServer<T : Serializable>(
             serverPort: Int,
             clientPool: IClientPool<*, *>?
         ) {
-            send(SharedInformation.getAcc().value?.uid.toString())
+            send(AccountProvider.getAcc().value?.uid.toString())
             Log.d("OkServer", "Client connected")
             client?.addIOCallback(object : IClientIOCallback {
                 override fun onClientRead(

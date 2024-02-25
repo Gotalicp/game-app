@@ -44,26 +44,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="10dp"
         android:background="@drawable/go_fish_player_card"
         android:elevation="10dp"
         android:orientation="vertical"
         android:padding="10dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/table"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/table">
 
-        <ImageView
-            android:id="@+id/your_image"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_image"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
+            app:cardCornerRadius="10dp"
             android:background="@drawable/rounded_image"
-            android:src="@drawable/image"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/your_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/image"
+                android:scaleType="centerCrop" />
+        </androidx.cardview.widget.CardView>
 
         <ProgressBar
             android:id="@+id/timeTurn"
@@ -86,7 +92,7 @@
             android:text="@string/username"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/your_image" />
+            app:layout_constraintTop_toBottomOf="@id/card_image" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -98,6 +104,8 @@
         android:orientation="horizontal"
         android:overScrollMode="never"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constrainedWidth="true"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/table"
         app:layout_constraintStart_toStartOf="@id/table"
@@ -121,6 +129,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#FF0000"
+        android:padding="5dp"
         android:text=""
         android:textSize="50sp"
         android:visibility="gone"
@@ -145,7 +154,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-5dp"
                 android:elevation="1dp"
-                android:text="3x"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"

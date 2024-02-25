@@ -19,6 +19,8 @@ import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.databinding.ActivityGoFishBinding
+import com.example.game_app.domain.AccountProvider
+import com.example.game_app.domain.LobbyProvider
 import com.example.game_app.domain.game.GoFishLogic
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.domain.server.OkClient
@@ -29,7 +31,6 @@ import com.example.game_app.ui.common.Popup
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GivingCardAnimation
 import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
-import com.example.game_app.ui.game.goFish.popup.LobbyPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -40,7 +41,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     //States
     sealed interface State {
         data object Loading : State
-        data object PreGame : State
+        data class PreGame(val showLobby: Boolean) : State
         data class MyTurn(
             val isYourTurn: Boolean,
             val playerUid: String,
@@ -58,13 +59,13 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     private var server: ServerInterface<GoFishLogic.Play>? = null
 
     var players: List<AppAcc>? = null
-    private var rounds: Int? = null
+    private var rounds: Int = -1
     private var timer: Long? = null
 
-    private var createSeed: (() -> Unit)? = null
+    var createSeed: (() -> Unit)? = null
 
-    private var uid = SharedInformation.getAcc().value?.uid
-    private var lobby = SharedInformation.getLobby()
+    private var uid = AccountProvider.getAcc().value?.uid
+    private var lobby = LobbyProvider.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
 
@@ -104,26 +105,23 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
         goFishLogic.startGame(seed)
     }
 
-    private suspend fun collectHasEnded(hasEnded: Boolean) {
+    private fun collectHasEnded(hasEnded: Boolean) {
         if (hasEnded) {
             goFishLogic.gamePlayers.value?.let {
-                players?.let { it1 -> popup = EndScreenPopup(application, it, it1) }
+                players?.let { it1 ->
+                    popup = EndScreenPopup(application.applicationContext, it, it1)
+                }
             }
             _state.value = State.EndGame
-            rounds?.let {
-                rounds = rounds!! - 1
-                if (rounds!! > 0) {
-                    createSeed?.invoke()
-                } else {
-                    Log.d("called", "called")
-                    players?.let { players ->
-                        Log.d("called", "called1")
-                        players.associate {
-                            Pair(it.uid, goFishLogic.getPlayer(it.uid)?.score ?: 0)
-                        }.let { map ->
-                            Log.d("called", "called2")
-                            FireBaseUtility().updateHistory(GameHistory(map, null, "GoFish"))
-                        }
+            this.rounds = rounds - 1
+            if (this.rounds > 0) {
+                createSeed?.invoke()
+            } else {
+                players?.let { players ->
+                    players.associate {
+                        Pair(it.uid, goFishLogic.getPlayer(it.uid)?.score ?: 0)
+                    }.let { map ->
+                        FireBaseUtility().updateHistory(GameHistory(map, null, "GoFish"))
                     }
                 }
             }
@@ -167,7 +165,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                 port = 8888
             ).apply {
                 join()
-                popup = LobbyPopup(context, false) {}
+                _state.value = State.PreGame(false)
             }
         } else {
             OkServer(
@@ -182,10 +180,9 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                         server?.send(seed)
                     }
                 }
-                popup = LobbyPopup(context, true) { createSeed?.invoke() }
+                _state.value = State.PreGame(true)
             }
         }
-        _state.value = State.PreGame
     }
 
     fun write(player: String, card: Rank) {
@@ -200,16 +197,6 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     //Ui Part
-    fun showPopup(data: Boolean, view: View) {
-        try {
-            if (data) {
-                popup.showPopup(view)
-            } else {
-                popup.dismissPopup()
-            }
-        } catch (_: ExceptionInInitializerError) {
-        }
-    }
 
     @SuppressLint("DiscouragedApi", "SetTextI18n")
     fun showAnimation(
@@ -270,13 +257,15 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     fun setTimer(binding: ActivityGoFishBinding, uid: String) {
-        if (!players.isNullOrEmpty() && timer != null) {
-            countDown = CountDown(
-                (getPositionById(binding.playerView, uid)?.timer ?: binding.timeTurn),
-                { viewModelScope.launch { goFishLogic.skipPlayer(uid) } },
-                timer!!,
-                1000
-            )
+        if (!players.isNullOrEmpty()) {
+            timer?.let {
+                countDown = CountDown(
+                    (getPositionById(binding.playerView, uid)?.timer ?: binding.timeTurn),
+                    { viewModelScope.launch { goFishLogic.skipPlayer(uid) } },
+                    it,
+                    1000
+                )
+            }
         }
     }
 
