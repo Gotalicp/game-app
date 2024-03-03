@@ -22,7 +22,10 @@ import kotlinx.coroutines.launch
 
 class LobbyDialogFragment(
     private val canChangeSettings: Boolean,
-    private val startGame: (() -> Unit)?
+    private val startGame: (() -> Unit)?,
+    private val maxPlayers: List<Int>,
+    private val timeLimit: List<String>,
+    private val rounds: List<Int>
 ) : DialogFragment() {
     private var _binding: DialogLobbyBinding? = null
     private val binding
@@ -44,7 +47,10 @@ class LobbyDialogFragment(
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,12 +60,10 @@ class LobbyDialogFragment(
             btnStart.apply {
                 visibility = if (canChangeSettings) View.VISIBLE else View.GONE
                 setOnClickListener {
-                    dismiss()
                     startGame?.invoke()
                 }
             }
             btnExit.setOnClickListener {
-                dismiss()
                 (context as? Activity)?.finish()
             }
 
@@ -68,68 +72,64 @@ class LobbyDialogFragment(
 
             LobbyProvider.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
                 lobbyCode.text = lobbyInfo.code
+                gameMode.text = "Game mode: ${lobbyInfo.clazz}"
                 CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
                     adapter.updateItems(lobbyInfo.players.mapNotNull { cache.get(it) })
                 }
             }
 
             turnTimeLimit.apply {
-                listOf("No limit", "15", "30", "45", "60").let {
-                    setSelection(0)
-                    isEnabled = canChangeSettings
-                    adapter = CustomSpinnerAdapter(context, it)
-                    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            viewModel.changeTime(canChangeSettings, time = it[position])
-                        }
 
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                        }
+                setSelection(0)
+                isEnabled = canChangeSettings
+                adapter = CustomSpinnerAdapter(context, timeLimit)
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        viewModel.changeTime(canChangeSettings, time = timeLimit[position])
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
                     }
                 }
             }
             playerLimit.apply {
-                listOf(2, 3, 4, 5, 6).let {
-                    setSelection(0)
-                    isEnabled = canChangeSettings
-                    adapter = CustomSpinnerAdapter(context, it)
-                    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            viewModel.changeTime(canChangeSettings, playerLimit = it[position])
-                        }
+                setSelection(0)
+                isEnabled = canChangeSettings
+                adapter = CustomSpinnerAdapter(context, maxPlayers)
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        viewModel.changeTime(canChangeSettings, playerLimit = maxPlayers[position])
+                    }
 
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                        }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
                     }
                 }
             }
             roundLimit.apply {
-                listOf(2, 3, 4, 5, 6).let {
-                    setSelection(0)
-                    isEnabled = canChangeSettings
-                    adapter = CustomSpinnerAdapter(context, it)
-                    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            viewModel.changeTime(canChangeSettings, rounds = it[position])
-                        }
+                setSelection(0)
+                isEnabled = canChangeSettings
+                adapter = CustomSpinnerAdapter(context, rounds)
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        viewModel.changeTime(canChangeSettings, rounds = rounds[position])
+                    }
 
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                        }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
                     }
                 }
             }

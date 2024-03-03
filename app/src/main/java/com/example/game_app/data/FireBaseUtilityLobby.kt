@@ -1,30 +1,22 @@
 package com.example.game_app.data
 
-import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.LobbyProvider
-import com.example.game_app.domain.SharedInformation
-import com.example.game_app.domain.bitmap.BitmapConverter
-import com.example.game_app.domain.firebase.AccAdapter
 import com.example.game_app.domain.firebase.CodeAdapter
 import com.example.game_app.domain.firebase.GenerateCode
 import com.example.game_app.domain.firebase.LobbyInfoAdapter
-import com.example.game_app.ui.common.AppAcc
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import kotlinx.coroutines.tasks.await
-import java.util.Date
 
-class FireBaseUtility {
+class FireBaseUtilityLobby {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
     private var database = Firebase.database
+    private val acc = AccountProvider.getAcc()
 
     companion object {
         private var lobbyReference: DatabaseReference? = null
@@ -39,7 +31,6 @@ class FireBaseUtility {
             Log.e("Firebase", "Cancelled")
         }
     }
-    private val acc: LiveData<AppAcc> = AccountProvider.getAcc()
 
     fun getLobby(uid: String, callback: (LobbyInfo?) -> Unit) {
         database.getReference("lobby/$uid").get()
@@ -63,10 +54,8 @@ class FireBaseUtility {
                 .addOnSuccessListener {
                     callback(CodeAdapter().adapt(it))
                 }.addOnFailureListener {
-                    Log.d("called", "fail")
                     callback(null)
                 }.addOnCanceledListener {
-                    Log.d("called", "cancel")
                     callback(null)
                 }
         } catch (e: Exception) {
@@ -80,6 +69,7 @@ class FireBaseUtility {
             GetLocalIp().getLocalInetAddress()?.let { ip ->
                 generateUniqueCode(clazz, acc) {
                     LobbyInfo(
+                        clazz = clazz,
                         ownerIp = ip,
                         lobbyUid = acc,
                         code = it,
@@ -145,47 +135,6 @@ class FireBaseUtility {
                 child("secPerTurn").setValue(it)
             }
         }
-    }
-
-    fun logout() {
-        Firebase.auth.signOut()
-        SharedInformation.updateLogged(false)
-    }
-
-    fun updateHistory(history: GameHistory) {
-        database.getReference("user/${acc.value?.uid}/history").setValue(
-            history.apply {
-                date = Date().time.toString()
-            })
-        Log.d("called", "made")
-    }
-
-    suspend fun getUserInfo(uid: String): AppAcc? {
-        var tempUser: AppAcc? = null
-        try {
-            database.getReference("user/${uid}").get()
-                .addOnSuccessListener {
-                    Log.d("Firebase", "Get Account")
-                    AccAdapter().adapt(it)?.let { acc ->
-                        tempUser = acc
-                    }
-                }.await()
-        } catch (ex: Exception) {
-            Log.e("Firebase", "Error getting data", ex)
-            logout()
-        }
-        return tempUser
-    }
-
-    fun createUser(uid: String, username: String, image: Bitmap) {
-        Firebase.database.getReference("user/$uid")
-            .setValue(FireBaseAcc(username, uid, BitmapConverter().adapt(image)))
-            .addOnCompleteListener {
-                AccountProvider.updateAcc(AppAcc(username, uid, image))
-                SharedInformation.updateLogged(true)
-            }.addOnFailureListener {
-                logout()
-            }
     }
 
     private fun generateUniqueCode(clazz: String, uid: String, callback: (String) -> Unit) {

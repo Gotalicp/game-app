@@ -1,10 +1,14 @@
 package com.example.game_app.domain.game
 
-interface GameLogic <T>{
+import kotlinx.coroutines.flow.Flow
 
-    suspend fun startGame(seed : Long)
-    fun setPlayer(players : MutableList<String>)
+interface GameLogic<T> {
+    val hasEnded: Flow<Boolean>
+    val playerToTakeTurn: Flow<String?>
+    val seed: Flow<Long?>
+    suspend fun startGame(seed: Long)
+    fun setPlayer(players: MutableList<String>)
     suspend fun turnHandling(t: T)
     fun checkEndGame(): Boolean
-    fun updateSeed(seed:Long)
+    fun updateSeed(seed: Long)
 }

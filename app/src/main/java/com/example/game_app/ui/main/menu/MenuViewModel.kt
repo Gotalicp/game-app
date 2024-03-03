@@ -4,17 +4,14 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.game_app.data.FireBaseUtility
-import com.example.game_app.data.LobbyInfo
-import kotlinx.coroutines.launch
+import com.example.game_app.data.FireBaseUtilityLobby
 
 class MenuViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val fireBaseUtility = FireBaseUtility()
+    private val fireBaseUtilityLobby = FireBaseUtilityLobby()
     fun join(code: String, clazz: Class<*>, callback: (Intent?) -> Unit) {
         try {
             if (code.length == 6) {
-                fireBaseUtility.useCode(code) {
+                fireBaseUtilityLobby.useCode(code) {
                     it?.let {
                         if (it.players.size < it.maxPlayerCount) {
                             callback(
@@ -29,7 +26,7 @@ class MenuViewModel(private val application: Application) : AndroidViewModel(app
                 }
             }
         } catch (ex: Exception) {
-            Log.d("error", "${ex}")
+            Log.d("Menu joining error", "$ex")
         }
     }
 

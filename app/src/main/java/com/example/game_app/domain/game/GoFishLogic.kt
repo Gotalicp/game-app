@@ -30,13 +30,13 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     //Checking who's turn is it
     private val _playerToTakeTurn = MutableSharedFlow<String>()
-    val playerToTakeTurn: Flow<String?> get() = _playerToTakeTurn
+    override val playerToTakeTurn: Flow<String?> get() = _playerToTakeTurn
 
     private val _hasEnded = MutableStateFlow(false)
-    val hasEnded: Flow<Boolean> get() = _hasEnded
+    override val hasEnded: Flow<Boolean> get() = _hasEnded
 
     private val _seed = MutableStateFlow<Long?>(null)
-    val seed: Flow<Long?> get() = _seed
+    override val seed: Flow<Long?> get() = _seed
 
     private val _play = MutableLiveData<Pair<Play, Int>>()
     val play: LiveData <Pair<Play, Int>> get() = _play

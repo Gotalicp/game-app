@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GameGrid</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_go_fish">GoFishActivity</string>
-
-    //spas beshe tuk
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="title_activity_main">Main Activity</string>
+    <string name="title_activity_go_fish">Go Fish Activity</string>
+    <string name="title_activity_chess">Chess Activity</string>
 
     //buttons
     <string name="next">Next</string>
@@ -39,5 +36,6 @@
     <string name="have_account">Have an account? Login here</string>
     <string name="no_account">Don\'t have an account? Register here</string>
     <string name="enter_code">Enter code to join</string>
+    <string name="date">Date</string>
 
 </resources>

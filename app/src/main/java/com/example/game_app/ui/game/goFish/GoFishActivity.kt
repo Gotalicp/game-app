@@ -13,6 +13,8 @@ import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.ui.common.AppAcc
+import com.example.game_app.ui.game.GameUiMapper
+import com.example.game_app.ui.game.GameUiModel
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
 import com.example.game_app.ui.game.goFish.popup.LobbyDialogFragment
 import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
@@ -24,7 +26,10 @@ class GoFishActivity : AppCompatActivity() {
     private val cardViewAdapter = CardsRecycleView()
     private val playerViewAdapter = PlayersRecycleView()
 
-    @SuppressLint("DiscouragedApi")
+    private var lobby: LobbyDialogFragment? = null
+
+
+    @SuppressLint("DiscouragedApi", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
@@ -40,8 +45,7 @@ class GoFishActivity : AppCompatActivity() {
             goFishViewModel.joinGame(
                 code = intent.getStringExtra("code"),
                 uid = intent.getStringExtra("lobbyUid"),
-                ip = intent.getStringExtra("lobbyIp"),
-                this
+                ip = intent.getStringExtra("lobbyIp")
             )
         }
 
@@ -82,17 +86,17 @@ class GoFishActivity : AppCompatActivity() {
                         goFishViewModel.findMyDeck()
                             ?.let { deck -> cardViewAdapter.updateItems(deck) }
                         yourImage.setImageBitmap(me.second.image)
-                        yourName.text = me.second.username
+                        yourName.text = "${me.first.score}: ${me.second.username}"
                     }
                 }
                 deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
             }
         }
-        goFishViewModel.state.map { GoFishUiMapper.map(it) }.observe(this) { updateContent(it) }
+        goFishViewModel.gameStates.map { GameUiMapper.map(it) }.observe(this) { updateContent(it) }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateContent(data: GoFishUiModel) {
+    private fun updateContent(data: GameUiModel) {
         binding.apply {
             data.startingIn?.let {
                 StartingInDialogFragment(it).show(
@@ -100,11 +104,21 @@ class GoFishActivity : AppCompatActivity() {
                     StartingInDialogFragment.TAG
                 )
             }
-            data.showLobby?.let {
-                LobbyDialogFragment(it, goFishViewModel.createSeed).show(
-                        supportFragmentManager,
-                        LobbyDialogFragment.TAG
-                    )
+            data.host?.let {
+                lobby = LobbyDialogFragment(
+                    it,
+                    goFishViewModel.createSeed,
+                    listOf(2, 3, 4, 5, 6),
+                    listOf("No limit", "15", "30", "45", "60"),
+                    listOf(1, 2, 3, 4, 5)
+                )
+            }
+            data.showLobby.let {
+                if (it) {
+                    lobby?.show(supportFragmentManager, LobbyDialogFragment.TAG)
+                } else {
+                    lobby?.dismiss()
+                }
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
             data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }

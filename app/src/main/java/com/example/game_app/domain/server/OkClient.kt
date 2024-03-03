@@ -2,7 +2,7 @@ package com.example.game_app.domain.server
 
 import android.util.Log
 import com.example.game_app.domain.game.GameLogic
-import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.data.FireBaseUtilityLobby
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.xuhao.didi.core.pojo.OriginalData
@@ -23,7 +23,7 @@ class OkClient<T : Serializable>(
     private val code: String, override val port: Int,
 ) : ServerInterface<T> {
     private var manager = OkSocket.open(ConnectionInfo(ip, port))
-    private val fireBaseUtility = FireBaseUtility()
+    private val fireBaseUtilityLobby = FireBaseUtilityLobby()
 
     init {
         OkSocketOptions.setIsDebug(true);
@@ -34,7 +34,7 @@ class OkClient<T : Serializable>(
                 override fun onSocketConnectionSuccess(info: ConnectionInfo?, action: String?) {
                     super.onSocketConnectionSuccess(info, action)
                     Log.d("OkClient", "Connected ${info?.ip}")
-                    fireBaseUtility.joinLobby(code)
+                    fireBaseUtilityLobby.joinLobby(code)
                 }
 
                 override fun onSocketReadResponse(
@@ -77,7 +77,7 @@ class OkClient<T : Serializable>(
                     e: Exception?
                 ) {
                     super.onSocketDisconnection(info, action, e)
-                    fireBaseUtility.leaveLobby()
+                    fireBaseUtilityLobby.leaveLobby()
                     manager.unRegisterReceiver(this)
                 }
             })
@@ -90,7 +90,7 @@ class OkClient<T : Serializable>(
 
     override fun disconnect() {
         manager.disconnect()
-        fireBaseUtility.leaveLobby()
+        fireBaseUtilityLobby.leaveLobby()
     }
 
     override fun <T> send(data: T) {

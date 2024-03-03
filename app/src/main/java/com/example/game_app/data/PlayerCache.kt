@@ -5,7 +5,7 @@ import com.example.game_app.data.common.Cache
 import com.example.game_app.ui.common.AppAcc
 
 class PlayerCache : Cache<AppAcc> {
-    val firebase = FireBaseUtility()
+    val firebase = FireBaseUtilityAcc()
 
     companion object {
         val instance: PlayerCache by lazy { PlayerCache() }

@@ -1,6 +1,6 @@
 package com.example.game_app.ui.main.profile
 
-import android.os.Bundle
+import  android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,10 +26,11 @@ class ProfileFragment : Fragment() {
 
         binding?.apply {
             viewModel.acc.observe(viewLifecycleOwner) {
-                profilePhoto.setImageBitmap(it.image)
+                profileImage.setImageBitmap(it.image)
                 username.text = it.username
                 email.text = viewModel.getEmail()
             }
+
         }
     }
 

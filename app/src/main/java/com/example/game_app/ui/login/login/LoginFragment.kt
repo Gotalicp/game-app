@@ -1,20 +1,15 @@
 package com.example.game_app.ui.login.login
 
-import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.map
 import androidx.navigation.fragment.findNavController
 import com.example.game_app.R
 import com.example.game_app.databinding.FragmentLoginBinding
-import com.example.game_app.ui.game.goFish.GoFishUiMapper
-import com.example.game_app.ui.game.goFish.GoFishUiModel
 import com.example.game_app.ui.login.AuthenticationUIMapper
 import com.example.game_app.ui.login.AuthenticationUiModel
 

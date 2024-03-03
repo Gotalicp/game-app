@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.R
-import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.data.FireBaseUtilityAcc
 import com.example.game_app.ui.login.AuthenticationState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -31,7 +31,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         auth.uid?.let {
-                            FireBaseUtility().createUser(
+                            FireBaseUtilityAcc().createUser(
                                 it,
                                 username,
                                 BitmapFactory.decodeResource(context.resources, R.drawable.image)

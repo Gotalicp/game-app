@@ -1,10 +1,8 @@
 package com.example.game_app.domain.server
 
 import android.util.Log
-import androidx.coordinatorlayout.widget.CoordinatorLayout.DispatchChangeEvent
 import com.example.game_app.domain.game.GameLogic
-import com.example.game_app.domain.SharedInformation
-import com.example.game_app.data.FireBaseUtility
+import com.example.game_app.data.FireBaseUtilityLobby
 import com.example.game_app.domain.AccountProvider
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
@@ -17,7 +15,6 @@ import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClient
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IClientPool
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerActionListener
 import com.xuhao.didi.socket.common.interfaces.common_interfacies.server.IServerShutdown
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,7 +24,7 @@ class OkServer<T : Serializable>(
     override val gameLogic: GameLogic<T>,
     override val expectedTClazz: Class<T>, override val port: Int
 ) : ServerInterface<T> {
-    private val fireBaseUtility = FireBaseUtility()
+    private val fireBaseUtility = FireBaseUtilityLobby()
     private val register = OkSocket.server(port)
 
     init {
