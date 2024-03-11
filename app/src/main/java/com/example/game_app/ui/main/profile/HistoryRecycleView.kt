@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.ToggleButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.ui.common.ItemClickListener
@@ -20,7 +21,7 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     private val items = ArrayList<History>()
-    val itemClickListener: ItemClickListener<HistoryWrapper>? = null
+    var itemClickListener: ItemClickListener<HistoryWrapper>? = null
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
@@ -84,7 +85,7 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             gameMode.text = item.gameName
             outcome.apply {
                 text = item.outcome
-                setTextColor(item.outcomeColor)
+                setTextColor(ContextCompat.getColor(context, item.outcomeColor))
             }
             date.text = item.date
             arrow.apply {
@@ -118,9 +119,10 @@ data class HistoryEntry(var history: HistoryWrapper) : History()
 data class PlayerEntry(val player: PlayerWrapper) : History()
 
 data class HistoryWrapper(
+    val id: String,
     val gameName: String,
     val date: String,
-    val arrowRotation: Float = 180F,
+    var arrowRotation: Float = 180F,
     val outcome: String,
     val outcomeColor: Int
 )

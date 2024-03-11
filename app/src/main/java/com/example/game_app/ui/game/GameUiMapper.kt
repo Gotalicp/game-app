@@ -1,7 +1,5 @@
 package com.example.game_app.ui.game
 
-import android.view.View
-
 object GameUiMapper {
     fun map(state: GameStates): GameUiModel = when (state) {
         is GameStates.PreGame -> GameUiModel(showLobby = true, host = state.host)
@@ -12,11 +10,10 @@ object GameUiMapper {
             playerName = state.playerName,
         )
 
-        is GameStates.EndGame -> GameUiModel(showPopup = true)
+        is GameStates.EndGame -> GameUiModel(showEnd = true)
         is GameStates.StartingIn -> GameUiModel(
             startingIn = state.startingIn,
-            showPopup = state.showPopup,
-            startingInVisibility = View.VISIBLE
+            showEnd = state.showEnd
         )
     }
 }

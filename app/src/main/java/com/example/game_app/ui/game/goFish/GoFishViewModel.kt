@@ -13,8 +13,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
 import com.example.game_app.data.FireBaseUtilityHistory
-import com.example.game_app.data.FireBaseUtilityLobby
-import com.example.game_app.data.GameHistory
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.databinding.ActivityGoFishBinding
@@ -26,18 +24,16 @@ import com.example.game_app.domain.server.OkClient
 import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
 import com.example.game_app.ui.CountDown
-import com.example.game_app.ui.common.Popup
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GameStates
 import com.example.game_app.ui.game.GivingCardAnimation
-import com.example.game_app.ui.game.goFish.popup.EndScreenPopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class GoFishViewModel(private val application: Application) : AndroidViewModel(application) {
+class GoFishViewModel(application: Application) : AndroidViewModel(application) {
     private val _gameStates = MutableLiveData<GameStates>()
     val gameStates: LiveData<GameStates> = _gameStates
 
@@ -50,13 +46,11 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     var createSeed: (() -> Unit)? = null
 
-    private var uid = AccountProvider.getAcc().value?.uid
+    private var uid = AccountProvider.getUid()
     private var lobby = LobbyProvider.getLobby()
     private var cache = PlayerCache.instance
     var goFishLogic = GoFishLogic()
 
-    //PopUps
-    private lateinit var popup: Popup
     private var countDown: CountDown? = null
 
     //Game
@@ -93,13 +87,8 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
 
     private fun collectHasEnded(hasEnded: Boolean) {
         if (hasEnded) {
-            goFishLogic.gamePlayers.value?.let {
-                players?.let { it1 ->
-                    popup = EndScreenPopup(application.applicationContext, it, it1)
-                }
-            }
             _gameStates.value = GameStates.EndGame
-            this.rounds = rounds - 1
+            this.rounds -= 1
             if (this.rounds > 0) {
                 createSeed?.invoke()
             } else {
@@ -107,7 +96,7 @@ class GoFishViewModel(private val application: Application) : AndroidViewModel(a
                     players.associate {
                         Pair(it.uid, goFishLogic.getPlayer(it.uid)?.score ?: 0)
                     }.let { map ->
-                        FireBaseUtilityHistory().updateHistory(map,  "GoFish")
+                        uid?.let { FireBaseUtilityHistory().updateHistory(map, "GoFish", it) }
                     }
                 }
             }

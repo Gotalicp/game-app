@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/rounded_image"
     android:paddingHorizontal="10dp"
+    android:layout_marginTop="5dp"
     android:paddingVertical="5dp">
 
     <TextView

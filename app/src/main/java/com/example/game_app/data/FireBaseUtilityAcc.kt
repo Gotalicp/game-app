@@ -14,7 +14,6 @@ import kotlinx.coroutines.tasks.await
 
 class FireBaseUtilityAcc() {
     private var database = Firebase.database
-
     fun getEmail() = Firebase.auth.currentUser?.email
     fun createUser(uid: String, username: String, image: Bitmap) {
         Firebase.database.getReference("user/$uid")

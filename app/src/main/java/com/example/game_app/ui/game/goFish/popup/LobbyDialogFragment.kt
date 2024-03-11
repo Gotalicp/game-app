@@ -1,5 +1,6 @@
 package com.example.game_app.ui.game.goFish.popup
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -53,6 +54,7 @@ class LobbyDialogFragment(
         );
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

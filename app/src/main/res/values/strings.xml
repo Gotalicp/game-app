@@ -37,5 +37,6 @@
     <string name="no_account">Don\'t have an account? Register here</string>
     <string name="enter_code">Enter code to join</string>
     <string name="date">Date</string>
+    <string name="score">Score</string>
 
 </resources>

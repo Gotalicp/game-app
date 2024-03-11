@@ -11,11 +11,13 @@ class HistoryAdapter : Adapter<DataSnapshot?, MutableList<GameHistory>> {
         t?.let { snapshot ->
             snapshot.children.forEach { dataSnapshot ->
                 val gameHistory = GameHistory(
+                    id = dataSnapshot.child("id").getValue(String::class.java) ?: "",
                     players = dataSnapshot.child("players")
                         .getValue(object : GenericTypeIndicator<Map<String, Int>>() {})
                         ?: emptyMap(),
                     game = dataSnapshot.child("game").getValue(String::class.java) ?: "",
-                    date = dataSnapshot.child("date").getValue(String::class.java) ?: ""
+                    date = dataSnapshot.child("date").getValue(String::class.java) ?: "",
+                    status = dataSnapshot.child("status").getValue(String::class.java) ?: "",
                 )
                 gameHistoryList.add(gameHistory)
             }

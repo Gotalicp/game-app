@@ -24,7 +24,7 @@ class ChessViewModel(application: Application) : AndroidViewModel(application){
 
 //    private var server: ServerInterface<>? = null
 
-    private var uid = AccountProvider.getAcc().value?.uid
+    private var uid = AccountProvider.getUid()
     private var lobby = LobbyProvider.getLobby()
     private var cache = PlayerCache.instance
 

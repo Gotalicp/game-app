@@ -16,7 +16,7 @@ import com.google.firebase.database.database
 class FireBaseUtilityLobby {
     private val lobbyInfoAdapter = LobbyInfoAdapter()
     private var database = Firebase.database
-    private val acc = AccountProvider.getAcc()
+    private val uid = AccountProvider.getUid()
 
     companion object {
         private var lobbyReference: DatabaseReference? = null
@@ -65,15 +65,15 @@ class FireBaseUtilityLobby {
 
     //Create a instance of hosted lobby in the database
     fun hostLobby(clazz: String) {
-        acc.value?.uid?.let { acc ->
+        uid?.let {uid->
             GetLocalIp().getLocalInetAddress()?.let { ip ->
-                generateUniqueCode(clazz, acc) {
+                generateUniqueCode(clazz, uid) {
                     LobbyInfo(
                         clazz = clazz,
                         ownerIp = ip,
-                        lobbyUid = acc,
+                        lobbyUid = uid,
                         code = it,
-                        players = mutableListOf(acc)
+                        players = mutableListOf(uid)
                     ).let { lobby ->
                         lobbyReference = database.getReference("lobby/${lobby.code}")
                             .apply {
@@ -89,11 +89,11 @@ class FireBaseUtilityLobby {
 
     //Add a player to selected lobby in database
     fun joinLobby(code: String) {
-        acc.value?.let { acc ->
+        uid?.let {
             lobbyReference = database.getReference("lobby/${code}")
                 .apply {
                     addValueEventListener(listener)
-                    child("players").child(acc.uid).setValue(acc.uid)
+                    child("players").child(it).setValue(it)
                 }
 
         }
@@ -101,8 +101,8 @@ class FireBaseUtilityLobby {
 
     //Remove a player from selected lobby in database
     fun leaveLobby() {
-        acc.value?.uid?.let { uid ->
-            lobbyReference?.child(uid)?.removeValue()
+        uid?.let {
+            lobbyReference?.child(it)?.removeValue()
             stopObservingLobby()
         }
     }

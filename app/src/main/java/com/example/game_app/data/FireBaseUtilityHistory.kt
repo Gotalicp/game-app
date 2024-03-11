@@ -4,21 +4,18 @@ import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.firebase.HistoryAdapter
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
-import java.util.Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class FireBaseUtilityHistory {
     private var database = Firebase.database
-    private val acc = AccountProvider.getAcc()
-    private val path = "history/${acc.value?.uid}"
+    private val path = "history/${AccountProvider.getUid()}"
 
     companion object {
-        var history: MutableList<GameHistory> = mutableListOf()
-    }
-    init {
-        getHistory { history = it?: mutableListOf() }
+        var history = mutableListOf<GameHistory>()
     }
 
-    fun updateHistory(players: Map<String, Int>, game: String) {
+    fun updateHistory(players: Map<String, Int>, game: String, uid: String) {
         database.getReference(path).setValue(
             history.apply {
                 if (size == 5) {
@@ -26,9 +23,14 @@ class FireBaseUtilityHistory {
                 }
                 add(
                     GameHistory(
+                        id = generateId(),
                         players = players,
-                        status = "",
-                        date = Date().time.toString(),
+                        status = GetPlacement.findPlacement(players, uid),
+                        date = (LocalDate.now())
+                            .format(
+                                DateTimeFormatter
+                                    .ofPattern("dd/MM/yyyy")
+                            ),
                         game = game
                     )
                 )
@@ -36,12 +38,18 @@ class FireBaseUtilityHistory {
         )
     }
 
-    private fun getHistory(callback: (MutableList<GameHistory>?) -> Unit) {
+    fun getHistory(callback: (MutableList<GameHistory>?) -> Unit) {
         database.getReference(path).get()
-            .addOnSuccessListener {
-                callback(HistoryAdapter().adapt(it))
+            .addOnSuccessListener { dataSnapshot ->
+                HistoryAdapter().adapt(dataSnapshot).let {
+                    history = it
+                    callback(it)
+                }
             }
             .addOnCanceledListener { }
             .addOnFailureListener { }
     }
+
+    private fun generateId() = System.currentTimeMillis().toString()
 }
+

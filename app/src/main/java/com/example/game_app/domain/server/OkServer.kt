@@ -42,7 +42,7 @@ class OkServer<T : Serializable>(
             serverPort: Int,
             clientPool: IClientPool<*, *>?
         ) {
-            send(AccountProvider.getAcc().value?.uid.toString())
+            send(AccountProvider.getUid().toString())
             Log.d("OkServer", "Client connected")
             client?.addIOCallback(object : IClientIOCallback {
                 override fun onClientRead(

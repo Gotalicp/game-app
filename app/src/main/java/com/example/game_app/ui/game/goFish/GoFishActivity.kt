@@ -16,6 +16,7 @@ import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.game.GameUiMapper
 import com.example.game_app.ui.game.GameUiModel
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
+import com.example.game_app.ui.game.goFish.popup.EndDialogFragment
 import com.example.game_app.ui.game.goFish.popup.LobbyDialogFragment
 import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
 
@@ -27,7 +28,6 @@ class GoFishActivity : AppCompatActivity() {
     private val playerViewAdapter = PlayersRecycleView()
 
     private var lobby: LobbyDialogFragment? = null
-
 
     @SuppressLint("DiscouragedApi", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,6 +118,15 @@ class GoFishActivity : AppCompatActivity() {
                     lobby?.show(supportFragmentManager, LobbyDialogFragment.TAG)
                 } else {
                     lobby?.dismiss()
+                }
+            }
+            data.showEnd.let {
+                if (it) {
+                    goFishViewModel.goFishLogic.gamePlayers.value?.let { game ->
+                        goFishViewModel.players?.let { acc ->
+                            EndDialogFragment(game, acc)
+                        }
+                    }?.show(supportFragmentManager, EndDialogFragment.TAG)
                 }
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
