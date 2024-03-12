@@ -1,5 +1,4 @@
-P
-roject name(in progress)
+Project name(in progress)
 Features:
 
 1. Game Library

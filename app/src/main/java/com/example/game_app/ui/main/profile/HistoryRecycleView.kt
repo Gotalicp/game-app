@@ -1,11 +1,16 @@
 package com.example.game_app.ui.main.profile
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
+import com.example.game_app.ui.common.ItemClickListener
 
 class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -14,7 +19,8 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         const val VIEW_TYPE_EXTENSION = 0
     }
 
-    private val items = ArrayList<WorkoutEntry>()
+    private val items = ArrayList<History>()
+    val itemClickListener: ItemClickListener<HistoryWrapper>? = null
 
     override fun getItemViewType(position: Int): Int {
         return when (items[position]) {
@@ -22,7 +28,7 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 VIEW_TYPE_HISTORY
             }
 
-            is ExtendedEntry -> {
+            is PlayerEntry -> {
                 VIEW_TYPE_EXTENSION
             }
         }
@@ -31,16 +37,16 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             VIEW_TYPE_HISTORY -> {
-                ExerciseViewHolder(
+                HistoryViewHolder(
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_history, parent, false)
                 )
             }
 
             VIEW_TYPE_EXTENSION -> {
-                SetViewHolder(
+                PlayerViewHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_history_extended, parent, false)
+                        .inflate(R.layout.item_history_player, parent, false)
                 )
             }
 
@@ -50,12 +56,12 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ExerciseViewHolder -> {
-                holder.bind((items[position] as HistoryEntry).exerciseEntry)
+            is HistoryViewHolder -> {
+                holder.bind((items[position] as HistoryEntry).history)
             }
 
-            is SetViewHolder -> {
-                holder.bind((items[position] as ExtendedEntry).setEntry)
+            is PlayerViewHolder -> {
+                holder.bind((items[position] as PlayerEntry).player)
             }
         }
     }
@@ -63,36 +69,64 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemCount(): Int = items.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateItems(newItems: List<WorkoutEntry>) {
+    fun updateItems(newItems: List<History>) {
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
     }
 
     inner class HistoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-
+        private val gameMode = view.findViewById<TextView>(R.id.game_mode)
+        private val outcome = view.findViewById<TextView>(R.id.outcome)
+        private val date = view.findViewById<TextView>(R.id.date)
+        private val arrow = view.findViewById<ToggleButton>(R.id.expand)
         fun bind(item: HistoryWrapper) {
+            gameMode.text = item.gameName
+            outcome.apply {
+                text = item.outcome
+                setTextColor(item.outcomeColor)
+            }
+            date.text = item.date
+            arrow.apply {
+                rotation = item.arrowRotation
+                setOnClickListener {
+                    itemClickListener?.onItemClicked(item, bindingAdapterPosition)
+                    notifyItemChanged(bindingAdapterPosition)
+                }
+            }
         }
     }
 
 
-    inner class SetViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class PlayerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val image = view.findViewById<ImageView>(R.id.image)
+        private val name = view.findViewById<TextView>(R.id.name)
+        private val score = view.findViewById<TextView>(R.id.score)
 
-        fun bind(item: ExtendedHistoryWrapper) {
-
+        fun bind(item: PlayerWrapper) {
+            image.setImageBitmap(item.image)
+            name.text = item.name
+            score.text = item.score
         }
     }
 }
 
-sealed class WorkoutEntry
+sealed class History
 
-data class HistoryEntry(var exerciseEntry: HistoryWrapper) : WorkoutEntry()
+data class HistoryEntry(var history: HistoryWrapper) : History()
 
-data class ExtendedEntry(val setEntry: ExtendedHistoryWrapper) : WorkoutEntry()
+data class PlayerEntry(val player: PlayerWrapper) : History()
 
 data class HistoryWrapper(
+    val gameName: String,
+    val date: String,
+    val arrowRotation: Float = 180F,
+    val outcome: String,
+    val outcomeColor: Int
 )
 
-data class ExtendedHistoryWrapper(
+data class PlayerWrapper(
+    val name: String,
+    val image: Bitmap,
+    val score: String
 )
