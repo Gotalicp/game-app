@@ -50,7 +50,6 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         playerViewAdapter.apply {
-            setHasStableIds(true)
             itemClickListener = object : ItemClickListener<AppAcc> {
                 override fun onItemClicked(item: AppAcc, itemPosition: Int) {
                     CardPickerPopup(application).apply {

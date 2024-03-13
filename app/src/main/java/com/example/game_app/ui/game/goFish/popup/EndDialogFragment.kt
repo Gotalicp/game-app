@@ -60,7 +60,7 @@ class EndDialogFragment(
                             }, player.uid)
                         )
                     }
-                }.sortedBy { it.score }
+                }.sortedByDescending { it.score }
                 )
             }
             scoreboard.layoutManager = LinearLayoutManager(context)

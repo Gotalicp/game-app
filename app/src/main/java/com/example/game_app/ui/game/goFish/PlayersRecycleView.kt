@@ -12,8 +12,8 @@ import com.example.game_app.domain.game.GoFishLogic
 import com.example.game_app.ui.common.AppAcc
 
 class PlayersRecycleView : RecycleViewAdapter<Pair<GoFishLogic.Player, AppAcc>>(
-    { oldItem, newItem -> oldItem.first.deck.size == newItem.first.deck.size },
-    { oldItem, newItem -> oldItem.first.deck.size == newItem.first.deck.size },
+    { oldItem, newItem -> oldItem == newItem },
+    { oldItem, newItem -> oldItem.first.deck.size != newItem.first.deck.size },
     R.layout.item_go_fish_player_card
 ) {
     var itemClickListener: ItemClickListener<AppAcc>? = null
@@ -30,11 +30,11 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<GoFishLogic.Player, AppAcc>>(
         @SuppressLint("SetTextI18n")
         override fun bind(item: Pair<GoFishLogic.Player, AppAcc>) {
             super.bind(item)
-            score.text = "${item.first.score}:"
             id = item.second.uid
+            score.text = "${item.first.score}:"
             profile.setImageBitmap(item.second.image)
             name.text = item.second.username
-            cards.text = "${item.first.deck.size}"
+            cards.text = item.first.deck.size.toString()
             view.setOnClickListener {
                 if (isYourTurn) {
                     itemClickListener?.onItemClicked(item.second, absoluteAdapterPosition)

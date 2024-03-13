@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Gameapp" parent="Base.Theme.Gameapp">
+        <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    </style>
+</resources>

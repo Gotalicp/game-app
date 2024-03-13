@@ -28,7 +28,6 @@ class EndScreenAdapter: RecycleViewAdapter<EndScreenWrapper>(
             name.text = item.name
             score.text = item.score
             placement.text = item.placement
-
         }
     }
 }
