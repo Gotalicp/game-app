@@ -85,7 +85,11 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             gameMode.text = item.gameName
             outcome.apply {
                 text = item.outcome
-                setTextColor(ContextCompat.getColor(context, item.outcomeColor))
+                try {
+                    setTextColor(ContextCompat.getColor(context, item.outcomeColor))
+                }catch (_: Exception){
+                    setTextColor(ContextCompat.getColor(context, R.color.blue))
+                }
             }
             date.text = item.date
             arrow.apply {

@@ -1,7 +1,6 @@
 package com.example.game_app.ui.main.profile
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,8 +14,7 @@ import com.example.game_app.domain.AccountProvider
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
-    val acc = AccountProvider.getAcc()
-    private val uid = AccountProvider.getUid()
+    val acc = AccountProvider
     fun getEmail() = FireBaseUtilityAcc().getEmail()
     private var history = mutableListOf<GameHistory>()
 
@@ -24,7 +22,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     val historyInfo: LiveData<List<History>>
         get() = _historyInfo
 
-    init {
+    fun getHistory() {
         FireBaseUtilityHistory().getHistory { gameHistories ->
             if (gameHistories != null) {
                 history = gameHistories
@@ -73,22 +71,13 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         )
     }
 
-    private fun getOutcomeColor(players: Map<String, Int>): Int {
-        return if (players[uid]
-                ?.let { it1 -> isValueInTop50Percent(players, it1) } == true
-        ) {
-            R.color.green
-        } else {
-            R.color.red
-        }
-    }
+    private fun getOutcomeColor(players: Map<String, Int>) = if (players[acc.getUid()]
+            ?.let { isValueInTop50Percent(players, it) } == true
+    ) { R.color.green } else { R.color.red }
 
     private fun isValueInTop50Percent(map: Map<String, Int>, valueToCheck: Int): Boolean {
-        map.values.apply {
-            toList().let {
-                it.sortedDescending()
-                return valueToCheck >= it[size / 2]
-            }
+        return map.values.sortedDescending().let {
+            valueToCheck >= it[(it.size / 2) - 1]
         }
     }
 }

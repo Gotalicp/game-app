@@ -23,14 +23,14 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:label="@string/title_activity_go_fish"
-            android:screenOrientation="landscape"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.Gameapp" />
         <activity
             android:name=".ui.game.chess.ChessActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:label="@string/title_activity_chess"
-            android:screenOrientation="landscape"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/Theme.Gameapp" />
         <activity
             android:name=".ui.login.AuthenticationActivity"
@@ -39,7 +39,7 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="sensorPortrait"
             android:windowSoftInputMode="adjustPan"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -48,5 +48,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

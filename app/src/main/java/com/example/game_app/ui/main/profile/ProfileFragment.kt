@@ -27,27 +27,31 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding?.apply {
-            viewModel.acc.observe(viewLifecycleOwner) {
+            viewModel.acc.getAcc().observe(viewLifecycleOwner) {
                 profileImage.setImageBitmap(it.image)
                 username.text = it.username
                 email.text = viewModel.getEmail()
             }
 
             historyAdapter.apply {
-                itemClickListener = object : ItemClickListener<HistoryWrapper>{
+                itemClickListener = object : ItemClickListener<HistoryWrapper> {
                     override fun onItemClicked(item: HistoryWrapper, itemPosition: Int) {
-                     viewModel.onClick(itemPosition, item)
+                        viewModel.onClick(itemPosition, item)
                     }
                 }
             }
             history.layoutManager = LinearLayoutManager(context)
             history.adapter = historyAdapter
-            viewModel.historyInfo.observe(viewLifecycleOwner){
+            viewModel.historyInfo.observe(viewLifecycleOwner) {
                 historyAdapter.updateItems(it)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getHistory()
     }
 
     override fun onDestroyView() {
