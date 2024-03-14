@@ -19,22 +19,15 @@ class MenuFragment : Fragment(R.layout.fragment_menu), MenuAdapter.AdapterListen
 
     private val viewModel: MenuViewModel by viewModels()
 
-    //TODO(hard code it)
     private val list = listOf(
         LibraryGame(
-            R.drawable.go_fish, GoFishActivity::class.java,
-            "Five cards are dealt from a standard 52-card deck to each player. The remaining cards are shared between the players, usually spread out in a disorderly pile referred to as the \"ocean\" or \"pool\". The player whose turn it is to play asks any another player for their cards of a particular face value."
+            R.drawable.go_fish, GoFishActivity::class.java, R.string.go_fish_description
         ),
         LibraryGame(
-            R.drawable.image, ChessActivity::class.java,
-            "Chess is an abstract strategy game that involves no hidden information and no elements of chance. It is played on a chessboard with 64 squares arranged in an 8×8 grid. At the start, each player controls sixteen pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns. White moves first, followed by Black. The game is won by checkmating the opponent's king, i.e. threatening it with inescapable capture. There are also several ways a game can end in a draw. "
-
-
+            R.drawable.image, ChessActivity::class.java, R.string.chess_description
         )
     )
-
     private var isVerticalScrollEnabled = true
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +51,7 @@ class MenuFragment : Fragment(R.layout.fragment_menu), MenuAdapter.AdapterListen
                             )
                         }
                     }
+
 
                     hostListener = object : ItemClickListener<Class<*>> {
                         override fun onItemClicked(item: Class<*>, itemPosition: Int) {

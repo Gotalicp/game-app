@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
+    android:layout_height="156dp"
     android:layout_marginStart="2dp"
+    android:layout_marginTop="5dp"
     android:layout_marginEnd="2dp"
     android:background="@drawable/rounded_corners"
     android:orientation="vertical">
@@ -13,12 +13,9 @@
         android:id="@+id/card_view"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_margin="3dp"
         android:background="@drawable/rounded_image"
-        android:backgroundTint="@color/black"
-        app:cardCornerRadius="12dp"
+        app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,9 +24,8 @@
             android:id="@+id/game_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/rounded_image"
-            android:padding="10dp"
-            android:src="@drawable/go_fish" />
+            android:background="?attr/gameIconColor"
+            android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>
 
@@ -38,6 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="5dp"
         app:layout_constraintBottom_toTopOf="@+id/buttons"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,14 +46,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:textColor="@color/white" />
+            android:textColor="?attr/gameDescriptionColor" />
     </ScrollView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/buttons"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/card_view">
@@ -66,17 +63,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/black"
-            android:text="@string/host"
-            android:textColor="@color/white" />
+            android:layout_marginBottom="3dp"
+            android:text="@string/host" />
 
         <Button
             android:id="@+id/btn_join"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:backgroundTint="@color/black"
-            android:text="@string/play"
-            android:textColor="@color/white" />
+            android:layout_marginBottom="3dp"
+            android:text="@string/play" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

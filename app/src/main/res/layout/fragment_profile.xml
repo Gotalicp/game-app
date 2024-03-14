@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top|center"
@@ -10,14 +9,15 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/userBackgroundColor"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingTop="10dp">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/card_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/rounded_image"
+            android:layout_marginStart="10dp"
             app:cardCornerRadius="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -26,8 +26,7 @@
                 android:id="@+id/profile_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/image" />
+                android:scaleType="centerCrop" />
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
@@ -43,20 +42,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/username"
-                android:textColor="@color/black"
-                android:textSize="30sp" />
+                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/email"
-                android:textColor="@color/black" />
+                android:text="@string/email" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="2dp"
             android:layout_marginTop="5dp"
             android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -65,11 +62,11 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/history"
+        android:id="@+id/history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="5dp"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

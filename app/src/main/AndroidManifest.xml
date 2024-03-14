@@ -16,7 +16,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Gameapp"
+        android:theme="@style/Base.Theme.Gameapp"
         tools:ignore="RtlEnabled"
         tools:targetApi="31">
         <activity
@@ -35,13 +35,14 @@
             android:theme="@style/Theme.Gameapp" />
         <activity
             android:name=".ui.login.AuthenticationActivity"
-            android:label="Authentication"
-            android:exported="false" />
+            android:exported="false"
+            android:label="Authentication" />
 
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
             android:screenOrientation="sensorPortrait"
+            android:theme="@style/AppTheme_Blue"
             android:windowSoftInputMode="adjustPan"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>

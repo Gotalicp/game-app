@@ -30,7 +30,7 @@ class MenuAdapter(private val callback: AdapterListener) : RecycleViewAdapter<Li
 
         @SuppressLint("ClickableViewAccessibility")
         override fun bind(item: LibraryGame) {
-            text.text = item.description
+            text.setText(item.description)
             scroll.setOnTouchListener { _, event ->
                 when (event?.action) {
                     MotionEvent.ACTION_DOWN -> {

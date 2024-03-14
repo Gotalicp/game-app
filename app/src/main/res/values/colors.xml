@@ -5,4 +5,17 @@
     <color name="blue">#0000FF</color>
     <color name="red">#FF0000</color>
     <color name="green">#008000</color>
+
+
+    <color name="oxford_blue">#0B132B</color>
+    <color name="space_cadet">#1C2541</color>
+    <color name="YInMn_blue">#3A506B</color>
+
+    <color name="jasper">#DB504A</color>
+    <color name="saffron">#E3B505</color>
+    <color name="midnight_green">#084C61</color>
+    
+    <color name="bright_pink">#FF6978</color>
+    <color name="baby_powder">#FFFCF9</color>
+    <color name="celeste">#B1EDE8</color>
 </resources>

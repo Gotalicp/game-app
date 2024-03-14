@@ -1,4 +1,157 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.Gameapp" parent="Theme.Material3.Light.NoActionBar"/>
-    <style name="Theme.Gameapp" parent="Base.Theme.Gameapp" />
+
+    <style name="Base.Theme.Gameapp" parent="Theme.Material3.DayNight.NoActionBar" />
+
+    <attr name="roundedCorner" format="color" />
+    <attr name="roundedImage" format="color" />
+
+    <attr name="nav_icons" format="color" />
+    <attr name="nav_bar" format="color" />
+
+    <attr name="gameDescriptionColor" format="color" />
+    <attr name="gameIconColor" format="color" />
+
+    <attr name="userBackgroundColor" format="color" />
+    <attr name="historyTextColor" format="color" />
+    <attr name="historyPlayerTextColor" format="color" />
+    <attr name="historyDateTextColor" format="color" />
+
+
+    <!-- Blue Theme -->
+    <style name="AppTheme_Blue" parent="Base.Theme.Gameapp">
+        <item name="materialButtonStyle">@style/BlueButton</item>
+        <item name="android:textViewStyle">@style/BlueTextView</item>
+        <item name="editTextStyle">@style/BlueEditText</item>
+        <item name="cardViewStyle">@style/BlueCardView</item>
+        <item name="android:statusBarColor">@color/oxford_blue</item>
+        <item name="android:navigationBarColor">@color/oxford_blue</item>
+        <item name="roundedCorner">@color/space_cadet</item>
+        <item name="nav_icons">@color/baby_powder</item>
+        <item name="nav_bar">@color/space_cadet</item>
+        <item name="roundedImage">@color/oxford_blue</item>
+        <item name="gameIconColor">@color/space_cadet</item>
+        <item name="gameDescriptionColor">@color/baby_powder</item>
+        <item name="userBackgroundColor">@color/space_cadet</item>
+        <item name="historyPlayerTextColor">@color/white</item>
+        <item name="historyTextColor">@color/white</item>
+        <item name="historyDateTextColor">@color/white</item>
+        <item name="android:windowBackground">@color/YInMn_blue</item>
+    </style>
+
+    <style name="BlueButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/oxford_blue</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="background">@drawable/rounded_corners</item>
+    </style>
+
+    <style name="BlueTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="BlueEditText" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/rounded_corners</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="BlueCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:background">@drawable/rounded_image</item>
+        <item name="android:backgroundTint">@color/white</item>
+    </style>
+    <!-- Blue Theme -->
+
+    <!-- Colorful Theme -->
+    <style name="AppTheme_Colorful" parent="Base.Theme.Gameapp">
+        <item name="materialButtonStyle">@style/ColorfulButton</item>
+        <item name="android:textViewStyle">@style/ColorfulTextView</item>
+        <item name="editTextStyle">@style/ColorfulEditText</item>
+        <item name="cardViewStyle">@style/ColorfulCardView</item>
+        <item name="android:statusBarColor">@color/jasper</item>
+        <item name="android:navigationBarColor">@color/jasper</item>
+        <item name="roundedCorner">@color/jasper</item>
+        <item name="nav_icons">@color/jasper</item>
+        <item name="nav_bar">@color/saffron</item>
+        <item name="roundedImage">@color/saffron</item>
+        <item name="gameIconColor">@color/saffron</item>
+        <item name="gameDescriptionColor">@color/white</item>
+        <item name="userBackgroundColor">@color/white</item>
+        <item name="historyPlayerTextColor">@color/white</item>
+        <item name="historyTextColor">@color/white</item>
+        <item name="historyDateTextColor">@color/black</item>
+        <item name="android:windowBackground">@color/midnight_green</item>
+    </style>
+
+    <style name="ColorfulButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/saffron</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="background">@drawable/rounded_corners</item>
+    </style>
+
+    <style name="ColorfulTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="ColorfulEditText" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/rounded_corners</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="ColorfulCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:background">@drawable/rounded_image</item>
+        <item name="android:backgroundTint">@color/white</item>
+    </style>
+    <!-- Colorful Theme -->
+
+    <!-- Light Theme -->
+    <style name="AppTheme_Light" parent="Base.Theme.Gameapp">
+        <item name="materialButtonStyle">@style/LightButton</item>
+        <item name="android:textViewStyle">@style/LightTextView</item>
+        <item name="editTextStyle">@style/LightEditText</item>
+        <item name="cardViewStyle">@style/LightCardView</item>
+        <item name="android:statusBarColor">@color/bright_pink</item>
+        <item name="android:navigationBarColor">@color/bright_pink</item>
+        <item name="roundedCorner">@color/bright_pink</item>
+        <item name="nav_icons">@color/bright_pink</item>
+        <item name="nav_bar">@color/celeste</item>
+        <item name="roundedImage">@color/celeste</item>
+        <item name="gameIconColor">@color/celeste</item>
+        <item name="gameDescriptionColor">@color/white</item>
+        <item name="userBackgroundColor">@color/celeste</item>
+        <item name="historyPlayerTextColor">@color/white</item>
+        <item name="historyTextColor">@color/black</item>
+        <item name="historyDateTextColor">@color/black</item>
+        <item name="android:windowBackground">@color/baby_powder</item>
+    </style>
+
+    <style name="LightButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/celeste</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="background">@drawable/rounded_corners</item>
+    </style>
+
+    <style name="LightTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="LightEditText" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/rounded_corners</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <style name="LightCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:background">@drawable/rounded_image</item>
+        <item name="android:backgroundTint">@color/white</item>
+    </style>
+    <!-- Light Theme -->
 </resources>
