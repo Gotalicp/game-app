@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.game_app.R
-import com.example.game_app.data.FireBaseUtilityAcc
-import com.example.game_app.data.FireBaseUtilityHistory
+import com.example.game_app.data.firebase.FireBaseUtilityAcc
+import com.example.game_app.data.firebase.FireBaseUtilityHistory
 import com.example.game_app.data.GameHistory
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.AccountProvider
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     val acc = AccountProvider
-    fun getEmail() = FireBaseUtilityAcc().getEmail()
+    fun getEmail() = FireBaseUtilityAcc.getEmail()
     private var history = mutableListOf<GameHistory>()
 
     private val _historyInfo = MutableLiveData<List<History>>()
@@ -33,21 +33,22 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun onClick(position: Int, item: HistoryWrapper) {
         viewModelScope.launch {
-            val captured = _historyInfo.value.orEmpty().toMutableList()
-            if (item.arrowRotation == 180F) {
-                (captured[position] as? HistoryEntry)?.history?.arrowRotation = 0F
-                history.find { it.id == item.id }
-                    ?.toPlayerWrapper()?.let { playerWrappers ->
-                        captured.addAll(position + 1, playerWrappers
-                            .map { PlayerEntry(it) })
+            _historyInfo.value.orEmpty().toMutableList().let { histories ->
+                if (item.arrowRotation == 180F) {
+                    (histories[position] as? HistoryEntry)?.history?.arrowRotation = 0F
+                    history.find { it.id == item.id }
+                        ?.toPlayerWrapper()?.let { playerWrappers ->
+                            histories.addAll(position + 1, playerWrappers
+                                .map { PlayerEntry(it) }.sortedByDescending { it.player.score })
+                        }
+                } else {
+                    (histories[position] as? HistoryEntry)?.history?.arrowRotation = 180F
+                    while (position + 1 < histories.size && histories[position + 1] is PlayerEntry) {
+                        histories.removeAt(position + 1)
                     }
-            } else {
-                (captured[position] as? HistoryEntry)?.history?.arrowRotation = 180F
-                while (position + 1 < captured.size && captured[position + 1] is PlayerEntry) {
-                    captured.removeAt(position + 1)
                 }
+                _historyInfo.postValue(histories)
             }
-            _historyInfo.postValue(captured)
         }
     }
 
@@ -73,7 +74,11 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getOutcomeColor(players: Map<String, Int>) = if (players[acc.getUid()]
             ?.let { isValueInTop50Percent(players, it) } == true
-    ) { R.color.green } else { R.color.red }
+    ) {
+        R.color.green
+    } else {
+        R.color.red
+    }
 
     private fun isValueInTop50Percent(map: Map<String, Int>, valueToCheck: Int): Boolean {
         return map.values.sortedDescending().let {

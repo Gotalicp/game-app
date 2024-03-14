@@ -1,6 +1,8 @@
-package com.example.game_app.data
+package com.example.game_app.data.firebase
 
 import android.util.Log
+import com.example.game_app.data.GetLocalIp
+import com.example.game_app.data.LobbyInfo
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.LobbyProvider
 import com.example.game_app.domain.firebase.CodeAdapter

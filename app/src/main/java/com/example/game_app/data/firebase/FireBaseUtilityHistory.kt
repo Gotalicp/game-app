@@ -1,5 +1,7 @@
-package com.example.game_app.data
+package com.example.game_app.data.firebase
 
+import com.example.game_app.data.GameHistory
+import com.example.game_app.data.GetPlacement
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.firebase.HistoryAdapter
 import com.google.firebase.Firebase

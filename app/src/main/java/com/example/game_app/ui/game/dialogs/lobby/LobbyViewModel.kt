@@ -1,8 +1,8 @@
-package com.example.game_app.ui.game.goFish.popup
+package com.example.game_app.ui.game.dialogs.lobby
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.example.game_app.data.FireBaseUtilityLobby
+import com.example.game_app.data.firebase.FireBaseUtilityLobby
 
 class LobbyViewModel(application: Application) : AndroidViewModel(application) {
     private val fireBaseUtility = FireBaseUtilityLobby()

@@ -1,4 +1,4 @@
-package com.example.game_app.data
+package com.example.game_app.data.firebase
 
 import java.io.Serializable
 

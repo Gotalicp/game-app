@@ -1,4 +1,4 @@
-package com.example.game_app.ui.game.goFish.popup
+package com.example.game_app.ui.game.dialogs
 
 import android.annotation.SuppressLint
 import android.graphics.Color

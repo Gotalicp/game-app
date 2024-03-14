@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.game_app.data.FireBaseUtilityAcc
+import com.example.game_app.data.firebase.FireBaseUtilityAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.SharedInformation
@@ -25,7 +25,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
                 PlayerCache.instance.get(it.uid)?.let { acc ->
                     AccountProvider.updateAcc(acc)
                 }
-            } ?: run { FireBaseUtilityAcc().logout() }
+            } ?: run { FireBaseUtilityAcc.logout() }
 
             SharedInformation.getLogged().collect {
                 if (!it) {

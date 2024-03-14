@@ -12,7 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.FireBaseUtilityHistory
+import com.example.game_app.data.firebase.FireBaseUtilityHistory
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.databinding.ActivityGoFishBinding
@@ -23,7 +23,7 @@ import com.example.game_app.domain.game.Rank
 import com.example.game_app.domain.server.OkClient
 import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
-import com.example.game_app.ui.CountDown
+import com.example.game_app.ui.common.CountDown
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GameStates
 import com.example.game_app.ui.game.GivingCardAnimation

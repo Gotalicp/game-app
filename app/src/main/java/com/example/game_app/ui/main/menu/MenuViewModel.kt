@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import com.example.game_app.data.FireBaseUtilityLobby
+import com.example.game_app.data.firebase.FireBaseUtilityLobby
 
 class MenuViewModel(private val application: Application) : AndroidViewModel(application) {
     private val fireBaseUtilityLobby = FireBaseUtilityLobby()

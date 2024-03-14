@@ -5,7 +5,7 @@ import android.util.Base64
 import com.example.game_app.data.common.Adapter
 import java.io.ByteArrayOutputStream
 
-class BitmapConverter : Adapter<Bitmap, String> {
+class BitmapToString : Adapter<Bitmap, String> {
     override fun adapt(t: Bitmap):String{
         val byteArrayOutputStream = ByteArrayOutputStream()
         t.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)

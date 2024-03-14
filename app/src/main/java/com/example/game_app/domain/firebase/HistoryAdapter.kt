@@ -22,6 +22,6 @@ class HistoryAdapter : Adapter<DataSnapshot?, MutableList<GameHistory>> {
                 gameHistoryList.add(gameHistory)
             }
         }
-        return gameHistoryList
+        return gameHistoryList.sortedByDescending { it.id }.toMutableList()
     }
 }

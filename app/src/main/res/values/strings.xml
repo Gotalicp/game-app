@@ -16,13 +16,17 @@
     <string name="show_password">Show Password</string>
     <string name="play">Play</string>
     <string name="host">Host</string>
+    <string name="themes">Themes</string>
     <string name="join">Join</string>
+    <string name="change_image">Change Image</string>
+    <string name="change_name">Change Name</string>
 
     //hints
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="username">Username</string>
     <string name="email">Email</string>
+    <string name="enter_code">Enter code to join</string>
     <string name="code">Code</string>
 
     //text views
@@ -35,8 +39,12 @@
     <string name="rounds">Rounds: </string>
     <string name="have_account">Have an account? Login here</string>
     <string name="no_account">Don\'t have an account? Register here</string>
-    <string name="enter_code">Enter code to join</string>
     <string name="date">Date</string>
     <string name="score">Score</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="rename">Rename</string>
+    <string name="enter_new_name">Enter new name</string>
+    <string name="profile">Profile</string>
+    <string name="more">More</string>
 
 </resources>

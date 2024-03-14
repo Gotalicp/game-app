@@ -11,6 +11,7 @@ import android.widget.ToggleButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
+import com.example.game_app.data.clickWithDebounce
 import com.example.game_app.ui.common.ItemClickListener
 
 class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -87,14 +88,14 @@ class HistoryRecycleView : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 text = item.outcome
                 try {
                     setTextColor(ContextCompat.getColor(context, item.outcomeColor))
-                }catch (_: Exception){
+                } catch (_: Exception) {
                     setTextColor(ContextCompat.getColor(context, R.color.blue))
                 }
             }
             date.text = item.date
             arrow.apply {
                 rotation = item.arrowRotation
-                setOnClickListener {
+                clickWithDebounce {
                     itemClickListener?.onItemClicked(item, bindingAdapterPosition)
                     notifyItemChanged(bindingAdapterPosition)
                 }

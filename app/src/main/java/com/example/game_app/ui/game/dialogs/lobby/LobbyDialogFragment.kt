@@ -1,4 +1,4 @@
-package com.example.game_app.ui.game.goFish.popup
+package com.example.game_app.ui.game.dialogs.lobby
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.data.PlayerCache
 import com.example.game_app.databinding.DialogLobbyBinding
 import com.example.game_app.domain.LobbyProvider
-import com.example.game_app.domain.SharedInformation
 import com.example.game_app.ui.common.CustomSpinnerAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

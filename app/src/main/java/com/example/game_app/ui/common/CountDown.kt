@@ -1,4 +1,4 @@
-package com.example.game_app.ui
+package com.example.game_app.ui.common
 
 import android.os.CountDownTimer
 import android.util.Log
@@ -16,6 +16,7 @@ class CountDown(
         progressBar.max = (millisInFuture / 1000).toInt()
         start()
     }
+
     fun cancelCountdown() {
         cancel()
         progressBar.visibility = View.INVISIBLE

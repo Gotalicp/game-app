@@ -2,7 +2,7 @@ package com.example.game_app.domain.firebase
 
 import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.common.Adapter
-import com.example.game_app.domain.bitmap.BitmapReverser
+import com.example.game_app.domain.bitmap.StringToBitmap
 import com.google.firebase.database.DataSnapshot
 
 class AccAdapter : Adapter<DataSnapshot?, AppAcc?> {
@@ -13,7 +13,7 @@ class AccAdapter : Adapter<DataSnapshot?, AppAcc?> {
                     it1,
                     t.child("uid").getValue(String::class.java)?:"",
                     t.child("image").getValue(String::class.java)
-                        ?.let { it2 -> BitmapReverser().adapt(it2) })
+                        ?.let { it2 -> StringToBitmap().adapt(it2) })
             }
         }
     }

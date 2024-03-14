@@ -16,9 +16,9 @@ import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.game.GameUiMapper
 import com.example.game_app.ui.game.GameUiModel
 import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
-import com.example.game_app.ui.game.goFish.popup.EndDialogFragment
-import com.example.game_app.ui.game.goFish.popup.LobbyDialogFragment
-import com.example.game_app.ui.game.goFish.popup.StartingInDialogFragment
+import com.example.game_app.ui.game.dialogs.end.EndDialogFragment
+import com.example.game_app.ui.game.dialogs.lobby.LobbyDialogFragment
+import com.example.game_app.ui.game.dialogs.StartingInDialogFragment
 
 class GoFishActivity : AppCompatActivity() {
     private val goFishViewModel: GoFishViewModel by viewModels()

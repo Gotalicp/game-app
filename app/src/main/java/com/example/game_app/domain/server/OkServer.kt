@@ -2,7 +2,7 @@ package com.example.game_app.domain.server
 
 import android.util.Log
 import com.example.game_app.domain.game.GameLogic
-import com.example.game_app.data.FireBaseUtilityLobby
+import com.example.game_app.data.firebase.FireBaseUtilityLobby
 import com.example.game_app.domain.AccountProvider
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
