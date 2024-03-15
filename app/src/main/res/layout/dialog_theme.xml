@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corners"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="20dp">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/blue_theme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:maxLines="1"
+        android:text="@string/blue_theme"
+        android:textAlignment="textStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/blue_arrow"
+        android:layout_width="25dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:rotation="90"
+        android:src="@drawable/arrow"
+        app:layout_constraintBottom_toBottomOf="@id/blue_theme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/blue_theme" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/colorful_theme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:maxLines="1"
+        android:text="@string/colorful_theme"
+        android:textAlignment="textStart"
+        app:layout_constraintEnd_toStartOf="@id/colorful_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/blue_theme" />
+
+    <ImageView
+        android:id="@+id/colorful_arrow"
+        android:layout_width="25dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:rotation="90"
+        android:src="@drawable/arrow"
+        app:layout_constraintBottom_toBottomOf="@id/colorful_theme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/colorful_theme" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/light_theme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:maxLines="1"
+        android:text="@string/light_theme"
+        android:textAlignment="textStart"
+        app:layout_constraintEnd_toStartOf="@id/light_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/colorful_theme" />
+
+    <ImageView
+        android:id="@+id/light_arrow"
+        android:layout_width="25dp"
+        android:layout_height="0dp"
+        android:clickable="false"
+        android:rotation="90"
+        android:src="@drawable/arrow"
+        app:layout_constraintBottom_toBottomOf="@id/light_theme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/light_theme" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

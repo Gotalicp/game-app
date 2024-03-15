@@ -16,9 +16,9 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val application: Application) : AndroidViewModel(application) {
-
     private val _intent = MutableLiveData<Intent>()
     val intent: LiveData<Intent> = _intent
+
     init {
         viewModelScope.launch {
             Firebase.auth.currentUser?.let {
