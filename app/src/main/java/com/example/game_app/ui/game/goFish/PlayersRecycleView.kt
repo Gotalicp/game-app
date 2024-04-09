@@ -31,7 +31,7 @@ class PlayersRecycleView : RecycleViewAdapter<Pair<GoFishLogic.Player, AppAcc>>(
         override fun bind(item: Pair<GoFishLogic.Player, AppAcc>) {
             super.bind(item)
             id = item.second.uid
-            score.text = "${item.first.score}:"
+            score.text = "${item.first.player.score}:"
             profile.setImageBitmap(item.second.image)
             name.text = item.second.username
             cards.text = item.first.deck.size.toString()

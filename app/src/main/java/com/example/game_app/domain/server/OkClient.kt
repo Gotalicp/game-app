@@ -17,10 +17,12 @@ import java.io.Serializable
 import java.lang.Exception
 
 class OkClient<T : Serializable>(
+    ip: String,
     override val gameLogic: GameLogic<T>,
     override val expectedTClazz: Class<T>,
-    ip: String,
-    private val code: String, override val port: Int,
+    private val code: String,
+    override val clazz: String = "",
+    override val port: Int,
 ) : ServerInterface<T> {
     private var manager = OkSocket.open(ConnectionInfo(ip, port))
     private val fireBaseUtilityLobby = FireBaseUtilityLobby()

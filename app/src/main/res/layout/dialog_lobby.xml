@@ -105,7 +105,7 @@
         android:layout_height="0dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/rounded_image"
+        android:background="@color/white"
         android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@id/btn_exit"
         app:layout_constraintLeft_toRightOf="@+id/settings"

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
-        android:name="com.example.game_app.ui.MyApplication"
+        android:name=".ui.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,6 +19,12 @@
         android:theme="@style/Base.Theme.Gameapp"
         tools:ignore="RtlEnabled"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.game.coin.CoinActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_coin"
+            android:theme="@style/Base.Theme.Gameapp.Fullscreen" />
         <activity
             android:name=".ui.game.goFish.GoFishActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -37,7 +43,6 @@
             android:name=".ui.login.AuthenticationActivity"
             android:exported="false"
             android:label="Authentication" />
-
         <activity
             android:name=".ui.main.MainActivity"
             android:exported="true"
@@ -47,8 +52,10 @@
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

@@ -12,7 +12,7 @@ import com.example.game_app.ui.common.AppAcc
 class LobbyAdapter : RecycleViewAdapter<AppAcc>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
-    R.layout.item_popup_profile
+    R.layout.item_lobby_player
 ) {
     var itemClickListener: ItemClickListener<AppAcc>? = null
     override fun createViewHolder(view: View) = PopupLobbyViewHolder(view)

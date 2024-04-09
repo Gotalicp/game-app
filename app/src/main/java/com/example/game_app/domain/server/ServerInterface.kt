@@ -5,6 +5,7 @@ import com.example.game_app.domain.game.GameLogic
 interface ServerInterface<T> {
     val gameLogic: GameLogic<T>
     val expectedTClazz: Class<T>
+    val clazz: String
     val port: Int
     fun join()
     fun disconnect()

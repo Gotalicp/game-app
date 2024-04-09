@@ -1,4 +1,6 @@
 package com.example.game_app.domain.game
 
-class PlayerWrapper {
-}
+data class PlayerWrapper(
+    val uid: String,
+    var score: Int,
+)

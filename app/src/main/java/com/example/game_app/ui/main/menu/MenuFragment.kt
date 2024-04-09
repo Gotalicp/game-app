@@ -11,6 +11,7 @@ import com.example.game_app.R
 import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.FragmentMenuBinding
 import com.example.game_app.ui.game.chess.ChessActivity
+import com.example.game_app.ui.game.coin.CoinActivity
 import com.example.game_app.ui.game.goFish.GoFishActivity
 
 class MenuFragment : Fragment(R.layout.fragment_menu), MenuAdapter.AdapterListener {
@@ -24,7 +25,10 @@ class MenuFragment : Fragment(R.layout.fragment_menu), MenuAdapter.AdapterListen
             R.drawable.go_fish, GoFishActivity::class.java, R.string.go_fish_description
         ),
         LibraryGame(
-            R.drawable.image, ChessActivity::class.java, R.string.chess_description
+            R.drawable.chess, ChessActivity::class.java, R.string.chess_description
+        ),
+        LibraryGame(
+            R.drawable.coin_flip, CoinActivity::class.java,R.string.coin_flip_description
         )
     )
     private var isVerticalScrollEnabled = true

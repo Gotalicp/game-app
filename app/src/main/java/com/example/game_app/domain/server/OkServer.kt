@@ -22,7 +22,9 @@ import java.io.Serializable
 
 class OkServer<T : Serializable>(
     override val gameLogic: GameLogic<T>,
-    override val expectedTClazz: Class<T>, override val port: Int
+    override val expectedTClazz: Class<T>,
+    override val clazz: String,
+    override val port: Int
 ) : ServerInterface<T> {
     private val fireBaseUtility = FireBaseUtilityLobby()
     private val register = OkSocket.server(port)
@@ -34,7 +36,7 @@ class OkServer<T : Serializable>(
     private var serverManager = register.registerReceiver(object : IServerActionListener {
         override fun onServerListening(serverPort: Int) {
             Log.d("OkServer", "Listening")
-            fireBaseUtility.hostLobby("GoFish")
+            fireBaseUtility.hostLobby(clazz)
         }
 
         override fun onClientConnected(
@@ -61,7 +63,7 @@ class OkServer<T : Serializable>(
                             } catch (_: JsonSyntaxException) {
                             }
                             try {
-                                val data = Gson().fromJson(it, String::class.java)
+                                val data = Gson().fromJson(it, clazz::class.java)
                                 Log.d("DATA", data.toString())
                             } catch (_: JsonSyntaxException) {
                             }

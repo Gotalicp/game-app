@@ -9,5 +9,6 @@ class MyApplication : Application() {
         super.onCreate()
         FirebaseApp.initializeApp(this)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
     }
 }

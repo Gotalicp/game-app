@@ -6,12 +6,7 @@ import android.widget.TextView
 import com.example.game_app.R
 import com.example.game_app.ui.common.RecycleViewAdapter
 
-data class EndScreenWrapper(
-    val name: String,
-    val score: String,
-    val placement: String
-)
-class EndScreenAdapter: RecycleViewAdapter<EndScreenWrapper>(
+class EndScreenAdapter: RecycleViewAdapter<EndWrapper>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
     R.layout.item_leaderboard
@@ -24,7 +19,7 @@ class EndScreenAdapter: RecycleViewAdapter<EndScreenWrapper>(
 
 
         @SuppressLint("SetTextI18n")
-        override fun bind(item: EndScreenWrapper) {
+        override fun bind(item: EndWrapper) {
             name.text = item.name
             score.text = item.score
             placement.text = item.placement

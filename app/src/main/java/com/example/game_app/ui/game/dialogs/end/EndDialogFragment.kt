@@ -9,14 +9,10 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.game_app.data.GetPlacement
 import com.example.game_app.databinding.DialogEndBinding
-import com.example.game_app.domain.game.GoFishLogic
-import com.example.game_app.ui.common.AppAcc
 
 class EndDialogFragment(
-    private val players: List<GoFishLogic.Player>,
-    private val users: List<AppAcc>
+    private val players: List<EndWrapper>
 ) : DialogFragment() {
     private var _binding: DialogEndBinding? = null
     private val binding
@@ -49,20 +45,7 @@ class EndDialogFragment(
             btnExit.setOnClickListener {
                 (context as? Activity)?.finish()
             }
-            adapter.apply {
-                updateItems(users.mapNotNull { name ->
-                    players.find { it.uid == name.uid }?.let { player ->
-                        EndScreenWrapper(
-                            name.username,
-                            player.score.toString(),
-                            GetPlacement.findPlacement(players.map {
-                                Pair(it.uid, it.score)
-                            }, player.uid)
-                        )
-                    }
-                }.sortedByDescending { it.score }
-                )
-            }
+            adapter.updateItems(players)
             scoreboard.layoutManager = LinearLayoutManager(context)
             scoreboard.adapter = adapter
         }

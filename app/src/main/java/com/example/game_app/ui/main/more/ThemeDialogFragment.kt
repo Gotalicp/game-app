@@ -14,13 +14,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
+import com.example.game_app.data.SharedTheme
 
 class ThemeDialogFragment : DialogFragment() {
     private var _binding: DialogThemeBinding? = null
     private val binding
         get() = requireNotNull(_binding)
 
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedTheme
 
     override fun onStart() {
         super.onStart()
@@ -40,7 +41,7 @@ class ThemeDialogFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = DialogThemeBinding.inflate(inflater, container, false)
-        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        sharedPreferences = SharedTheme(requireActivity())
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         setStyle(STYLE_NO_FRAME, android.R.style.Theme)
         dialog?.window?.apply {
@@ -57,19 +58,19 @@ class ThemeDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             lightTheme.setOnClickListener {
-                sharedPreferences.edit().putInt("theme", R.style.AppTheme_Light).apply()
+                sharedPreferences.saveTheme(R.style.AppTheme_Light)
                 (requireActivity() as MainActivity).recreate()
                 dismiss()
             }
 
             blueTheme.setOnClickListener {
-                sharedPreferences.edit().putInt("theme", R.style.AppTheme_Blue).apply()
+                sharedPreferences.saveTheme(R.style.AppTheme_Blue)
                 (requireActivity() as MainActivity).recreate()
                 dismiss()
             }
 
             colorfulTheme.setOnClickListener {
-                sharedPreferences.edit().putInt("theme", R.style.AppTheme_Colorful).apply()
+                sharedPreferences.saveTheme(R.style.AppTheme_Colorful)
                 (requireActivity() as MainActivity).recreate()
                 dismiss()
             }

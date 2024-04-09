@@ -31,6 +31,8 @@ class LobbyDialogFragment(
     private val binding
         get() = requireNotNull(_binding)
 
+    private var canStart = false
+
     private val viewModel: LobbyViewModel by viewModels()
     private val cache = PlayerCache.instance
     private val adapter = LobbyAdapter()
@@ -61,7 +63,7 @@ class LobbyDialogFragment(
             btnStart.apply {
                 visibility = if (canChangeSettings) View.VISIBLE else View.GONE
                 setOnClickListener {
-                    startGame?.invoke()
+                    if (canStart) startGame?.invoke()
                 }
             }
             btnExit.setOnClickListener {
@@ -73,6 +75,7 @@ class LobbyDialogFragment(
 
             LobbyProvider.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
                 lobbyCode.text = lobbyInfo.code
+                canStart = (lobbyInfo.players.size <= 2)
                 gameMode.text = "Game mode: ${lobbyInfo.clazz}"
                 CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
                     adapter.updateItems(lobbyInfo.players.mapNotNull { cache.get(it) })

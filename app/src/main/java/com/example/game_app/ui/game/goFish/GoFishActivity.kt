@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.example.game_app.data.SharedTheme
 import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.game.Rank
@@ -21,7 +22,7 @@ import com.example.game_app.ui.game.dialogs.lobby.LobbyDialogFragment
 import com.example.game_app.ui.game.dialogs.StartingInDialogFragment
 
 class GoFishActivity : AppCompatActivity() {
-    private val goFishViewModel: GoFishViewModel by viewModels()
+    private val viewModel: GoFishViewModel by viewModels()
     private lateinit var binding: ActivityGoFishBinding
 
     private val cardViewAdapter = CardsRecycleView()
@@ -33,6 +34,7 @@ class GoFishActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGoFishBinding.inflate(layoutInflater)
+        setTheme(SharedTheme(this).getTheme())
         setContentView(binding.root)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -42,7 +44,7 @@ class GoFishActivity : AppCompatActivity() {
         })
 
         binding.root.post {
-            goFishViewModel.joinGame(
+            viewModel.joinGame(
                 code = intent.getStringExtra("code"),
                 uid = intent.getStringExtra("lobbyUid"),
                 ip = intent.getStringExtra("lobbyIp")
@@ -53,13 +55,13 @@ class GoFishActivity : AppCompatActivity() {
             itemClickListener = object : ItemClickListener<AppAcc> {
                 override fun onItemClicked(item: AppAcc, itemPosition: Int) {
                     CardPickerPopup(application).apply {
-                        goFishViewModel.findMyDeck()?.let {
+                        viewModel.findMyDeck()?.let {
                             showPopup(binding.root, item, it)
                         }
                         adapter.itemClickListener = object : ItemClickListener<Rank> {
                             override fun onItemClicked(card: Rank, itemPosition: Int) {
                                 dismiss()
-                                item.uid.let { goFishViewModel.write(it, card) }
+                                item.uid.let { viewModel.write(it, card) }
                             }
                         }
                     }
@@ -73,25 +75,24 @@ class GoFishActivity : AppCompatActivity() {
                 (playerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 
-            goFishViewModel.goFishLogic.play.observe(this@GoFishActivity) { plays ->
-                goFishViewModel.showAnimation(plays, this)
+            viewModel.goFishLogic.play.observe(this@GoFishActivity) { plays ->
+                viewModel.showAnimation(plays, this)
             }
 
-            goFishViewModel.goFishLogic.gamePlayers.observe(this@GoFishActivity) {
+            viewModel.goFishLogic.gamePlayers.observe(this@GoFishActivity) {
                 profile.visibility = View.VISIBLE
-                goFishViewModel.findPlayers()?.let { players ->
+                viewModel.findMyDeck()?.let { cardViewAdapter.updateItems(it) }
+                viewModel.findPlayers()?.let { players ->
                     playerViewAdapter.updateItems(players.second)
                     players.first.first().let { me ->
-                        goFishViewModel.findMyDeck()
-                            ?.let { deck -> cardViewAdapter.updateItems(deck) }
                         yourImage.setImageBitmap(me.second.image)
-                        yourName.text = "${me.first.score}: ${me.second.username}"
+                        yourName.text = "${me.first.player.score}: ${me.second.username}"
                     }
                 }
-                deckSize.text = "${goFishViewModel.goFishLogic.getDeckSize()}"
+                deckSize.text = "${viewModel.goFishLogic.getDeckSize()}"
             }
         }
-        goFishViewModel.gameStates.map { GameUiMapper.map(it) }.observe(this) { updateContent(it) }
+        viewModel.state.map { GameUiMapper.map(it) }.observe(this) { updateContent(it) }
     }
 
     @SuppressLint("SetTextI18n")
@@ -106,7 +107,7 @@ class GoFishActivity : AppCompatActivity() {
             data.host?.let {
                 lobby = LobbyDialogFragment(
                     it,
-                    goFishViewModel.createSeed,
+                    viewModel.createSeed,
                     listOf(2, 3, 4, 5, 6),
                     listOf("No limit", "15", "30", "45", "60"),
                     listOf(1, 2, 3, 4, 5)
@@ -121,21 +122,22 @@ class GoFishActivity : AppCompatActivity() {
             }
             data.showEnd.let {
                 if (it) {
-                    goFishViewModel.goFishLogic.gamePlayers.value?.let { game ->
-                        goFishViewModel.players?.let { acc ->
-                            EndDialogFragment(game, acc)
-                        }
-                    }?.show(supportFragmentManager, EndDialogFragment.TAG)
+                    viewModel.getFinalScores()?.let { it1 ->
+                        EndDialogFragment(it1).show(
+                            supportFragmentManager,
+                            EndDialogFragment.TAG
+                        )
+                    }
                 }
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
-            data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }
-            data.playerName?.let { goFishViewModel.showPlayerToTakeTurn(binding.playerTurn, it) }
+            data.playerUid?.let { it1 -> viewModel.setTimer(binding, it1) }
+            data.playerName?.let { viewModel.showPlayerToTakeTurn(binding.playerTurn, it) }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        goFishViewModel.disconnect()
+        viewModel.disconnect()
     }
 }

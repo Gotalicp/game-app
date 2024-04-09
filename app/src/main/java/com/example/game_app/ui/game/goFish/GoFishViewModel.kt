@@ -27,6 +27,8 @@ import com.example.game_app.ui.common.CountDown
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GameStates
 import com.example.game_app.ui.game.GivingCardAnimation
+import com.example.game_app.ui.game.dialogs.end.EndWrapper
+import com.example.game_app.ui.game.dialogs.end.PlayerLeaderBoardAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -34,22 +36,23 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class GoFishViewModel(application: Application) : AndroidViewModel(application) {
-    private val _gameStates = MutableLiveData<GameStates>()
-    val gameStates: LiveData<GameStates> = _gameStates
+    private val _state = MutableLiveData<GameStates>()
+    val state: LiveData<GameStates> = _state
+
+    private var uid = AccountProvider.getUid()
+    private var lobby = LobbyProvider.getLobby()
+    private var cache = PlayerCache.instance
 
     //Server
     private var server: ServerInterface<GoFishLogic.Play>? = null
 
+    var goFishLogic = GoFishLogic()
     var players: List<AppAcc>? = null
     private var rounds: Int = -1
     private var timer: Long? = null
 
     var createSeed: (() -> Unit)? = null
 
-    private var uid = AccountProvider.getUid()
-    private var lobby = LobbyProvider.getLobby()
-    private var cache = PlayerCache.instance
-    var goFishLogic = GoFishLogic()
 
     private var countDown: CountDown? = null
 
@@ -70,9 +73,9 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     private suspend fun collectPlayer(player: String) {
         countDown?.cancelCountdown()
-        _gameStates.postValue(cache.get(player)?.username?.let { name ->
-            GameStates.MyTurn((player == uid), player, name)
-        })
+        cache.get(player)?.username?.let { name ->
+            _state.postValue(GameStates.MyTurn((player == uid), player, name))
+        }
     }
 
     private suspend fun collectSeed(seed: Long) {
@@ -80,21 +83,21 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             setUp()
         }
         Log.d("GoFishViewModel", "Seed: $seed")
-        _gameStates.postValue(GameStates.StartingIn(5000L, false))
+        _state.postValue(GameStates.StartingIn(5000L, false))
         delay(5000L)
         goFishLogic.startGame(seed)
     }
 
     private fun collectHasEnded(hasEnded: Boolean) {
         if (hasEnded) {
-            _gameStates.value = GameStates.EndGame
+            _state.value = GameStates.EndGame
             this.rounds -= 1
             if (this.rounds > 0) {
                 createSeed?.invoke()
             } else {
                 players?.let { players ->
                     players.associate {
-                        Pair(it.uid, goFishLogic.getPlayer(it.uid)?.score ?: 0)
+                        Pair(it.uid, goFishLogic.getPlayer(it.uid)?.player?.score ?: 0)
                     }.let { map ->
                         uid?.let { FireBaseUtilityHistory().updateHistory(map, "GoFish", it) }
                     }
@@ -105,8 +108,10 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     private suspend fun setUp() {
         lobby.value?.let { lobby ->
-            players = lobby.players.map {
-                PlayerCache.instance.get(it)!!
+            players = lobby.players.mapNotNull {
+                PlayerCache.instance.get(it)
+            }.apply {
+                goFishLogic.setPlayer(map { it.uid }.toMutableList())
             }
             rounds = lobby.rounds
             try {
@@ -118,7 +123,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
 
     //Methods to get Information from GameLogic
     fun findPlayers() =
-        goFishLogic.gamePlayers.value?.associateBy { it.uid }?.let { gamePlayers ->
+        goFishLogic.gamePlayers.value?.associateBy { it.player.uid }?.let { gamePlayers ->
             players?.mapNotNull { player ->
                 gamePlayers[player.uid]?.let {
                     Pair(it, player)
@@ -127,7 +132,16 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
         }?.partition { it.second.uid == uid }
 
     fun findMyDeck() =
-        goFishLogic.gamePlayers.value?.find { uid == it.uid }?.deck?.sortedBy { it.rank }
+        goFishLogic.gamePlayers.value?.find { uid == it.player.uid }?.deck?.sortedBy { it.rank }
+
+    fun getFinalScores(): List<EndWrapper>? {
+        goFishLogic.gamePlayers.value?.map { it.player }?.let { gamePlayer ->
+            players?.let { account ->
+                return PlayerLeaderBoardAdapter().adapt(Pair(account, gamePlayer))
+            }
+        }
+        return null
+    }
 
     //Server Part
     fun joinGame(code: String? = null, uid: String? = null, ip: String? = null) {
@@ -140,12 +154,13 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
                 port = 8888
             ).apply {
                 join()
-                _gameStates.value = GameStates.PreGame(false)
+                _state.value = GameStates.PreGame(false)
             }
         } else {
             OkServer(
                 gameLogic = goFishLogic,
                 expectedTClazz = GoFishLogic.Play::class.java,
+                clazz = "GoFish",
                 port = 8888
             ).apply {
                 join()
@@ -155,7 +170,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
                         server?.send(seed)
                     }
                 }
-                _gameStates.value = GameStates.PreGame(true)
+                _state.value = GameStates.PreGame(true)
             }
         }
     }
