@@ -15,6 +15,7 @@ import com.example.game_app.ui.game.GameUiModel
 import com.example.game_app.ui.game.dialogs.StartingInDialogFragment
 import com.example.game_app.ui.game.dialogs.end.EndDialogFragment
 import com.example.game_app.ui.game.dialogs.lobby.LobbyDialogFragment
+import com.github.bhlangonijr.chesslib.Side
 
 class ChessActivity : AppCompatActivity() {
     private val viewModel: ChessViewModel by viewModels()
@@ -46,8 +47,14 @@ class ChessActivity : AppCompatActivity() {
             board.chessDelegate = object : ChessDelegate {
                 override fun pieceAt(pawn: String) = viewModel.getChessPiece(pawn)
 
-                override fun movePiece(move: Pair<String, String>) {
-                    viewModel.validateMove(move)
+                override fun movePiece(side: Side, move: Pair<String, String>, promotion: Boolean) {
+                    if (promotion) {
+                        PromotionDialogFragment(side) {
+                            viewModel.validateMove(side,move, it)
+                        }.show(supportFragmentManager, "PromotionDialogFragment")
+                    } else {
+                        viewModel.validateMove(side,move, null)
+                    }
                 }
 
                 override fun getLegalMoves(location: String) = viewModel.getLegalMoves(location)
@@ -77,7 +84,6 @@ class ChessActivity : AppCompatActivity() {
                     yourName2.text = it.username
                 }
                 board.side = viewModel.getMySide()
-                board.invalidate()
             }
             data.host?.let {
                 lobby = LobbyDialogFragment(

@@ -1,6 +1,5 @@
 package com.example.game_app.domain.game.chess
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.game_app.domain.LobbyProvider
@@ -22,7 +21,7 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
         val side: Side,
         val from: String,
         val to: String,
-        val promotion: String?
+        val promotion: PieceType?
     ) : Serializable
 
     data class Player(
@@ -51,10 +50,11 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
     override suspend fun startGame(seed: Long) {
         if (_gamePlayers.value == null) {
             LobbyProvider.getLobby().value?.players?.let { setPlayer(it) }
+        } else {
+            switchSides()
         }
         _hasEnded.value = false
         board = Board()
-        switchSides()
         _gamePlayers.value?.find { it.side == Side.WHITE }?.player?.uid?.let {
             _playerToTakeTurn.emit(it)
         }
@@ -64,8 +64,8 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
 
     override fun setPlayer(players: MutableList<String>) {
         _gamePlayers.value = mutableListOf(
-            Player(Side.WHITE, PlayerWrapper(players.last(), 0)),
-            Player(Side.BLACK, PlayerWrapper(players.first(), 0))
+            Player(Side.WHITE, PlayerWrapper(players.first(), 0)),
+            Player(Side.BLACK, PlayerWrapper(players.last(), 0))
         )
     }
 
@@ -78,16 +78,14 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
     override suspend fun turnHandling(t: Play) {
         if (board.doMove(convertToMove(t))) {
             nextPlayer(t.side)
-            _play.value.let {
-                _play.postValue(it?.apply { add(t) } ?: mutableListOf(t))
-            }
-            if (checkEndGame()) {
+            _play.postValue(_play.value?.apply { add(t) } ?: mutableListOf(t))
+            _hasEnded.value = checkEndGame()
+            if (_hasEnded.value) {
                 if (board.isMated) {
                     _gamePlayers.value?.find { it.side == t.side }?.player?.let {
                         it.score += 1
                     }
                 }
-                _hasEnded.value = true
             }
         }
     }
@@ -96,20 +94,15 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
     { it == convertToMove(play) }?.let
     { true } ?: false)
 
-    private fun convertToMove(t: Play) = t.promotion?.let {
-        Move(
-            Square.fromValue(t.from),
-            Square.fromValue(t.to),
-            Piece.make(t.side, PieceType.fromValue(t.promotion))
-        )
-    } ?: Move(
+    private fun convertToMove(t: Play) = Move(
         Square.fromValue(t.from),
-        Square.fromValue(t.to)
+        Square.fromValue(t.to),
+        t.promotion?.let { Piece.make(t.side, t.promotion) } ?: Piece.NONE
     )
 
     //Sets the next player
     private suspend fun nextPlayer(side: Side) {
-        gamePlayers.value?.find { it.side != side }?.let {
+        _gamePlayers.value?.find { it.side != side }?.let {
             _playerToTakeTurn.emit(it.player.uid)
         }
     }

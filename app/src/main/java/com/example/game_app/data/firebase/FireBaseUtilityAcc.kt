@@ -15,15 +15,14 @@ import kotlinx.coroutines.tasks.await
 object FireBaseUtilityAcc {
     private var database = Firebase.database.getReference("user")
     fun getEmail() = Firebase.auth.currentUser?.email
+
     fun createUser(uid: String, username: String, image: Bitmap) {
         database.child(uid)
             .setValue(FireBaseAcc(username, uid, BitmapToString().adapt(image)))
             .addOnCompleteListener {
                 AccountProvider.updateAcc(AppAcc(username, uid, image))
                 SharedInformation.updateLogged(true)
-            }.addOnFailureListener {
-                logout()
-            }
+            }.addOnFailureListener { logout() }
     }
 
     suspend fun getUser(uid: String): AppAcc? {

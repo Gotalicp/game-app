@@ -22,11 +22,9 @@ class Deck {
     private val cards: MutableList<Card> = mutableListOf()
 
     init {
-        for (suit in Suit.values()) {
-            for (rank in Rank.values()) {
+        for (suit in Suit.values())
+            for (rank in Rank.values())
                 cards.add(Card(suit, rank))
-            }
-        }
     }
 
     fun deal(
@@ -46,16 +44,11 @@ class Deck {
     }
 
     fun showDeck() {
-        for (card in cards) {
+        for (card in cards)
             Log.d("ShowDeck", "${card.rank} of ${card.suit}")
-        }
     }
 
-    fun drawCard() = if (cards.isNotEmpty()) {
-        cards.removeAt(0)
-    } else {
-        null
-    }
+    fun drawCard() = if (cards.isNotEmpty()) cards.removeAt(0) else null
 
     fun isEmpty() = cards.isEmpty()
 

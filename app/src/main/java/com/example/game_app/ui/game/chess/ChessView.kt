@@ -8,6 +8,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.example.game_app.domain.game.chess.ChessDelegate
+import com.github.bhlangonijr.chesslib.Piece
+import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Side
 import kotlin.math.min
 
@@ -31,6 +33,7 @@ class ChessView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
     private val paint = Paint()
 
     private var movingPieceBitmap: Drawable? = null
+    private var movingPieceType: PieceType? = null
     private var movingPiece: String? = null
 
     var chessDelegate: ChessDelegate? = null
@@ -70,6 +73,7 @@ class ChessView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
                     chessDelegate?.pieceAt(cell)?.let {
                         if (it.side == side) {
                             movingPiece = cell
+                            movingPieceType = it.pieceType
                             movingPieceBitmap =
                                 it.image?.let { image ->
                                     context.resources.getDrawable(
@@ -97,15 +101,20 @@ class ChessView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
                     if (event.x in originX..(originX + 8 * cellSide)
                         && event.y in originY..(originY + 8 * cellSide)
                     ) {
-                        chessDelegate?.movePiece(
-                            Pair(
-                                getCell(fromCol, fromRow),
-                                getCell(col, row)
+                        side?.let {
+                            chessDelegate?.movePiece(
+                                it,
+                                Pair(
+                                    getCell(fromCol, fromRow),
+                                    getCell(col, row)
+                                ),
+                                (row <= 0 && movingPieceType == PieceType.PAWN)
                             )
-                        )
+                        }
                     }
                 }
                 movingPiece = null
+                movingPieceType = null
                 movingPieceBitmap = null
                 invalidate()
             }
@@ -164,7 +173,7 @@ class ChessView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
                         chessDelegate?.getLegalMoves(cell)
                             ?.find { it.value() == getCell(col, row) }
                             ?.let { GridColor.GreenColor }
-                    } ?: if ((col + row) % 2 == 1) GridColor.LightColor else GridColor.DarkColor,
+                    } ?: if ((col + row) % 2 == 1) GridColor.DarkColor else GridColor.LightColor,
                     getCell(col, row)
                 )
             }
@@ -184,11 +193,11 @@ class ChessView(context: Context?, attrs: AttributeSet?) : View(context, attrs) 
         paint.color = Color.BLACK
         paint.textSize = 24f
         paint.textAlign = Paint.Align.CENTER
-            canvas.drawText(
-                text,
-                originX + (col + 0.5f) * cellSide,
-                (originY + (row + 0.5f) * cellSide),
-                paint
-            )
+        canvas.drawText(
+            text,
+            originX + (col + 0.5f) * cellSide,
+            (originY + (row + 0.5f) * cellSide),
+            paint
+        )
     }
 }

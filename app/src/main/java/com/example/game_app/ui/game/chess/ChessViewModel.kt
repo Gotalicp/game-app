@@ -20,6 +20,8 @@ import com.example.game_app.ui.game.GameStates
 import com.example.game_app.ui.game.dialogs.end.EndScreenAdapter
 import com.example.game_app.ui.game.dialogs.end.EndWrapper
 import com.example.game_app.ui.game.dialogs.end.PlayerLeaderBoardAdapter
+import com.github.bhlangonijr.chesslib.Piece
+import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
@@ -174,12 +176,11 @@ class ChessViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getLegalMoves(pawn: String): List<Square> = chessLogic.getPawnMoves(pawn)
 
-    fun validateMove(move: Pair<String, String>) {
-        getMySide()?.let { side ->
-            ChessLogic.Play(side, move.first, move.second, null).let {
-                if (chessLogic.validateMove(it)) {
-                    write(it)
-                }
+    fun validateMove(side: Side, move: Pair<String, String>, promotion: PieceType?) {
+        ChessLogic.Play(side, move.first, move.second, promotion).let {
+            Log.d("play", "$it")
+            if (chessLogic.validateMove(it)) {
+                write(it)
             }
         }
     }

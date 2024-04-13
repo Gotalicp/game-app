@@ -67,7 +67,7 @@ class FireBaseUtilityLobby {
 
     //Create a instance of hosted lobby in the database
     fun hostLobby(clazz: String) {
-        uid?.let {uid->
+        uid?.let { uid ->
             GetLocalIp().getLocalInetAddress()?.let { ip ->
                 generateUniqueCode(clazz, uid) {
                     LobbyInfo(
@@ -97,7 +97,6 @@ class FireBaseUtilityLobby {
                     addValueEventListener(listener)
                     child("players").child(it).setValue(it)
                 }
-
         }
     }
 

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/select_promotion"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/queenButton"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:adjustViewBounds="true"
+            android:padding="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/white_queen"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/rookButton"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:adjustViewBounds="true"
+            android:padding="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/white_rook"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/bishopButton"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:adjustViewBounds="true"
+            android:padding="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/white_bishop"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/knightButton"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:adjustViewBounds="true"
+            android:padding="16dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/white_horse"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</LinearLayout>
