@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.game_app.data.firebase.FireBaseUtilityAcc
 import com.example.game_app.data.PlayerCache
+import com.example.game_app.data.firebase.FireBaseUtilityAcc
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.SharedInformation
 import com.example.game_app.ui.login.AuthenticationActivity
@@ -16,8 +16,8 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val application: Application) : AndroidViewModel(application) {
-    private val _intent = MutableLiveData<Intent>()
-    val intent: LiveData<Intent> = _intent
+    private val _intent = MutableLiveData<Intent?>(null)
+    val intent: LiveData<Intent?> = _intent
 
     init {
         viewModelScope.launch {
@@ -30,6 +30,8 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
             SharedInformation.getLogged().collect {
                 if (!it) {
                     _intent.postValue(Intent(application, AuthenticationActivity::class.java))
+                } else {
+                    _intent.postValue(null)
                 }
             }
         }
