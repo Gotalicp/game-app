@@ -103,7 +103,7 @@ class FireBaseUtilityLobby {
     //Remove a player from selected lobby in database
     fun leaveLobby() {
         uid?.let {
-            lobbyReference?.child(it)?.removeValue()
+            lobbyReference?.child("players")?.child(it)?.removeValue()
             stopObservingLobby()
         }
     }

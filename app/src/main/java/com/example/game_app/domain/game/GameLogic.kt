@@ -7,7 +7,7 @@ interface GameLogic<T> {
     val playerToTakeTurn: Flow<String?>
     val seed: Flow<Long?>
     suspend fun startGame(seed: Long)
-    fun setPlayer(players: MutableList<String>)
+    fun setPlayer(players: List<String>)
     suspend fun turnHandling(t: T)
     fun checkEndGame(): Boolean
     fun updateSeed(seed: Long)

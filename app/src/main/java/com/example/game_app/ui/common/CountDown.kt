@@ -1,19 +1,23 @@
 package com.example.game_app.ui.common
 
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 
 class CountDown(
     private val progressBar: ProgressBar,
     private val onFinishCallback: () -> Unit,
-    millisInFuture: Long, countDownInterval: Long
-) : CountDownTimer(millisInFuture, countDownInterval) {
+    millisInFuture: Long
+) : CountDownTimer(millisInFuture, 1000) {
 
     init {
         progressBar.visibility = View.VISIBLE
         progressBar.max = (millisInFuture / 1000).toInt()
+    }
+
+    fun resetCountdown() {
+        progressBar.visibility = View.VISIBLE
+        progressBar.progress = progressBar.max
         start()
     }
 

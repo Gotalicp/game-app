@@ -62,7 +62,7 @@ class ChessLogic : GameLogic<ChessLogic.Play> {
 
     fun getPlayer(uid: String) = _gamePlayers.value?.find { it.player.uid == uid }
 
-    override fun setPlayer(players: MutableList<String>) {
+    override fun setPlayer(players: List<String>) {
         _gamePlayers.value = mutableListOf(
             Player(Side.WHITE, PlayerWrapper(players.first(), 0)),
             Player(Side.BLACK, PlayerWrapper(players.last(), 0))

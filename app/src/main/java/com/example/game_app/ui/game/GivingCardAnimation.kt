@@ -20,9 +20,11 @@ class GivingCardAnimation(
             override fun onAnimationStart(animation: Animation) {
                 view.visibility = View.VISIBLE
             }
+
             override fun onAnimationEnd(animation: Animation) {
                 view.visibility = View.GONE
             }
+
             override fun onAnimationRepeat(animation: Animation) {}
         })
     }
@@ -48,7 +50,7 @@ class GivingCardAnimation(
 
     override fun initialize(width: Int, height: Int, parentWidth: Int, parentHeight: Int) {
         super.initialize(width, height, parentWidth, parentHeight)
-        (parentWidth / 2f).let{
+        (parentWidth / 2f).let {
             deltaX1 = it - from[0]
             deltaX2 = to[0] - it
         }

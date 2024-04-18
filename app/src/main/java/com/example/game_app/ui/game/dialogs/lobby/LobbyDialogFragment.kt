@@ -7,18 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.AdapterView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.game_app.data.PlayerCache
 import com.example.game_app.databinding.DialogLobbyBinding
 import com.example.game_app.domain.LobbyProvider
+import com.example.game_app.ui.common.CustomItemSelectedListener
 import com.example.game_app.ui.common.CustomSpinnerAdapter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class LobbyDialogFragment(
     private val canChangeSettings: Boolean,
@@ -34,12 +30,9 @@ class LobbyDialogFragment(
     private var canStart = false
 
     private val viewModel: LobbyViewModel by viewModels()
-    private val cache = PlayerCache.instance
     private val adapter = LobbyAdapter()
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = DialogLobbyBinding.inflate(inflater, container, false)
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -50,9 +43,8 @@ class LobbyDialogFragment(
     override fun onStart() {
         super.onStart()
         dialog?.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        );
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+        )
     }
 
     @SuppressLint("SetTextI18n")
@@ -74,67 +66,44 @@ class LobbyDialogFragment(
             playerRecycleView.adapter = adapter
 
             LobbyProvider.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
+                if (lobbyInfo.code == "") {
+                    (context as? Activity)?.finish()
+                }
                 lobbyCode.text = lobbyInfo.code
-                canStart = (lobbyInfo.players.size <= 2)
+                canStart = (lobbyInfo.players.size >= 2)
+                turnTimeLimit.setSelection(timeLimit.indexOf(lobbyInfo.secPerTurn))
+                playerLimit.setSelection(maxPlayers.indexOf(lobbyInfo.maxPlayerCount))
+                roundLimit.setSelection(rounds.indexOf(lobbyInfo.rounds))
                 gameMode.text = "Game mode: ${lobbyInfo.clazz}"
-                CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
-                    adapter.updateItems(lobbyInfo.players.mapNotNull { cache.get(it) })
+                viewModel.getPlayer(lobbyInfo) {
+                    adapter.updateItems(it)
                 }
             }
 
             turnTimeLimit.apply {
-
                 setSelection(0)
                 isEnabled = canChangeSettings
                 adapter = CustomSpinnerAdapter(context, timeLimit)
-                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        viewModel.changeTime(canChangeSettings, time = timeLimit[position])
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
+                onItemSelectedListener = CustomItemSelectedListener {
+                    viewModel.changeSettings(canChangeSettings, time = timeLimit[it])
                 }
             }
+
             playerLimit.apply {
                 setSelection(0)
                 isEnabled = canChangeSettings
                 adapter = CustomSpinnerAdapter(context, maxPlayers)
-                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        viewModel.changeTime(canChangeSettings, playerLimit = maxPlayers[position])
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
+                onItemSelectedListener = CustomItemSelectedListener {
+                    viewModel.changeSettings(canChangeSettings, playerLimit = maxPlayers[it])
                 }
             }
+
             roundLimit.apply {
                 setSelection(0)
                 isEnabled = canChangeSettings
                 adapter = CustomSpinnerAdapter(context, rounds)
-                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        viewModel.changeTime(canChangeSettings, rounds = rounds[position])
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                    }
+                onItemSelectedListener = CustomItemSelectedListener {
+                    viewModel.changeSettings(canChangeSettings, rounds = rounds[it])
                 }
             }
         }

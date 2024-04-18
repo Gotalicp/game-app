@@ -50,10 +50,10 @@ class ChessActivity : AppCompatActivity() {
                 override fun movePiece(side: Side, move: Pair<String, String>, promotion: Boolean) {
                     if (promotion) {
                         PromotionDialogFragment(side) {
-                            viewModel.validateMove(side,move, it)
+                            viewModel.validateMove(side, move, it)
                         }.show(supportFragmentManager, "PromotionDialogFragment")
                     } else {
-                        viewModel.validateMove(side,move, null)
+                        viewModel.validateMove(side, move, null)
                     }
                 }
 

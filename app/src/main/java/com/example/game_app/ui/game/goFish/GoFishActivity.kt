@@ -9,17 +9,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.map
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.example.game_app.R
 import com.example.game_app.data.SharedTheme
-import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.game.Rank
 import com.example.game_app.ui.common.AppAcc
+import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.ui.game.GameUiMapper
 import com.example.game_app.ui.game.GameUiModel
-import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
+import com.example.game_app.ui.game.dialogs.StartingInDialogFragment
 import com.example.game_app.ui.game.dialogs.end.EndDialogFragment
 import com.example.game_app.ui.game.dialogs.lobby.LobbyDialogFragment
-import com.example.game_app.ui.game.dialogs.StartingInDialogFragment
+import com.example.game_app.ui.game.goFish.popup.CardPickerPopup
 
 class GoFishActivity : AppCompatActivity() {
     private val viewModel: GoFishViewModel by viewModels()
@@ -52,6 +53,7 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         playerViewAdapter.apply {
+
             itemClickListener = object : ItemClickListener<AppAcc> {
                 override fun onItemClicked(item: AppAcc, itemPosition: Int) {
                     CardPickerPopup(application).apply {
@@ -76,7 +78,11 @@ class GoFishActivity : AppCompatActivity() {
             }
 
             viewModel.goFishLogic.play.observe(this@GoFishActivity) { plays ->
-                viewModel.showAnimation(plays, this)
+                viewModel.showAnimation(
+                    plays, this,
+                    playerView.findViewWithTag(plays.first.askingPlayer) ?: profile,
+                    playerView.findViewWithTag(plays.first.askedPlayer) ?: profile
+                )
             }
 
             viewModel.goFishLogic.gamePlayers.observe(this@GoFishActivity) {
@@ -113,25 +119,26 @@ class GoFishActivity : AppCompatActivity() {
                     listOf(1, 2, 3, 4, 5)
                 )
             }
-            data.showLobby.let {
-                if (it) {
-                    lobby?.show(supportFragmentManager, LobbyDialogFragment.TAG)
-                } else {
-                    lobby?.dismiss()
-                }
+            if (data.showLobby) {
+                lobby?.show(supportFragmentManager, LobbyDialogFragment.TAG)
+            } else {
+                lobby?.dismiss()
             }
-            data.showEnd.let {
-                if (it) {
-                    viewModel.getFinalScores()?.let { it1 ->
-                        EndDialogFragment(it1).show(
-                            supportFragmentManager,
-                            EndDialogFragment.TAG
-                        )
-                    }
+            if (data.showEnd) {
+                viewModel.getFinalScores()?.let {
+                    EndDialogFragment(it).show(
+                        supportFragmentManager,
+                        EndDialogFragment.TAG
+                    )
                 }
             }
             playerViewAdapter.isYourTurn = data.isYourTurn
-            data.playerUid?.let { it1 -> viewModel.setTimer(binding, it1) }
+            data.playerUid?.let {
+                viewModel.setTimer(
+                    playerView.findViewWithTag<View?>(it)?.findViewById(R.id.timeTurn) ?: timeTurn,
+                    it
+                )
+            }
             data.playerName?.let { viewModel.showPlayerToTakeTurn(binding.playerTurn, it) }
         }
     }

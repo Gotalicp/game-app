@@ -4,17 +4,15 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.recyclerview.widget.RecyclerView
 import com.example.game_app.R
-import com.example.game_app.data.firebase.FireBaseUtilityHistory
-import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.data.PlayerCache
+import com.example.game_app.data.firebase.FireBaseUtilityHistory
 import com.example.game_app.databinding.ActivityGoFishBinding
 import com.example.game_app.domain.AccountProvider
 import com.example.game_app.domain.LobbyProvider
@@ -23,6 +21,7 @@ import com.example.game_app.domain.game.Rank
 import com.example.game_app.domain.server.OkClient
 import com.example.game_app.domain.server.OkServer
 import com.example.game_app.domain.server.ServerInterface
+import com.example.game_app.ui.common.AppAcc
 import com.example.game_app.ui.common.CountDown
 import com.example.game_app.ui.game.DrawingCardAnimation
 import com.example.game_app.ui.game.GameStates
@@ -111,7 +110,7 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
             players = lobby.players.mapNotNull {
                 PlayerCache.instance.get(it)
             }.apply {
-                goFishLogic.setPlayer(map { it.uid }.toMutableList())
+                goFishLogic.setPlayer(map { it.uid })
             }
             rounds = lobby.rounds
             try {
@@ -187,77 +186,46 @@ class GoFishViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     //Ui Part
-
     @SuppressLint("DiscouragedApi", "SetTextI18n")
     fun showAnimation(
         plays: Pair<GoFishLogic.Play, Int>,
-        binding: ActivityGoFishBinding
+        binding: ActivityGoFishBinding,
+        asking: View,
+        asked: View
     ) {
         binding.apply {
             plays.let {
-                val view1 =
-                    getPositionById(playerView, it.first.askingPlayer)?.itemView ?: profile
                 if (it.second != 0) {
-                    try {
-                        numberCards.text = "${it.second}x"
-                        imageCard.setImageDrawable(
-                            ContextCompat.getDrawable(
-                                root.context, root.context.resources.getIdentifier(
-                                    it.first.rank.name.lowercase(),
-                                    "drawable",
-                                    root.context.packageName
-                                )
-                            )
+                    numberCards.text = "${it.second}x".uppercase()
+                    imageCard.setImageResource(
+                        root.context.resources.getIdentifier(
+                            it.first.rank.name.lowercase(),
+                            "drawable",
+                            root.context.packageName
                         )
-                        movableCard.apply {
-                            startAnimation(
-                                GivingCardAnimation(
-                                    this,
-                                    view1,
-                                    getPositionById(playerView, it.first.askedPlayer)?.itemView
-                                        ?: profile
-                                )
-                            )
-                        }
-                    } catch (_: Exception) {
-                    }
+                    )
+                    movableCard.startAnimation(GivingCardAnimation(movableCard, asking, asked))
                 } else {
                     numberCards.text = ""
                     imageCard.setImageResource(R.drawable.back)
-                    movableCard.apply {
-                        startAnimation(DrawingCardAnimation(this, view1))
-                    }
+                    movableCard.startAnimation(DrawingCardAnimation(movableCard, asking))
                 }
             }
         }
     }
 
-    private fun getPositionById(
-        recyclerView: RecyclerView,
-        id: String
-    ): PlayersRecycleView.PlayersViewHolder? {
-        for (i in 0 until (recyclerView.adapter?.itemCount ?: 0)) {
-            (recyclerView.findViewHolderForAdapterPosition(i) as? PlayersRecycleView.PlayersViewHolder)?.let {
-                if (it.id == id) {
-                    return it
-                }
-            }
-        }
-        return null
-    }
-
-    fun setTimer(binding: ActivityGoFishBinding, uid: String) {
+    fun setTimer(view: ProgressBar, uid: String) {
         if (!players.isNullOrEmpty()) {
             timer?.let {
                 countDown = CountDown(
-                    (getPositionById(binding.playerView, uid)?.timer ?: binding.timeTurn),
-                    { viewModelScope.launch { goFishLogic.skipPlayer(uid) } },
-                    it,
-                    1000
+                    view,
+                    { viewModelScope.launch { goFishLogic.skipPlayer(uid) } }, it
                 )
+                countDown?.start()
             }
         }
     }
+
 
     fun showPlayerToTakeTurn(view: TextView, data: String) {
         view.text = data
