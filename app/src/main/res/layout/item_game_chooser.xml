@@ -59,6 +59,14 @@
         app:layout_constraintStart_toEndOf="@id/card_view">
 
         <Button
+            android:id="@+id/btn_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="3dp"
+            android:text="@string/play" />
+
+        <Button
             android:id="@+id/btn_host"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,12 +74,5 @@
             android:layout_marginBottom="3dp"
             android:text="@string/host" />
 
-        <Button
-            android:id="@+id/btn_join"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="3dp"
-            android:text="@string/play" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

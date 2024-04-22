@@ -1,8 +1,8 @@
 package com.example.game_app.ui.login
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.example.game_app.R
 
 class AuthenticationActivity : AppCompatActivity() {
@@ -12,7 +12,9 @@ class AuthenticationActivity : AppCompatActivity() {
         setContentView(R.layout.activity_authentication)
 
         viewModel.logged.observe(this) {
-            if (it) { finish() }
+            if (it) {
+                finish()
+            }
         }
     }
 }

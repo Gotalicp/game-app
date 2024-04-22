@@ -12,7 +12,6 @@ import com.example.game_app.R
 import com.example.game_app.ui.common.ItemClickListener
 import com.example.game_app.ui.common.RecycleViewAdapter
 
-
 class MenuAdapter(private val callback: AdapterListener) : RecycleViewAdapter<LibraryGame>(
     { oldItem, newItem -> oldItem == newItem },
     { oldItem, newItem -> oldItem == newItem },
@@ -44,14 +43,17 @@ class MenuAdapter(private val callback: AdapterListener) : RecycleViewAdapter<Li
                     }
 
                     else -> {
-                        /* return false so that scrollview can scroll the content */
                         false
                     }
                 }
             }
             image.setImageDrawable(ContextCompat.getDrawable(view.context, item.imageId))
-            join.setOnClickListener {
-                joinListener?.onItemClicked(item.clazz, absoluteAdapterPosition)
+            if (item.isSinglePlayer) {
+                join.visibility = View.INVISIBLE
+            } else {
+                join.setOnClickListener {
+                    joinListener?.onItemClicked(item.clazz, absoluteAdapterPosition)
+                }
             }
             host.setOnClickListener {
                 hostListener?.onItemClicked(item.clazz, absoluteAdapterPosition)
@@ -59,6 +61,7 @@ class MenuAdapter(private val callback: AdapterListener) : RecycleViewAdapter<Li
             }
         }
     }
+
     interface AdapterListener {
         fun onScrollViewTouched(isTouched: Boolean)
     }

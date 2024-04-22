@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setUpNavigation()
         supportActionBar?.hide()
-        viewModel.intent.observe(this){
+        viewModel.intent.observe(this) {
             it?.let { startActivity(it) }
         }
     }
