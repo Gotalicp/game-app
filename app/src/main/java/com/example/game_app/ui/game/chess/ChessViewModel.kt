@@ -77,6 +77,7 @@ class ChessViewModel(application: Application) : AndroidViewModel(application) {
         _state.postValue(GameStates.StartingIn(5000L, false))
         delay(5000L)
         chessLogic.startGame(seed)
+
     }
 
     private fun collectHasEnded(hasEnded: Boolean) {

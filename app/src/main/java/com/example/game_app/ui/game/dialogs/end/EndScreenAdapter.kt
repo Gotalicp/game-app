@@ -6,9 +6,9 @@ import android.widget.TextView
 import com.example.game_app.R
 import com.example.game_app.ui.common.RecycleViewAdapter
 
-class EndScreenAdapter: RecycleViewAdapter<EndWrapper>(
+class EndScreenAdapter : RecycleViewAdapter<EndWrapper>(
     { oldItem, newItem -> oldItem == newItem },
-    { oldItem, newItem -> oldItem == newItem },
+    { oldItem, newItem -> oldItem.score == newItem.score },
     R.layout.item_leaderboard
 ) {
     override fun createViewHolder(view: View) = PopupLobbyViewHolder(view)

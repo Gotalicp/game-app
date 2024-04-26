@@ -22,7 +22,7 @@ class ChessActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChessBinding
 
     private var lobby: LobbyDialogFragment? = null
-
+    private var end = EndDialogFragment()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(SharedTheme(this).getTheme())
@@ -104,12 +104,21 @@ class ChessActivity : AppCompatActivity() {
             data.showEnd.let {
                 if (it) {
                     viewModel.getFinalScores()?.let { it1 ->
-                        EndDialogFragment(it1).show(
+                        end.show(
                             supportFragmentManager,
                             EndDialogFragment.TAG
                         )
+                        end.updateView(it1)
+                    }
+                } else {
+                    try {
+                        end.dismiss()
+                    } catch (_: IllegalStateException) {
                     }
                 }
+            }
+            if (data.reloaud == true) {
+                board.invalidate()
             }
 //            data.playerUid?.let { it1 -> goFishViewModel.setTimer(binding, it1) }
 //            data.playerName?.let { goFishViewModel.showPlayerToTakeTurn(binding.playerTurn, it) }

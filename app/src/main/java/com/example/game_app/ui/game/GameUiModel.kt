@@ -8,5 +8,6 @@ data class GameUiModel(
     val startingIn: Long? = null,
     val playerName: String? = null,
     val playerUid: String? = null,
-    val host: Boolean? = null
+    val host: Boolean? = null,
+    val reloaud: Boolean? = null
 )

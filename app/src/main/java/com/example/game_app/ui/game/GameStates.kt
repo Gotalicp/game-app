@@ -11,4 +11,5 @@ sealed interface GameStates {
 
     data object EndGame : GameStates
     data class StartingIn(val startingIn: Long, val showEnd: Boolean) : GameStates
+    data object Started : GameStates
 }

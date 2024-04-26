@@ -30,6 +30,7 @@ class GoFishActivity : AppCompatActivity() {
     private val playerViewAdapter = PlayersRecycleView()
 
     private var lobby: LobbyDialogFragment? = null
+    private var end: EndDialogFragment = EndDialogFragment()
 
     @SuppressLint("DiscouragedApi", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +54,6 @@ class GoFishActivity : AppCompatActivity() {
         }
 
         playerViewAdapter.apply {
-
             itemClickListener = object : ItemClickListener<AppAcc> {
                 override fun onItemClicked(item: AppAcc, itemPosition: Int) {
                     CardPickerPopup(application).apply {
@@ -126,10 +126,13 @@ class GoFishActivity : AppCompatActivity() {
             }
             if (data.showEnd) {
                 viewModel.getFinalScores()?.let {
-                    EndDialogFragment(it).show(
-                        supportFragmentManager,
-                        EndDialogFragment.TAG
-                    )
+                    end.updateView(it)
+                    end.show(supportFragmentManager, EndDialogFragment.TAG)
+                }
+            } else {
+                try {
+                    end.dismiss()
+                } catch (_: IllegalStateException) {
                 }
             }
             playerViewAdapter.isYourTurn = data.isYourTurn

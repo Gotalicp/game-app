@@ -23,6 +23,7 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     private val _gamePlayers = MutableLiveData<MutableList<Player>>()
     val gamePlayers: LiveData<MutableList<Player>> get() = _gamePlayers
 
+    private var playerTurn: String = ""
     private val _playerToTakeTurn = MutableSharedFlow<String>()
     override val playerToTakeTurn: Flow<String?> get() = _playerToTakeTurn
 
@@ -42,8 +43,8 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
     fun getPlayer(uid: String) = _gamePlayers.value?.find { it.player.uid == uid }
 
     override fun setPlayer(players: List<String>) {
-        _gamePlayers.value =
-            players.map { Player(mutableListOf(), PlayerWrapper(it, 0)) }.toMutableList()
+        _gamePlayers.postValue(players.map { Player(mutableListOf(), PlayerWrapper(it, 0)) }
+            .toMutableList())
     }
 
     override fun updateSeed(seed: Long) {
@@ -54,48 +55,48 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
         _hasEnded.value = false
         deck = Deck()
         deck.shuffle(seed)
-        if (!_gamePlayers.value.isNullOrEmpty()) {
-            _gamePlayers.value?.let { players ->
-                players.shuffle(Random(seed))
-                deck.deal(players.map { it.player.uid }, 5, deck).let {
-                    players.forEach { player ->
-                        it[player.player.uid]?.let {
-                            player.deck.addAll(it)
-                        }
+        _gamePlayers.value?.let { players ->
+            players.shuffle(Random(seed))
+            deck.deal(players.map { it.player.uid }, 5, deck).let {
+                players.forEach { player ->
+                    it[player.player.uid]?.let {
+                        player.deck.addAll(it)
                     }
-                    _gamePlayers.postValue(players)
-                    _playerToTakeTurn.emit(players[0].player.uid)
                 }
             }
+            _gamePlayers.postValue(players)
+            keepTrackOfCringe(players[0].player.uid)
         }
     }
 
     override suspend fun turnHandling(t: Play) {
-        val askingIndex = indexOf(t.askingPlayer)
-        val askedIndex = indexOf(t.askedPlayer)
-        _gamePlayers.value?.let { player ->
-            val cardsReceived = player[askedIndex].deck.filter { it.rank == t.rank }
-            _play.postValue(Pair(t, cardsReceived.size))
-            if (cardsReceived.isNotEmpty()) {
-                player[askingIndex].deck.addAll(cardsReceived)
-                player[askedIndex].deck.removeAll(cardsReceived)
-                if (isHandEmpty(askedIndex)) {
-                    drawCard(askedIndex)
-                }
-                if (hasBook(askingIndex) == null) {
-                    nextPlayer(askingIndex)
+        if (playerTurn == t.askingPlayer) {
+            val askingIndex = indexOf(t.askingPlayer)
+            val askedIndex = indexOf(t.askedPlayer)
+            _gamePlayers.value?.let { player ->
+                val cardsReceived = player[askedIndex].deck.filter { it.rank == t.rank }
+                _play.postValue(Pair(t, cardsReceived.size))
+                if (cardsReceived.isNotEmpty()) {
+                    player[askingIndex].deck.addAll(cardsReceived)
+                    player[askedIndex].deck.removeAll(cardsReceived)
+                    if (isHandEmpty(askedIndex)) {
+                        drawCard(askedIndex)
+                    }
+                    if (hasBook(askingIndex) == null) {
+                        nextPlayer(askingIndex)
+                    } else {
+                        setSamePlayer(askingIndex)
+                    }
                 } else {
-                    setSamePlayer(askingIndex)
+                    drawCard(askingIndex)
+                    if (hasBook(askingIndex) == true) {
+                        setSamePlayer(askingIndex)
+                    } else {
+                        nextPlayer(askingIndex)
+                    }
                 }
-            } else {
-                drawCard(askingIndex)
-                if (hasBook(askingIndex) == true) {
-                    setSamePlayer(askingIndex)
-                } else {
-                    nextPlayer(askingIndex)
-                }
+                _gamePlayers.postValue(player)
             }
-            _gamePlayers.postValue(player)
         }
     }
 
@@ -127,15 +128,16 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
         deck.drawCard()?.let { _gamePlayers.value?.get(index)?.deck?.add(it) }
 
     override fun checkEndGame() =
-        (deck.isEmpty() && gamePlayers.value?.all { it.deck.isEmpty() } ?: true)
+        (deck.isEmpty() && _gamePlayers.value?.all { it.deck.isEmpty() } ?: true)
 
-    private fun indexOf(uid: String) = gamePlayers.value?.indexOfFirst { it.player.uid == uid } ?: 0
+    private fun indexOf(uid: String) =
+        _gamePlayers.value?.indexOfFirst { it.player.uid == uid } ?: 0
 
     private suspend fun nextPlayer(index: Int) {
         if (!_hasEnded.value) {
-            gamePlayers.value?.let {
+            _gamePlayers.value?.let {
                 if (it[(index + 1) % it.size].deck.isNotEmpty()) {
-                    _playerToTakeTurn.emit(it[(index + 1) % it.size].player.uid)
+                    keepTrackOfCringe(it[(index + 1) % it.size].player.uid)
                 } else {
                     nextPlayer(index + 1)
                 }
@@ -145,9 +147,9 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     private suspend fun setSamePlayer(index: Int) {
         if (!_hasEnded.value) {
-            gamePlayers.value?.get(index)?.let {
+            _gamePlayers.value?.get(index)?.let {
                 if (it.deck.isNotEmpty()) {
-                    _playerToTakeTurn.emit(it.player.uid)
+                    keepTrackOfCringe(it.player.uid)
                 } else {
                     nextPlayer(index)
                 }
@@ -157,5 +159,10 @@ class GoFishLogic : GameLogic<GoFishLogic.Play> {
 
     suspend fun skipPlayer(uid: String) {
         nextPlayer(indexOf(uid))
+    }
+
+    private suspend fun keepTrackOfCringe(next: String) {
+        playerTurn = next
+        _playerToTakeTurn.emit(next)
     }
 }

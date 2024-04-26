@@ -15,5 +15,6 @@ object GameUiMapper {
             startingIn = state.startingIn,
             showEnd = state.showEnd
         )
+        is GameStates.Started -> GameUiModel(reloaud = true)
     }
 }

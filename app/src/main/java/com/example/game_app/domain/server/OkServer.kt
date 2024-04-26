@@ -30,7 +30,7 @@ class OkServer<T : Serializable>(
     private val register = OkSocket.server(port)
 
     init {
-        OkSocketOptions.setIsDebug(true);
+        OkSocketOptions.setIsDebug(true)
     }
 
     private var serverManager = register.registerReceiver(object : IServerActionListener {
@@ -100,14 +100,14 @@ class OkServer<T : Serializable>(
 
         override fun onServerAlreadyShutdown(serverPort: Int) {
             Log.d("OkServer", "onServerAlreadyShutdown")
-            fireBaseUtility.destroyLobby()
             register.unRegisterReceiver(this)
+            fireBaseUtility.destroyLobby()
         }
     }
     )
 
     override fun <J> send(data: J) {
-        serverManager.clientPool.sendToAll(
+        serverManager.clientPool?.sendToAll(
             ISendableData(Gson().toJson(data))
         )
         if (expectedTClazz.isInstance(data)) {

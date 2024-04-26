@@ -1,6 +1,5 @@
 package com.example.game_app.ui.game.dialogs.end
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,9 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.game_app.databinding.DialogEndBinding
 
-class EndDialogFragment(
-    private val players: List<EndWrapper>
-) : DialogFragment() {
+class EndDialogFragment : DialogFragment() {
     private var _binding: DialogEndBinding? = null
     private val binding
         get() = requireNotNull(_binding)
@@ -37,7 +34,6 @@ class EndDialogFragment(
         );
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -45,10 +41,13 @@ class EndDialogFragment(
             btnExit.setOnClickListener {
                 (context as? Activity)?.finish()
             }
-            adapter.updateItems(players)
             scoreboard.layoutManager = LinearLayoutManager(context)
             scoreboard.adapter = adapter
         }
+    }
+
+    fun updateView(list: List<EndWrapper>) {
+        adapter.updateItems(list)
     }
 
     override fun onDestroyView() {

@@ -3,6 +3,7 @@ package com.example.game_app.ui.game.dialogs.lobby
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +51,6 @@ class LobbyDialogFragment(
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.apply {
             btnStart.apply {
                 visibility = if (canChangeSettings) View.VISIBLE else View.GONE
@@ -66,9 +66,6 @@ class LobbyDialogFragment(
             playerRecycleView.adapter = adapter
 
             LobbyProvider.getLobby().observe(context as LifecycleOwner) { lobbyInfo ->
-                if (lobbyInfo.code == "") {
-                    (context as? Activity)?.finish()
-                }
                 lobbyCode.text = lobbyInfo.code
                 canStart = (lobbyInfo.players.size >= 2)
                 turnTimeLimit.setSelection(timeLimit.indexOf(lobbyInfo.secPerTurn))
